@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:weightSum="100"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/statusBarBack">
+
+    <ImageView
+        android:id="@+id/status_bar_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="#000"
+        android:scaleType="center"
+        android:src="@mipmap/ic_launcher"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/status_bar_albumart"
+        android:src="@drawable/logo"
+        android:padding="2dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:paddingLeft="2dp"
+        android:layout_weight="40"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/status_bar_track_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ABCD"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:singleLine="true"
+            android:textSize="15dp"
+            android:textColor="#fff"
+            />
+
+        <TextView
+            android:textColor="#fff"
+            android:id="@+id/status_bar_artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:textSize="12dp"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:singleLine="true"
+            android:text="abcd" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_weight="60"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/status_bar_prev"
+            android:background="?android:selectableItemBackground"
+            android:layout_width="0.0dip"
+            android:layout_height="48dip"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_skip_previous_white_24dp"
+            android:scaleType="fitCenter"
+            android:layout_weight="15" />
+
+        <ImageButton
+            android:id="@+id/status_bar_play"
+            android:background="?android:selectableItemBackground"
+            android:layout_width="0.0dip"
+            android:layout_height="48dip"
+            android:src="@drawable/uamp_ic_play_arrow_white_24dp"
+            android:scaleType="fitCenter"
+            android:layout_weight="15" />
+
+        <ImageButton android:id="@+id/status_bar_next"
+            android:background="?android:selectableItemBackground"
+            android:layout_width="0.0dip"
+            android:layout_height="48dip"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_skip_next_white_24dp"
+            android:scaleType="fitCenter"
+            android:layout_weight="15" />
+
+        <ImageButton
+            android:id="@+id/status_bar_collapse"
+            android:layout_marginLeft="20dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="@null"/>
+
+    </LinearLayout>
+    
+</LinearLayout>
