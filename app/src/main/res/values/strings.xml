@@ -1,6 +1,117 @@
 <resources>
-    <string name="app_name">Music Player</string>
+    <string name="app_name">Playback Music</string>
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!--Ads ID-->
+    <string name="AlbumSongsActId">262748928305734_262787078301919</string>
+    <string name="recentSongsActId">262748928305734_262787574968536</string>
+    <string name="nowPlayingActId">262748928305734_262787901635170</string>
+    <string name="playlistActId">262748928305734_262787771635183</string>
+    <string name="searchActId">262748928305734_262788031635157</string>
+    <string name="albumFragId">262748928305734_262766631637297</string>
+    <string name="artistFragId">262748928305734_262766798303947</string>
+    <string name="nameFragId">262748928305734_262765258304101</string>
+    <string name="playlistFragId">262748928305734_262750781638882</string>
+    <string name="mainActId">262748928305734_262784294968864</string>
+
+    <string name="recentAdded">Recent Added</string>
+    <string name="favTracks">Favorite Tracks</string>
+    <string name="appVersion">v1.0</string>
+    <string name="support">Thanks for your Support.\nMade in India.</string>
+
+    <string name="deleteMessage">Do you want to delete?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="notValid">Not Valid Search</string>
+
+    <string name="doit">do</string>
+    <string name="prev">prev</string>
+    <string name="playPause">playPause</string>
+    <string name="next">next</string>
+
+    <string name="playLists">PlayLists</string>
+    <string name="playback_info">playback_info</string>
+    <string name="DB">DB</string>
+
+    <string name="ID">ID</string>
+    <string name="Shuffle">Shuffle</string>
+    <string name="Started">Started</string>
+    <string name="Songs">Songs</string>
+    <string name="Shuffle_On">Shuffle On</string>
+    <string name="Shuffle_Off">Shuffle Off</string>
+    <string name="Repeat_On">Repeat On</string>
+    <string name="Repeat_Off">Repeat Off</string>
+    <string name="playAsong">Play A Song</string>
+    <string name="added_To_Favorite">Song Added To Favorite</string>
+    <string name="choose_Timer">Choose Timer</string>
+    <string name="timeOff">Timer Off</string>
+    <string name="mins30">Timer Set To 30 Mins</string>
+    <string name="mins60">Timer Set To 1 Hour</string>
+    <string name="mins90">Timer Set To 1 hour 30 Min</string>
+    <string name="mins120">Timer Set To 2 Hour</string>
+    <string name="playlist">Playlist</string>
+    <string name="Tracks">Tracks</string>
+    <string name="Albums">Albums</string>
+    <string name="Artists">Artists</string>
+    <string name="music_Service">Music Service</string>
+    <string name="PlaybackMusicService">PlaybackMusicService</string>
+    <string name="Grant">Grant</string>
+    <string name="dont">Don\'t</string>
+    <string name="packageName">package</string>
+    <string name="about">About Playback</string>
+    <string name="permissionAlert">You have forcefully denied Read storage permission.\n\nThis is Necessary and Important for the working of this APP.\n\nClick on \'Grant\' to grant permission</string>
+
+    <!--Layouts-->
+    <string name="select_Playlist">Select Playlist</string>
+    <string name="album_Title">Album Title</string>
+    <string name="album_SongNumbers">Album SongNumbers</string>
+    <string name="song_Info">Song Info</string>
+    <string name="fav">Favorite</string>
+    <string name="time0">0:00</string>
+    <string name="pipe">|</string>
+    <string name="now_Playing">Now Playing</string>
+    <string name="search_Here">Search Here</string>
+    <string name="search">Search</string>
+    <string name="playlist_Name">Playlist Name</string>
+    <string name="Cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="createNewPlaylist">Create New Playlist</string>
+    <string name="location">Location:</string>
+    <string name="duration">Duration:</string>
+    <string name="notAvailable">Not Available</string>
+    <string name="composer">Composer:</string>
+    <string name="album">Album:</string>
+    <string name="artist">Artist:</string>
+
+    <string-array name="longPressItems">
+        <item>Play</item>
+        <item>Add To Playlist</item>
+        <item>Delete</item>
+        <item>Share</item>
+        <item>Details</item>
+    </string-array>
+
+    <string-array name="longPressItemsRemove">
+        <item>Play</item>
+        <item>Remove From Playlist</item>
+        <item>Share</item>
+        <item>Details</item>
+    </string-array>
+
+    <string-array name="longPressItemsPlaylist">
+        <item>Play Playlist</item>
+        <item>Delete Playlist</item>
+    </string-array>
+    <string-array name="timer">
+        <item> Off </item>
+        <item>30 Minutes</item>
+        <item>1 Hour</item>
+        <item>1 Hour 30 Minutes</item>
+        <item>2 hours</item>
+    </string-array>
+
 </resources>

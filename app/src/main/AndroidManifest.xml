@@ -1,36 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ravisharma.musicdemo1">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.ravisharma.playbackmusic">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
+    <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
+
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
+        android:name=".PlaybackApp"
         android:allowBackup="true"
-        android:icon="@drawable/logo"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
+        android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:targetApi="n">
+        <activity android:name=".Activities.AboutActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.AddToPlaylistActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.RecentAddedActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.PlaylistActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.SearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activities.NowPlayingActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activities.ArtistSongsActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".SplashScreen"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activities.AlbumSongsActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MUSIC_PLAYER" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" />
-
-        <receiver android:name=".NotificationHandler">
+        <service android:name=".MusicService" /> <!-- Receivers -->
+        <receiver android:name=".Broadcast.NotificationHandler">
             <intent-filter>
                 <action android:name="prev" />
                 <action android:name="playPause" />
@@ -38,10 +76,8 @@
                 <action android:name="close" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Timer" />
-
-        <activity android:name=".EqualizerActivity"
-            android:screenOrientation="portrait"></activity>
+        <receiver android:name=".Broadcast.Timer">
+        </receiver>
     </application>
 
 </manifest>
