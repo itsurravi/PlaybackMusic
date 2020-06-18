@@ -29,6 +29,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="n">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/appAdId"/>
+
+
         <activity android:name=".Activities.AboutActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".Activities.AddToPlaylistActivity"
@@ -67,7 +73,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" /> <!-- Receivers -->
+        <service android:name=".MusicService" />
+        <!-- Receivers -->
         <receiver android:name=".Broadcast.NotificationHandler">
             <intent-filter>
                 <action android:name="prev" />
@@ -78,6 +85,7 @@
         </receiver>
         <receiver android:name=".Broadcast.Timer">
         </receiver>
+
     </application>
 
 </manifest>

@@ -1,26 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ravisharma.playbackmusic.Fragments.NameWise">
+    tools:context=".Fragments.AlbumsFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
-        android:id="@+id/song_list"
+        android:id="@+id/album_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         app:fastScrollThumbColor="@color/scrollThumb" />
 
-
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/banner_container_name"
+        android:id="@+id/banner_container_albums"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/nameFragId"/>
+        ads:adUnitId="@string/albumFragId"/>
 
 </LinearLayout>

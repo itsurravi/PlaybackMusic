@@ -40,13 +40,6 @@
 
             </com.google.android.material.appbar.AppBarLayout>
 
-            <LinearLayout
-                android:id="@+id/npLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="gone" />
-
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/tabBar"
                 android:layout_width="match_parent"
@@ -371,12 +364,13 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
                         android:id="@+id/banner_container_player"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="bottom"
-                        android:orientation="vertical" />
+                        ads:adSize="SMART_BANNER"
+                        ads:adUnitId="@string/mainActId"/>
 
                 </LinearLayout>
 

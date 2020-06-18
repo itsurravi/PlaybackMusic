@@ -26,7 +26,13 @@
         android:title="Share" />
 
     <item
-        android:id="@+id/about"
+        android:id="@+id/rateUs"
         android:orderInCategory="5"
+        android:title="Rate Us" />
+
+    <item
+        android:id="@+id/about"
+        android:orderInCategory="6"
         android:title="About" />
+
 </menu>
