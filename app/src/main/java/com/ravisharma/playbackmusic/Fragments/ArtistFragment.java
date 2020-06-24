@@ -11,14 +11,18 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.Activities.ArtistSongsActivity;
 import com.ravisharma.playbackmusic.Adapters.ArtistAdapter;
@@ -41,6 +45,7 @@ import static com.ravisharma.playbackmusic.MainActivity.ARTIST_SONGS;
 public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistClicked,
         DataUpdateListener {
     private AdView adView;
+    private FrameLayout adContainerView;
 
     FastScrollRecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -89,12 +94,45 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
         // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
         // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
 
-        adView = v.findViewById(R.id.banner_container_artist);
+        adContainerView = v.findViewById(R.id.banner_container_artist);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        adView = new AdView(getContext());
+        adView.setAdUnitId(getString(R.string.artistFragId));
+        adContainerView.addView(adView);
+        loadBanner();
 
         return v;
+    }
+
+    private void loadBanner() {
+        // Create an ad request. Check your logcat output for the hashed device ID
+        // to get test ads on a physical device, e.g.,
+        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
+        // device."
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+
+        AdSize adSize = getAdSize();
+        // Step 4 - Set the adaptive ad size on the ad view.
+        adView.setAdSize(adSize);
+
+        // Step 5 - Start loading the ad in the background.
+        adView.loadAd(adRequest);
+    }
+
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(getContext(), adWidth);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.Activities.AboutActivity;
 import com.ravisharma.playbackmusic.Activities.NowPlayingActivity;
@@ -47,11 +48,14 @@ import android.os.Bundle;
 
 import androidx.appcompat.widget.Toolbar;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -80,6 +84,7 @@ import org.jsoup.Jsoup;
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl,
         View.OnClickListener, NameWise.OnFragmentItemClicked {
 
+    private FrameLayout adContainerView;
     private AdView adView;
 
     private static String TAG;
@@ -130,6 +135,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     public static Provider provider;
 
     MediaSession mediaSession;
+
+    Song playingSong;
 
     public static MainActivity getInstance() {
         return activity;
@@ -278,12 +285,65 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         favorite.setOnClickListener(this);
 
-        adView = findViewById(R.id.banner_container_player);
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
-
         new checkUpdate().execute();
+
+        adContainerView = findViewById(R.id.banner_container_player);
+
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.mainActId));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void loadBanner() {
+        // Create an ad request. Check your logcat output for the hashed device ID
+        // to get test ads on a physical device, e.g.,
+        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
+        // device."
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+
+        AdSize adSize = getAdSize();
+        // Step 4 - Set the adaptive ad size on the ad view.
+        adView.setAdSize(adSize);
+
+        // Step 5 - Start loading the ad in the background.
+        adView.loadAd(adRequest);
+    }
+
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    }
+
+    public void setPlayingSong(Song song) {
+        playingSong = song;
+    }
+
+    public Song getPlayingSong() {
+        return playingSong;
+    }
+
+    public void addNextSong(Song song) {
+        songList.add(songPosn + 1, song);
+    }
+
+    public void addToQueue(Song song) {
+        songList.add(song);
+    }
+
+    public void setServiceList() {
+        musicSrv.setList(songList);
     }
 
     @Override
@@ -302,10 +362,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 OnFragmentItemClick(position, songList);
             }
         }
-    }
-
-    public void setServiceList() {
-        musicSrv.setList(songList);
     }
 
     @Override
@@ -663,10 +719,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         dialog.show();
     }
 
-    public Song getPlayingSong() {
-        return songList.get(songPosn);
-    }
-
     private void setTimer(int time) {
         i = new Intent(this, Timer.class);
         pi = PendingIntent.getBroadcast(this, 1234, i, 0);
@@ -739,23 +791,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        paused = true;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (paused) {
-            paused = false;
-        }
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
     }
+
+    boolean doubleBackToExitPressedOnce = false;
 
     @Override
     public void onBackPressed() {
@@ -765,20 +805,42 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (isPlaying()){
+            if (musicSrv.isPng()) {
                 moveTaskToBack(true);
-            }
-            else{
+            } else {
+                if (doubleBackToExitPressedOnce) {
+                    killApp();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.exit(0);
+                        }
+                    }, 800);
+                    return;
+                }
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        doubleBackToExitPressedOnce = false;
+                    }
+                }, 2000);
             }
+
         }
     }
 
-    @Override
-    public void onDestroy() {
+    private void killApp() {
         if (played) {
             manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
-            manage.storeInfo(getString(R.string.Shuffle), musicSrv.shuffle);
+            if (musicSrv != null) {
+                manage.storeInfo(getString(R.string.Shuffle), musicSrv.shuffle);
+            }
+            else{
+                manage.storeInfo(getString(R.string.Shuffle), false);
+            }
             manage.storeInfo(getString(R.string.Started), started);
             manage.storeInfo(getString(R.string.Songs), true);
             manage.storeInfo("position", String.valueOf(songPosn));
@@ -787,15 +849,22 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         if (TIMER) {
             am.cancel(pi);
         }
-        unbindService(musicConnection);
+        if (musicSrv != null) {
+            unbindService(musicConnection);
 //        stopService(playIntent);
+        }
         musicSrv = null;
-        playIntent=null;
+        playIntent = null;
         mListeners.clear();
         if (adView != null) {
             adView.destroy();
         }
         finish();
+    }
+
+    @Override
+    public void onDestroy() {
+        killApp();
         super.onDestroy();
     }
 
@@ -833,7 +902,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     public int getDuration() {
         return musicSrv.getDur();
-
     }
 
     @Override
@@ -1082,5 +1150,4 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         AlertDialog ad = builder.create();
         ad.show();
     }
-
 }

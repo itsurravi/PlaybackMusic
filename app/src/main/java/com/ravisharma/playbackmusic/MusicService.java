@@ -54,7 +54,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final int id = 123;
     public String CHANNEL_ID;
 
-    protected MainActivity act;
     //media player
     protected MediaPlayer player;
     //adap_song alert_list
@@ -108,8 +107,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         CHANNEL_ID = getString(R.string.music_Service);
         songTitle = "";
         artist = "";
-
-        act = new MainActivity();
+        shuffle = false;
+        songs = new ArrayList<>();
         rotateAnimation = AnimationUtils.loadAnimation(this, R.anim.rotate_anim);
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         //initialize position
@@ -151,6 +150,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setList(ArrayList<Song> theSongs) {
         songs = theSongs;
+        Log.d("SERVICELISt", "" + songs.size());
+    }
+
+    public void setSong(int songIndex) {
+        songPosn = songIndex;
     }
 
     private void start() {
@@ -247,12 +251,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         MusicService getService() {
             return MusicService.this;
         }
+
     }
 
     public void playSong() {
         //play a adap_song
         player.reset();
         //get adap_song
+
         Song playSong = songs.get(songPosn);
         songTitle = playSong.getTitle();
         //get id
@@ -274,10 +280,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    public void setSong(int songIndex) {
-        songPosn = songIndex;
+        MainActivity.getInstance().setPlayingSong(playSong);
     }
 
     @Override
@@ -498,7 +502,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void playNext() {
         if (shuffle) {
             int newSong = songPosn;
-            while (newSong == songPosn) {
+            while (newSong == songPosn && songs.size() > 1) {
                 newSong = random.nextInt(songs.size());
             }
             songPosn = newSong;

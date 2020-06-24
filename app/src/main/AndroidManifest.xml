@@ -26,14 +26,14 @@
         android:requestLegacyExternalStorage="true"
         android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:hardwareAccelerated="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:targetApi="n">
+        tools:targetApi="q">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/appAdId"/>
-
 
         <activity android:name=".Activities.AboutActivity"
             android:screenOrientation="portrait"/>
@@ -61,7 +61,8 @@
         </activity>
         <activity
             android:name=".Activities.AlbumSongsActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/TransparentBar"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

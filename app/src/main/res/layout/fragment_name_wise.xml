@@ -14,13 +14,9 @@
         android:layout_weight="1"
         app:fastScrollThumbColor="@color/scrollThumb" />
 
-
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+    <FrameLayout
         android:id="@+id/banner_container_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/nameFragId"/>
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

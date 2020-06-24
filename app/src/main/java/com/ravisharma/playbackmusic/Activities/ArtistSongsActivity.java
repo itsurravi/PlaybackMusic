@@ -14,10 +14,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,8 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.Adapters.SongAdapter;
+import com.ravisharma.playbackmusic.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.Model.Song;
 import com.ravisharma.playbackmusic.Provider.Provider;
@@ -40,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 public class ArtistSongsActivity extends AppCompatActivity implements SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
 
     private AdView adView;
+    private FrameLayout adContainerView;
 
     ImageView imgBack;
     TextView artistName;
@@ -61,7 +67,7 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
         String artistId = getIntent().getExtras().getString("artistId");
 
         Provider p = new Provider(this);
-        songList = p.getSongListByArtist(artistId);
+        songList.addAll(p.getSongListByArtist(artistId));
 
         artistName.setText(songList.get(0).getArtist());
 
@@ -84,10 +90,43 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
             }
         });
 
-        adView = findViewById(R.id.banner_container_artistActivity);
+        adContainerView = findViewById(R.id.banner_container_artistActivity);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.artistSongsActId));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void loadBanner() {
+        // Create an ad request. Check your logcat output for the hashed device ID
+        // to get test ads on a physical device, e.g.,
+        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
+        // device."
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+
+        AdSize adSize = getAdSize();
+        // Step 4 - Set the adaptive ad size on the ad view.
+        adView.setAdSize(adSize);
+
+        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
+    }
+
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
     }
 
     @Override
@@ -101,120 +140,10 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
 
     @Override
     public void onItemLongClick(final int mposition) {
-        String[] items = getResources().getStringArray(R.array.longPressItems);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-
-        View v = LayoutInflater.from(this).inflate(R.layout.alert_list, null);
-
-        ListView lv = v.findViewById(R.id.list);
-        TextView tv = v.findViewById(R.id.title);
-        tv.setText(songList.get(mposition).getTitle());
-        lv.setAdapter(ad);
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setView(v);
-
-        final AlertDialog alertDialog = dialog.create();
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        alertDialog.show();
-
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-                        ArtistSongsActivity.this.onItemClick(mposition);
-                        break;
-                    case 1:
-                        Intent i = new Intent(ArtistSongsActivity.this, AddToPlaylistActivity.class);
-                        i.putExtra("Song", songList.get(mposition));
-                        startActivity(i);
-                        break;
-                    case 2:
-                        // Delete Song Code
-                        AlertDialog.Builder b = new AlertDialog.Builder(ArtistSongsActivity.this);
-                        b.setTitle(getString(R.string.deleteMessage));
-                        b.setMessage(songList.get(mposition).getTitle());
-                        b.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-                                String[] projection = {MediaStore.Audio.Media._ID};
-                                String selection = MediaStore.Audio.Media.DATA + " = ?";
-                                String[] selectionArgs = new String[]{songList.get(mposition).getData()};
-                                Cursor musicCursor = getContentResolver().query(musicUri, projection,
-                                        selection, selectionArgs, null);
-
-                                if (musicCursor.moveToFirst()) {
-                                    try {
-
-                                        long id = musicCursor.getLong(musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                                        Uri deleteUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-                                        File fdelete = new File(selectionArgs[0]);
-
-                                        if (fdelete.exists()) {
-                                            if (fdelete.delete()) {
-                                                if (MainActivity.getInstance().getPlayingSong() == songList.get(mposition)) {
-                                                    MainActivity.getInstance().songList.remove(mposition);
-                                                    MainActivity.getInstance().setServiceList();
-                                                    MainActivity.getInstance().playNext();
-                                                }
-                                                else if(MainActivity.getInstance().songList.contains(songList.get(mposition))){
-                                                    MainActivity.getInstance().songList.remove(songList.get(mposition));
-                                                    MainActivity.getInstance().setServiceList();
-                                                }
-                                                getContentResolver().delete(deleteUri, null, null);
-                                                Toast.makeText(ArtistSongsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-
-                                                Provider provider = new Provider(MainActivity.getInstance());
-                                                provider.execute();
-
-                                                updateList(mposition);
-                                            } else {
-                                                Toast.makeText(ArtistSongsActivity.this, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-
-
-                                    } catch (Exception e) {
-                                        Toast.makeText(ArtistSongsActivity.this, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                } else {
-                                    Toast.makeText(ArtistSongsActivity.this, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
-                                }
-                                musicCursor.close();
-                                dialog.dismiss();
-                            }
-                        }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                        AlertDialog d = b.create();
-                        d.show();
-                        break;
-                    case 3:
-                        Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.setType("audio/*");
-                        Uri uri = Uri.parse(songList.get(mposition).getData());
-                        intent.putExtra(Intent.EXTRA_STREAM, uri);
-                        startActivity(Intent.createChooser(intent, "Share Via"));
-                        break;
-                    case 4:
-                        songDetails(mposition);
-                        break;
-                }
-                alertDialog.dismiss();
-            }
-        });
+        new LongClickItems(this, mposition, songList);
     }
 
-    private void updateList(int mposition) {
+    public void updateList(int mposition) {
         songList.remove(mposition);
         if (songList.size() > 0) {
             recyclerView.getAdapter().notifyDataSetChanged();
@@ -222,33 +151,12 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
             finish();
         }
     }
-
-    private void songDetails(int pos) {
-        View v = LayoutInflater.from(this).inflate(R.layout.info, null);
-        TextView title, artist, album, composer, duration, location;
-        title = v.findViewById(R.id.info_title);
-        artist = v.findViewById(R.id.info_artist);
-        album = v.findViewById(R.id.info_album);
-        composer = v.findViewById(R.id.info_composer);
-        duration = v.findViewById(R.id.info_duration);
-        location = v.findViewById(R.id.info_location);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(v);
-
-        title.setText(songList.get(pos).getTitle());
-        artist.setText(songList.get(pos).getArtist());
-        album.setText(songList.get(pos).getAlbum());
-        composer.setText(songList.get(pos).getComposer());
-        duration.setText((String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(songList.get(pos).getDuration()),
-                TimeUnit.MILLISECONDS.toSeconds(songList.get(pos).getDuration()) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(songList.get(pos).getDuration())))));
-        location.setText(songList.get(pos).getData());
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        dialog.show();
+    @Override
+    protected void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        songList.clear();
+        super.onDestroy();
     }
 }

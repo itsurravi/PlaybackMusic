@@ -15,17 +15,21 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.Adapters.SongAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
@@ -43,6 +47,8 @@ import java.util.concurrent.TimeUnit;
 public class PlaylistActivity extends AppCompatActivity implements SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
 
     private AdView adView;
+    private FrameLayout adContainerView;
+
     private TextView txtPlaylistName;
     private ArrayList<Song> songList;
     private FastScrollRecyclerView recyclerView;
@@ -71,10 +77,43 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
         // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
 
-        adView = findViewById(R.id.banner_container_fav);
+        adContainerView = findViewById(R.id.banner_container_fav);
 
-        AdRequest adRequest = new AdRequest.Builder().build();
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.playlistActId));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void loadBanner() {
+        // Create an ad request. Check your logcat output for the hashed device ID
+        // to get test ads on a physical device, e.g.,
+        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
+        // device."
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+
+        AdSize adSize = getAdSize();
+        // Step 4 - Set the adaptive ad size on the ad view.
+        adView.setAdSize(adSize);
+
+        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
+    }
+
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
     }
 
     private void initRecyclerView() {
@@ -98,7 +137,7 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     }
 
     private void fetchPlayList() {
-        songList = tinydb.getListObject(playlistName, Song.class);
+        songList.addAll(tinydb.getListObject(playlistName, Song.class));
     }
 
     public void finishPage(View view) {
@@ -143,6 +182,12 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
                         PlaylistActivity.this.onItemClick(mposition);
                         break;
                     case 1:
+                        MainActivity.getInstance().addNextSong(songList.get(mposition));
+                        break;
+                    case 2:
+                        MainActivity.getInstance().addToQueue(songList.get(mposition));
+                        break;
+                    case 3:
                         // Delete Song Code
                         ArrayList<Song> list = tinydb.getListObject(playlistName, Song.class);
                         list.remove(songList.get(mposition));
@@ -153,14 +198,14 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
                         songList.remove(mposition);
                         adapter.notifyItemRemoved(mposition);
                         break;
-                    case 2:
+                    case 4:
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("audio/*");
                         Uri uri = Uri.parse(songList.get(mposition).getData());
                         intent.putExtra(Intent.EXTRA_STREAM, uri);
                         startActivity(Intent.createChooser(intent, "Share Via"));
                         break;
-                    case 3:
+                    case 5:
                         songDetails(mposition);
                         break;
                 }

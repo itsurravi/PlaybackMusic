@@ -15,6 +15,7 @@
     <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>
     <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
     <string name="mainActId">ca-app-pub-8188016146639430/7494562314</string>
+    <string name="adSize">FULL_BANNER</string>
 
     <string name="recentAdded">Recent Added</string>
     <string name="favTracks">Favorite Tracks</string>
@@ -84,8 +85,19 @@
     <string name="composer">Composer:</string>
     <string name="album">Album:</string>
     <string name="artist">Artist:</string>
+    <string name="savePlaylist">Save as Playlist</string>
 
     <string-array name="longPressItems">
+        <item>Play</item>
+        <item>Play Next</item>
+        <item>Add To Queue</item>
+        <item>Add To Playlist</item>
+        <item>Delete</item>
+        <item>Share</item>
+        <item>Details</item>
+    </string-array>
+
+    <string-array name="longPressNowPlaying">
         <item>Play</item>
         <item>Add To Playlist</item>
         <item>Delete</item>
@@ -95,6 +107,8 @@
 
     <string-array name="longPressItemsRemove">
         <item>Play</item>
+        <item>Play Next</item>
+        <item>Add To Queue</item>
         <item>Remove From Playlist</item>
         <item>Share</item>
         <item>Details</item>

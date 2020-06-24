@@ -18,18 +18,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.Activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.DataUpdateListener;
@@ -50,6 +54,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         SongAdapter.OnItemLongClicked, DataUpdateListener {
 
     private AdView adView;
+    private FrameLayout adContainerView;
 
     FastScrollRecyclerView recyclerView;
     SongAdapter adapter;
@@ -66,7 +71,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        songList = new ArrayList<>();
     }
 
     @Override
@@ -74,9 +79,11 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_name_wise, container, false);
+        if (songList.size() > 0) {
+            songList.clear();
+        }
 
-        songList = MainActivity.provider.getSongListByName();
-
+        songList.addAll(MainActivity.provider.getSongListByName());
         ((MainActivity) Objects.requireNonNull(getActivity())).registerDataUpdateListener(this);
 
         li = inflater;
@@ -102,11 +109,45 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
         // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
 
-        adView = v.findViewById(R.id.banner_container_name);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        adContainerView = v.findViewById(R.id.banner_container_name);
+
+        adView = new AdView(getContext());
+        adView.setAdUnitId(getString(R.string.nameFragId));
+        adContainerView.addView(adView);
+        loadBanner();
 
         return v;
+    }
+
+    private void loadBanner() {
+        // Create an ad request. Check your logcat output for the hashed device ID
+        // to get test ads on a physical device, e.g.,
+        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
+        // device."
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+
+        AdSize adSize = getAdSize();
+        // Step 4 - Set the adaptive ad size on the ad view.
+        adView.setAdSize(adSize);
+
+        // Step 5 - Start loading the ad in the background.
+        adView.loadAd(adRequest);
+    }
+
+    private AdSize getAdSize() {
+        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        // Step 3 - Get adaptive ad size and return for setting on the ad view.
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(getContext(), adWidth);
     }
 
     @Override
@@ -145,12 +186,18 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                         onFragmentItemClicked.OnFragmentItemClick(mposition, songList);
                         break;
                     case 1:
-                        //todo add song to existing playlist
+                        ((MainActivity) getActivity()).addNextSong(songList.get(mposition));
+                        break;
+                    case 2:
+                        ((MainActivity) getActivity()).addToQueue(songList.get(mposition));
+                        break;
+                    case 3:
+                        ((MainActivity) getActivity()).addNextSong(songList.get(mposition));
                         Intent i = new Intent(getContext(), AddToPlaylistActivity.class);
                         i.putExtra("Song", songList.get(mposition));
                         startActivity(i);
                         break;
-                    case 2:
+                    case 4:
                         // Delete Song Code
                         AlertDialog.Builder b = new AlertDialog.Builder(getContext());
                         b.setTitle(getString(R.string.deleteMessage));
@@ -178,11 +225,13 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                                                     MainActivity.getInstance().songList.remove(mposition);
                                                     MainActivity.getInstance().setServiceList();
                                                     MainActivity.getInstance().playNext();
+                                                } else if (MainActivity.getInstance().songList.contains(songList.get(mposition))) {
+                                                    MainActivity.getInstance().songList.remove(songList.get(mposition));
+                                                    MainActivity.getInstance().setServiceList();
                                                 }
                                                 getActivity().getContentResolver().delete(deleteUri, null, null);
                                                 Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
 
-                                                command = true;
                                                 Provider provider = new Provider(getActivity());
                                                 provider.execute();
 
@@ -213,14 +262,14 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                         AlertDialog d = b.create();
                         d.show();
                         break;
-                    case 3:
+                    case 5:
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("audio/*");
                         Uri uri = Uri.parse(songList.get(mposition).getData());
                         intent.putExtra(Intent.EXTRA_STREAM, uri);
                         getActivity().startActivity(Intent.createChooser(intent, "Share Via"));
                         break;
-                    case 4:
+                    case 6:
                         songDetails(mposition);
                         break;
                 }
@@ -260,13 +309,11 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
 
     @Override
     public void onDataUpdate() {
-        songList = MainActivity.provider.getSongListByName();
-        adapter.setList(songList);
-        if (command) {
-            MainActivity.getInstance().songList = songList;
-            MainActivity.getInstance().setServiceList();
-            command = false;
+        if (songList.size() > 0) {
+            songList.clear();
         }
+        songList.addAll(MainActivity.provider.getSongListByName());
+        adapter.setList(songList);
         adapter.notifyDataSetChanged();
     }
 
