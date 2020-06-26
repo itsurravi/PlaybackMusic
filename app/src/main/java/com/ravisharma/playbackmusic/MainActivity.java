@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     public static Provider provider;
 
     MediaSession mediaSession;
-
     Song playingSong;
 
     public static MainActivity getInstance() {
@@ -963,7 +962,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         return super.onKeyDown(keyCode, event);
     }
 
-
     public void performAction(int action) {
         if (action == KeyEvent.ACTION_DOWN) {
             d++;
@@ -1040,7 +1038,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             return null;
         }
     }
-
 
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection() {

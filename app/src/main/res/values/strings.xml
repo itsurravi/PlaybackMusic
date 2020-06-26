@@ -15,6 +15,7 @@
     <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>
     <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
     <string name="mainActId">ca-app-pub-8188016146639430/7494562314</string>
+
     <string name="adSize">FULL_BANNER</string>
 
     <string name="recentAdded">Recent Added</string>
