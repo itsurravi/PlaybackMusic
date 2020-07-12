@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:src="@drawable/ic_left"
+            android:background="?android:selectableItemBackground"
             tools:ignore="RtlSymmetry" />
 
 

@@ -7,7 +7,6 @@ package com.ravisharma.playbackmusic;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -36,16 +35,15 @@ import android.app.PendingIntent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 
 import com.bumptech.glide.Glide;
-import com.ravisharma.playbackmusic.Broadcast.NotificationHandler;
-import com.ravisharma.playbackmusic.Model.Song;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.request.target.NotificationTarget;
+import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
+import com.ravisharma.playbackmusic.model.Song;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
@@ -143,6 +141,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //set player properties
         player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        MainActivity.getInstance().sessionId = player.getAudioSessionId();
+
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
@@ -369,28 +370,53 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_pause_white_24dp);
         smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_pause_white_24dp);
+
         not = builder.build();
 
-        Picasso
-                .with(this)
-                .load(Uri.parse(songs.get(songPosn).getArt()))
-                .into(bigView, R.id.status_bar_ex_album_art, id, not);
-        Picasso
-                .with(this)
-                .load(Uri.parse(songs.get(songPosn).getArt()))
-                .into(smallView, R.id.status_bar_albumart, id, not);
+        NotificationTarget target1 = new NotificationTarget(
+                this,
+                R.id.status_bar_ex_album_art,
+                bigView,
+                not,
+                id
+        );
+
+        NotificationTarget target2 = new NotificationTarget(
+                this,
+                R.id.status_bar_albumart,
+                smallView,
+                not,
+                id
+        );
+
+        Glide.with(this)
+                .asBitmap()
+                .load(songs.get(songPosn).getArt())
+                .into(target1);
+
+        Glide.with(this)
+                .asBitmap()
+                .load(songs.get(songPosn).getArt())
+                .into(target2);
+
+//        Picasso
+//                .with(this)
+//                .load(Uri.parse(songs.get(songPosn).getArt()))
+//                .into(bigView, R.id.status_bar_ex_album_art, id, not);
+//        Picasso
+//                .with(this)
+//                .load(Uri.parse(songs.get(songPosn).getArt()))
+//                .into(smallView, R.id.status_bar_albumart, id, not);
 
         startForeground(id, not);
 
     }
 
     private void createNotification() {
-
         notificationManagerCompat = NotificationManagerCompat.from(this);
 
         smallView = new RemoteViews(getPackageName(), R.layout.status_bar);
         bigView = new RemoteViews(getPackageName(), R.layout.status_bar_expanded);
-
 
         smallView.setImageViewResource(R.id.status_bar_albumart, R.drawable.logo);
         smallView.setTextViewText(R.id.status_bar_track_name, songTitle);
@@ -406,11 +432,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         previousIntent.putExtra(getString(R.string.doit), getString(R.string.prev));
         PendingIntent ppreviousIntent = PendingIntent.getBroadcast(this, 9, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
         Intent playPauseIntent = new Intent(this, NotificationHandler.class);
         playPauseIntent.putExtra(getString(R.string.doit), getString(R.string.playPause));
         PendingIntent pplayPauseIntent = PendingIntent.getBroadcast(this, 8, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
 
         Intent nextIntent = new Intent(this, NotificationHandler.class);
         nextIntent.putExtra(getString(R.string.doit), getString(R.string.next));
@@ -500,16 +524,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     //skip to next
     public void playNext() {
-        if (shuffle) {
-            int newSong = songPosn;
-            while (newSong == songPosn && songs.size() > 1) {
-                newSong = random.nextInt(songs.size());
-            }
-            songPosn = newSong;
-        } else {
-            songPosn++;
-            if (songPosn >= songs.size()) songPosn = 0;
-        }
+//        if (shuffle) {
+//            int newSong = songPosn;
+//            while (newSong == songPosn && songs.size() > 1) {
+//                newSong = random.nextInt(songs.size());
+//            }
+//            songPosn = newSong;
+//        } else {
+//            songPosn++;
+//            if (songPosn >= songs.size()) songPosn = 0;
+//        }
+        songPosn++;
+        if (songPosn >= songs.size()) songPosn = 0;
         playSong();
         MainActivity.getInstance().checkInFav(MainActivity.getInstance().songList.get(songPosn));
     }
@@ -521,6 +547,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.release();
         unregisterReceiver(becomingNoisyReceiver);
         removeAudioFocus();
+        seekBar.removeCallbacks(mProgressRunner);
         super.onDestroy();
     }
 

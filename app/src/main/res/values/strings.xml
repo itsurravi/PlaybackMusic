@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Playback Music</string>
+    <string name="eq">Equalizer</string>
 
     <!--Ads ID-->
     <string name="appAdId">ca-app-pub-8188016146639430~6373052337</string>
@@ -19,7 +20,7 @@
     <string name="adSize">FULL_BANNER</string>
 
     <string name="recentAdded">Recent Added</string>
-    <string name="favTracks">Favorite Tracks</string>
+    <string name="favTracks">My Favorites</string>
     <string name="appVersion">v1.0</string>
     <string name="support">Thanks for your Support.\nMade in India.</string>
 
@@ -41,6 +42,7 @@
     <string name="Shuffle">Shuffle</string>
     <string name="Started">Started</string>
     <string name="Songs">Songs</string>
+    <string name="NormalSongs">NormalSongs</string>
     <string name="Shuffle_On">Shuffle On</string>
     <string name="Shuffle_Off">Shuffle Off</string>
     <string name="Repeat_On">Repeat On</string>
@@ -71,6 +73,7 @@
     <string name="album_SongNumbers">Album SongNumbers</string>
     <string name="song_Info">Song Info</string>
     <string name="fav">Favorite</string>
+
     <string name="time0">0:00</string>
     <string name="pipe">|</string>
     <string name="now_Playing">Now Playing</string>

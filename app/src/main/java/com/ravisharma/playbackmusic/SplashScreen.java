@@ -18,8 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 
-import com.ravisharma.playbackmusic.Prefrences.PrefManager;
-import com.ravisharma.playbackmusic.Provider.Provider;
+import com.ravisharma.playbackmusic.provider.Provider;
 
 
 public class SplashScreen extends AppCompatActivity {

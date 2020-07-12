@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/contentBGclr"
     android:orientation="vertical"
-    tools:context=".Activities.ArtistSongsActivity">
+    tools:context=".activities.ArtistSongsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:src="@drawable/ic_left"
+            android:background="?android:selectableItemBackground"
             tools:ignore="RtlSymmetry" />
 
 

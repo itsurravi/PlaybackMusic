@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/contentBGclr"
     android:orientation="vertical"
-    tools:context=".Activities.AddToPlaylistActivity">
+    tools:context=".activities.AddToPlaylistActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:padding="15dp"
             android:src="@drawable/ic_left"
+            android:background="?android:selectableItemBackground"
             tools:ignore="RtlSymmetry" />
 
         <TextView

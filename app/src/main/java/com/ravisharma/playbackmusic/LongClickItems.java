@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic;
 
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,20 +12,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.ravisharma.playbackmusic.Activities.AddToPlaylistActivity;
-import com.ravisharma.playbackmusic.Activities.AlbumSongsActivity;
-import com.ravisharma.playbackmusic.Activities.ArtistSongsActivity;
-import com.ravisharma.playbackmusic.Activities.NowPlayingActivity;
-import com.ravisharma.playbackmusic.Activities.RecentAddedActivity;
-import com.ravisharma.playbackmusic.Activities.SearchActivity;
-import com.ravisharma.playbackmusic.Model.Song;
-import com.ravisharma.playbackmusic.Provider.Provider;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
+import com.ravisharma.playbackmusic.activities.AlbumSongsActivity;
+import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
+import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
+import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
+import com.ravisharma.playbackmusic.activities.SearchActivity;
+import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.provider.Provider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,6 +59,18 @@ public class LongClickItems {
 
         ListView lv = v.findViewById(R.id.list);
         TextView tv = v.findViewById(R.id.title);
+        ImageView songArt = v.findViewById(R.id.songArt);
+
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(R.drawable.logo);
+        requestOptions.error(R.drawable.logo);
+
+        Glide.with(v)
+                .setDefaultRequestOptions(requestOptions)
+                .load(songList.get(mposition).getArt())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(songArt);
+
         tv.setText(songList.get(mposition).getTitle());
         lv.setAdapter(ad);
 
@@ -173,6 +188,19 @@ public class LongClickItems {
 
         ListView lv = v.findViewById(R.id.list);
         TextView tv = v.findViewById(R.id.title);
+        ImageView songArt = v.findViewById(R.id.songArt);
+
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(R.drawable.logo);
+        requestOptions.error(R.drawable.logo);
+
+        Glide.with(v)
+                .setDefaultRequestOptions(requestOptions)
+                .load(songList.get(mposition).getArt())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(songArt);
+
+
         tv.setText(songList.get(mposition).getTitle());
         lv.setAdapter(ad);
 

@@ -12,12 +12,18 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
+        <ImageView
+            android:id="@+id/playlistIcon"
+            android:layout_margin="10dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"/>
+
         <TextView
             android:id="@+id/playlistTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
             android:ellipsize="end"
+            android:layout_margin="10dp"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/listitemTitle" />

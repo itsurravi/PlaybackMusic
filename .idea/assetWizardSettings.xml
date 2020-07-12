@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\baseline_playlist_play_24.xml" />
+                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\round_equalizer_24.xml" />
                                                 <entry key="opacityPercent" value="80" />
                                                 <entry key="paddingPercent" value="-10" />
                                               </map>
@@ -37,7 +37,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialicons/playlist_play/baseline_playlist_play_24.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/equalizer/round_equalizer_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -49,7 +49,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\117-1176126_video-file-data-playlist-play-music-comments-free.png" />
+                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\PlayBack Music\icon.png" />
                                                 <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
@@ -82,8 +82,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\117-1176126_video-file-data-playlist-play-music-comments-free.png" />
-                                      <entry key="outputName" value="ic_playlist" />
+                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\icon.png" />
+                                      <entry key="outputName" value="ic_equalizer2" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ffffff" />
                                     </map>
@@ -366,7 +366,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/save/round_save_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/chevron_right/round_chevron_right_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -377,8 +377,8 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_save_24" />
-                            <entry key="sourceFile" value="C:\Users\ravik" />
+                            <entry key="outputName" value="ic_right" />
+                            <entry key="sourceFile" value="D:\Android\2.psd" />
                           </map>
                         </option>
                       </PersistentState>

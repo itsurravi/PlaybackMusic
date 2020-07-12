@@ -4,16 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.ravisharma.playbackmusic.Fragments.NameWise">
+    tools:context="com.ravisharma.playbackmusic.fragments.NameWise">
 
     <Button
         android:id="@+id/btnAddNewPlaylist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="16dp"
         android:background="@drawable/btn_background"
         android:text="@string/createNewPlaylist"
         android:textColor="#fff" />

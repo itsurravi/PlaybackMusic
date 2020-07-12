@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/contentBGclr"
     android:orientation="vertical"
-    tools:context=".Activities.AboutActivity">
+    tools:context=".activities.AboutActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -25,6 +25,7 @@
             android:onClick="finishPage"
             android:padding="15dp"
             android:src="@drawable/ic_left"
+            android:background="?android:selectableItemBackground"
             tools:ignore="RtlSymmetry" />
 
 

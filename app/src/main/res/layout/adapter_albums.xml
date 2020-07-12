@@ -17,6 +17,8 @@
             android:id="@+id/song_art_card"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="10dp">
 

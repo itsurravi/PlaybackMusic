@@ -20,37 +20,46 @@
     <application
         android:name=".PlaybackApp"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:requestLegacyExternalStorage="true"
         android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:hardwareAccelerated="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/appAdId"/>
+            android:value="@string/appAdId" />
 
-        <activity android:name=".Activities.AboutActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activities.AddToPlaylistActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activities.RecentAddedActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activities.PlaylistActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activities.SearchActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".Activities.NowPlayingActivity"
-            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.EqualizerActivity"
+            android:screenOrientation="portrait" ></activity>
         <activity
-            android:name=".Activities.ArtistSongsActivity"
+            android:name=".activities.AboutActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SplashScreen"
+        <activity
+            android:name=".activities.AddToPlaylistActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.RecentAddedActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.PlaylistActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.SearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.NowPlayingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.ArtistSongsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SplashScreen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -60,9 +69,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.AlbumSongsActivity"
+            android:name=".activities.AlbumSongsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TransparentBar"/>
+            android:theme="@style/TransparentBar" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -74,9 +83,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" />
-        <!-- Receivers -->
-        <receiver android:name=".Broadcast.NotificationHandler">
+        <service android:name=".MusicService" /> <!-- Receivers -->
+        <receiver android:name=".broadcast.NotificationHandler">
             <intent-filter>
                 <action android:name="prev" />
                 <action android:name="playPause" />
@@ -84,9 +92,7 @@
                 <action android:name="close" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Broadcast.Timer">
-        </receiver>
-
+        <receiver android:name=".broadcast.Timer"></receiver>
     </application>
 
 </manifest>
