@@ -61,11 +61,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private String songTitle, artist;
     boolean shuffle = false;
     boolean repeat = false;
+    boolean repeat_one = false;
     private Random random;
     protected SeekBar seekBar;
     private TextView mCurrentPosition;
     private TextView mTotalDuration;
     private AudioManager audioManager;
+
     Animation rotateAnimation;
 
     //Handle incoming phone calls
@@ -121,13 +123,26 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         shuffle = shuff;
     }
 
+    public void checkRepeat(boolean repeat, boolean repeat_one) {
+        this.repeat_one = repeat_one;
+        this.repeat = repeat;
+    }
+
     public void setRepeat() {
-        if (repeat) {
+        if (repeat && repeat_one) {
             player.setLooping(false);
             repeat = false;
+            repeat_one = false;
         } else {
-            player.setLooping(true);
-            repeat = true;
+            if (repeat && !repeat_one) {
+                repeat_one = true;
+                player.setLooping(true);
+                if (shuffle) {
+                    shuffle = false;
+                }
+            } else {
+                repeat = true;
+            }
         }
     }
 
@@ -321,7 +336,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onPrepared(MediaPlayer mp) {
         requestAudioFocus();
         mp.start();
-        if (repeat) {
+        if (repeat_one) {
             mp.setLooping(true);
         }
         seekBar.setMax(mp.getDuration());
@@ -397,6 +412,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Glide.with(this)
                 .asBitmap()
                 .load(songs.get(songPosn).getArt())
+
                 .into(target2);
 
 //        Picasso

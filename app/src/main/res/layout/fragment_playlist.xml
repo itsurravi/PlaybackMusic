@@ -6,7 +6,7 @@
     android:orientation="vertical"
     tools:context="com.ravisharma.playbackmusic.fragments.NameWise">
 
-    <Button
+    <android.widget.Button
         android:id="@+id/btnAddNewPlaylist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

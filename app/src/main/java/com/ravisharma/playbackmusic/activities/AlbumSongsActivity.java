@@ -5,12 +5,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,7 +24,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
-import com.ravisharma.playbackmusic.LongClickItems;
+import com.ravisharma.playbackmusic.commoncode.longclick.LongClickItems;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.provider.Provider;
 import com.ravisharma.playbackmusic.R;
@@ -48,10 +48,9 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // In Activity's onCreate() for instance
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
 
         setContentView(R.layout.activity_album_songs);
 
@@ -64,6 +63,11 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
         recyclerView = findViewById(R.id.song_list);
 
         String albumId = getIntent().getExtras().getString("albumId");
+
+        if (albumId == null) {
+            finish();
+            return;
+        }
 
         Provider p = new Provider(this);
         songList.addAll(p.getSongList(albumId));
@@ -117,35 +121,23 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
         loadBanner();
     }
 
-    private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
-        adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
-        adView.loadAd(adRequest);
+    public void setWindowFlag(Activity activity, final int bits, boolean on) {
+        Window win = activity.getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
     }
 
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    private void loadBanner() {
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+        AdSize adSize = CustomAdSize.getAdSize(this);
+        adView.setAdSize(adSize);
+        adView.loadAd(adRequest);
     }
 
     @Override

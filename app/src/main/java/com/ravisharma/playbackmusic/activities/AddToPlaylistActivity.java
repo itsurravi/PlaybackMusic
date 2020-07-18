@@ -1,24 +1,21 @@
 package com.ravisharma.playbackmusic.activities;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.commoncode.alert.AlertClickListener;
+import com.ravisharma.playbackmusic.commoncode.alert.PlaylistAlert;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
@@ -69,7 +66,7 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
         btnAddNewPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showCreateListAler();
+                showCreateListAlert();
             }
         });
     }
@@ -111,42 +108,16 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
     }
 
-    private void showCreateListAler() {
-        View v = LayoutInflater.from(this).inflate(R.layout.alert_create_playlist, null);
-
-        final EditText edPlayListName = v.findViewById(R.id.edPlaylistName);
-        TextView tvCancel = v.findViewById(R.id.tvCancel);
-        TextView tvOk = v.findViewById(R.id.tvOk);
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setView(v);
-
-        final AlertDialog alertDialog = dialog.create();
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        alertDialog.show();
-
-        tvCancel.setOnClickListener(new View.OnClickListener() {
+    private void showCreateListAlert() {
+        AlertClickListener listener = new AlertClickListener() {
             @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
+            public void OnOkClicked(String playlistName) {
+                setUpArrayList();
             }
-        });
+        };
 
-        tvOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = edPlayListName.getText().toString().trim();
-                if (playlistName.length() > 0) {
-                    playlistName = playlistName.substring(0, 1).toUpperCase().concat(playlistName.substring(1));
-                    PrefManager p = new PrefManager(AddToPlaylistActivity.this);
-                    p.createNewPlaylist(playlistName);
-                    setUpArrayList();
-                }
-                edPlayListName.setText("");
-                alertDialog.dismiss();
-            }
-        });
+        PlaylistAlert alert = new PlaylistAlert(this, listener);
+        alert.showCreateListAlert();
     }
 
     private void setUpArrayList() {

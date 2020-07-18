@@ -10,6 +10,7 @@ import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.PresetReverb;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class EqualizerFragment extends Fragment {
-    public static final String ARG_AUDIO_SESSIOIN_ID = "audio_session_id";
 
     ImageView backBtn;
     TextView fragTitle;
@@ -51,7 +51,6 @@ public class EqualizerFragment extends Fragment {
     Context ctx;
 
     static int themeColor = Color.parseColor("#B24242");
-    static boolean showBackButton = true;
 
     public EqualizerFragment() {
         // Required empty public constructor
@@ -86,7 +85,6 @@ public class EqualizerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backBtn = view.findViewById(R.id.equalizer_back_btn);
-        backBtn.setVisibility(showBackButton ? View.VISIBLE : View.GONE);
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,21 +96,21 @@ public class EqualizerFragment extends Fragment {
 
         fragTitle = view.findViewById(R.id.equalizer_fragment_title);
 
-
-
         equalizerSwitch = view.findViewById(R.id.equalizer_switch);
         equalizerSwitch.setChecked(Settings.isEqualizerEnabled);
         equalizerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                MainActivity.getInstance().mEqualizer.setEnabled(isChecked);
-                MainActivity.getInstance().bassBoost.setEnabled(isChecked);
-                MainActivity.getInstance().presetReverb.setEnabled(isChecked);
 
                 Settings.isEqualizerEnabled = isChecked;
                 Settings.isEqualizerReloaded = isChecked;
                 Settings.equalizerModel.setEqualizerEnabled(isChecked);
                 Settings.equalizerModel.setEqualizerReloaded(isChecked);
+
+                MainActivity.getInstance().mEqualizer.setEnabled(isChecked);
+                MainActivity.getInstance().bassBoost.setEnabled(isChecked);
+                MainActivity.getInstance().presetReverb.setEnabled(isChecked);
+
                 if (isChecked) {
                     equalizerBlocker.setVisibility(View.INVISIBLE);
                 } else {
@@ -409,11 +407,6 @@ public class EqualizerFragment extends Fragment {
 
         public Builder setAccentColor(int color) {
             themeColor = color;
-            return this;
-        }
-
-        public Builder setShowBackButton(boolean show){
-            showBackButton = show;
             return this;
         }
 

@@ -25,11 +25,5 @@ public class NotificationHandler extends BroadcastReceiver {
         else if(as.equals(context.getString(R.string.next))){
             MainActivity.getInstance().playNext();
         }
-        /*else if(as.equals("close")){
-
-            MainActivity.getInstance().onDestroy();
-            MainActivity.getInstance().finish();
-        }*/
-
     }
 }

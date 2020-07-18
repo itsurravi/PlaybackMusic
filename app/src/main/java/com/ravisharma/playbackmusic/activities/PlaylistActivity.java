@@ -11,8 +11,6 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -30,6 +28,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
@@ -81,34 +80,15 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     }
 
     private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
+        AdSize adSize = CustomAdSize.getAdSize(this);
         adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
     }
 
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    private void fetchPlayList() {
+        songList.addAll(tinydb.getListObject(playlistName, Song.class));
     }
 
     private void initRecyclerView() {
@@ -129,10 +109,6 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
 
         adapter.setOnClick(this);
         adapter.setOnLongClick(this);
-    }
-
-    private void fetchPlayList() {
-        songList.addAll(tinydb.getListObject(playlistName, Song.class));
     }
 
     public void finishPage(View view) {

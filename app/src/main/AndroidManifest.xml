@@ -35,8 +35,9 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/appAdId" />
 
-        <activity android:name=".activities.EqualizerActivity"
-            android:screenOrientation="portrait" ></activity>
+        <activity
+            android:name=".activities.EqualizerActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.AboutActivity"
             android:screenOrientation="portrait" />
@@ -54,7 +55,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.NowPlayingActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.ArtistSongsActivity"
             android:screenOrientation="portrait" />
@@ -84,6 +85,7 @@
         </activity>
 
         <service android:name=".MusicService" /> <!-- Receivers -->
+
         <receiver android:name=".broadcast.NotificationHandler">
             <intent-filter>
                 <action android:name="prev" />
@@ -92,7 +94,8 @@
                 <action android:name="close" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".broadcast.Timer"></receiver>
+
+        <receiver android:name=".broadcast.Timer" />
     </application>
 
 </manifest>

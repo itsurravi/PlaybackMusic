@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +22,7 @@ import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter;
 import com.ravisharma.playbackmusic.DataUpdateListener;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Artist;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -101,34 +100,11 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
     }
 
     private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
+        AdSize adSize = CustomAdSize.getAdSize(getActivity());
         adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
-    }
-
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(getContext(), adWidth);
     }
 
     @Override

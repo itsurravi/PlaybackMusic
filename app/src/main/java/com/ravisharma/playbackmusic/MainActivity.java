@@ -6,12 +6,14 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ravisharma.playbackmusic.activities.AboutActivity;
 import com.ravisharma.playbackmusic.activities.EqualizerActivity;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
 import com.ravisharma.playbackmusic.fragments.ArtistFragment;
 import com.ravisharma.playbackmusic.fragments.NameWise;
@@ -32,17 +34,15 @@ import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.PresetReverb;
 import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.SystemClock;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.tabs.TabLayout;
@@ -59,9 +59,7 @@ import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -118,7 +116,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     public static MainActivity activity;
     public static String songName, songArtist, songId, lastSongId;
-    public static Boolean lastShuffle;
+    public static boolean lastShuffle = false;
+    public static boolean lastRepeat = false;
+    public static boolean lastRepeatOne = false;
     public SeekBar seekBar;
     public MusicService musicSrv;
 
@@ -135,8 +135,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     public LayoutInflater li;
 
     public boolean musicBound = false, fromlist = false, started = false,
-            fromButton = false, played = false, paused = false, playbackPaused = false, TIMER = false;
+            fromButton = false, played = false, playbackPaused = false, TIMER = false;
 
+    boolean doubleBackToExitPressedOnce = false;
 
     public ArrayList<Song> songList, normalList;
     public int songPosn;
@@ -150,12 +151,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     TinyDB tinydb;
     public static Provider provider;
 
-    MediaSession mediaSession;
     Song playingSong;
 
     public Equalizer mEqualizer;
     public BassBoost bassBoost;
     public PresetReverb presetReverb;
+
+    MediaSessionManager mediaSessionManager;
+    MediaSession mediaSession;
 
     public static MainActivity getInstance() {
         return activity;
@@ -179,28 +182,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         setSupportActionBar(toolbar);
 
         getView();
-
-        mediaSession.setCallback(new MediaSession.Callback() {
-            @Override
-            public boolean onMediaButtonEvent(@NonNull Intent intent) {
-                KeyEvent event = (KeyEvent) intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if (event == null) {
-                    return false;
-                }
-                int action = event.getAction();
-                performAction(action);
-                return super.onMediaButtonEvent(intent);
-            }
-        });
-
-        mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        PlaybackState state = new PlaybackState.Builder()
-                .setActions(PlaybackState.ACTION_PLAY_PAUSE)
-                .setState(PlaybackState.STATE_STOPPED, PlaybackState.PLAYBACK_POSITION_UNKNOWN, SystemClock.elapsedRealtime())
-                .build();
-        mediaSession.setPlaybackState(state);
-
-        mediaSession.setActive(true);
     }
 
     public void getView() {
@@ -261,6 +242,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         lastSongId = manage.get_s_Info(getString(R.string.ID));
         lastShuffle = manage.get_b_Info(getString(R.string.Shuffle));
+        lastRepeat = manage.get_b_Info(getString(R.string.Repeat));
+        lastRepeatOne = manage.get_b_Info(getString(R.string.RepeatOne));
         boolean start = manage.get_b_Info(getString(R.string.Started));
         String position = manage.get_s_Info("position");
 
@@ -280,6 +263,16 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             shuffle.setImageResource(R.drawable.ic_shuffle);
         } else {
             shuffle.setImageResource(R.drawable.ic_shuffle_off);
+        }
+
+        if (lastRepeat) {
+            if (lastRepeatOne) {
+                repeat.setImageResource(R.drawable.ic_repeat_one);
+            } else {
+                repeat.setImageResource(R.drawable.ic_repeat_all);
+            }
+        } else {
+            repeat.setImageResource(R.drawable.ic_repeat_off);
         }
 
         slidingLayout.addPanelSlideListener(onSlideListener());
@@ -318,34 +311,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
     private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
+        AdSize adSize = CustomAdSize.getAdSize(this);
         adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
-    }
-
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
     }
 
     public void setPlayingSong(Song song) {
@@ -391,9 +361,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         songList = (ArrayList<Song>) songsArrayList.clone();
         fromlist = true;
         songPosn = position;
-        if(!nowPlaying){
+        if (!nowPlaying) {
             shuffle.setImageResource(R.drawable.ic_shuffle_off);
-            musicSrv.shuffle=false;
+            musicSrv.shuffle = false;
         }
         musicSrv.setList(songList);
         musicSrv.setSong(songPosn);
@@ -414,35 +384,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         artist.setText(songArtist);
         glide_images(songPosn);
         checkInFav(songList.get(songPosn));
-    }
-
-    private void songDetails(int pos, ArrayList<Song> list) {
-        View v = li.inflate(R.layout.info, null);
-        TextView title, artist, album, composer, duration, location;
-        title = v.findViewById(R.id.info_title);
-        artist = v.findViewById(R.id.info_artist);
-        album = v.findViewById(R.id.info_album);
-        composer = v.findViewById(R.id.info_composer);
-        duration = v.findViewById(R.id.info_duration);
-        location = v.findViewById(R.id.info_location);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setView(v);
-
-        title.setText(list.get(pos).getTitle());
-        artist.setText(list.get(pos).getArtist());
-        album.setText(list.get(pos).getAlbum());
-        composer.setText(list.get(pos).getComposer());
-        duration.setText((String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(list.get(pos).getDuration()),
-                TimeUnit.MILLISECONDS.toSeconds(list.get(pos).getDuration()) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(list.get(pos).getDuration())))));
-        location.setText(list.get(pos).getData());
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        dialog.show();
     }
 
     public void btnplaypause() {
@@ -469,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             } else {
                 musicBound = true;
                 pause();
-
             }
         }
     }
@@ -512,10 +452,15 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
                     Toast.makeText(this, getString(R.string.Shuffle_On), Toast.LENGTH_SHORT).show();
                     shuffle.setImageResource(R.drawable.ic_shuffle);
-                    musicSrv.player.setLooping(false);
 
+                    musicSrv.player.setLooping(false);
                     musicSrv.repeat = false;
+                    musicSrv.repeat_one = false;
+                    lastRepeatOne = false;
+                    lastRepeat = false;
                     repeat.setImageResource(R.drawable.ic_repeat_off);
+
+                    lastShuffle = true;
                 } else {
                     songList.removeAll(normalList);
 
@@ -529,21 +474,31 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     MainActivity.getInstance().musicSrv.setList(songList);
                     MainActivity.getInstance().musicSrv.setSong(position);
 
-                    Log.i("POSITION", songPosn+" "+musicSrv.songPosn);
-
+                    Log.i("POSITION", songPosn + " " + musicSrv.songPosn);
 
                     Toast.makeText(this, getString(R.string.Shuffle_Off), Toast.LENGTH_SHORT).show();
                     shuffle.setImageResource(R.drawable.ic_shuffle_off);
+                    lastShuffle = false;
                 }
             }
 
             if (v == repeat) {
                 musicSrv.setRepeat();
-                if (musicSrv.repeat) {
-                    Toast.makeText(this, getString(R.string.Repeat_On), Toast.LENGTH_SHORT).show();
-                    repeat.setImageResource(R.drawable.ic_repeat);
+                if (musicSrv.repeat && musicSrv.repeat_one) {
+                    Toast.makeText(this, getString(R.string.Repeat_One), Toast.LENGTH_SHORT).show();
+                    repeat.setImageResource(R.drawable.ic_repeat_one);
                     shuffle.setImageResource(R.drawable.ic_shuffle_off);
+                    lastRepeatOne = true;
+                    lastRepeat = true;
+                    lastShuffle = false;
+                } else if (musicSrv.repeat) {
+                    lastRepeat = true;
+                    lastRepeatOne = false;
+                    Toast.makeText(this, getString(R.string.Repeat_On), Toast.LENGTH_SHORT).show();
+                    repeat.setImageResource(R.drawable.ic_repeat_all);
                 } else {
+                    lastRepeatOne = false;
+                    lastRepeat = false;
                     Toast.makeText(this, getString(R.string.Repeat_Off), Toast.LENGTH_SHORT).show();
                     repeat.setImageResource(R.drawable.ic_repeat_off);
                 }
@@ -857,8 +812,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onStop();
     }
 
-    boolean doubleBackToExitPressedOnce = false;
-
     @Override
     public void onBackPressed() {
         if (slidingLayout != null &&
@@ -897,12 +850,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private void killApp() {
         if (played) {
             manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
-            if (musicSrv != null) {
-                manage.storeInfo(getString(R.string.Shuffle), musicSrv.shuffle);
-            }
-            else{
-                manage.storeInfo(getString(R.string.Shuffle), lastShuffle);
-            }
+            manage.storeInfo(getString(R.string.Shuffle), lastShuffle);
+            manage.storeInfo(getString(R.string.Repeat), lastRepeat);
+            manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne);
             manage.storeInfo(getString(R.string.Started), started);
             manage.storeInfo(getString(R.string.Songs), true);
             manage.storeInfo("position", String.valueOf(songPosn));
@@ -916,6 +866,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             unbindService(musicConnection);
 //        stopService(playIntent);
         }
+
+        mediaSession.release();
 
         saveEqualizerSettings();
 
@@ -1014,9 +966,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         return 0;
     }
 
+    //Headset button listener
+    /*
+     * onKeyDown will work when Activity is in Foreground
+     * */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.d(TAG, keyCode + "");
         if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
             //handle click
             int action = event.getAction();
@@ -1037,19 +992,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
                 @Override
                 public void run() {
-                    // single click *******************************
                     if (d == 1) {
                         btnplaypause();
-                        /*Toast.makeText(getApplicationContext(), "single click!", Toast.LENGTH_SHORT).show();*/
                     }
-                    // double click *********************************
                     if (d == 2) {
                         playNext();
-                        /*Toast.makeText(getApplicationContext(), "Double click!!", Toast.LENGTH_SHORT).show();*/
                     }
                     if (d == 3) {
                         playPrev();
-                        /*Toast.makeText(getApplicationContext(), "Triple Click!!", Toast.LENGTH_SHORT).show();*/
                     }
                     d = 0;
                 }
@@ -1057,8 +1007,57 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             if (d == 1) {
                 handler.postDelayed(r, 500);
             }
-
         }
+    }
+
+    /*
+     * This will work when activity is in background
+     * */
+    private void initMediaSessions() {
+        mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        mediaSession = new MediaSession(getApplicationContext(), TAG);
+        mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        PlaybackState state = new PlaybackState.Builder()
+                .setActions(PlaybackState.ACTION_PLAY |
+                        PlaybackState.ACTION_PLAY_PAUSE |
+                        PlaybackState.ACTION_PAUSE |
+                        PlaybackState.ACTION_SKIP_TO_NEXT |
+                        PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                .setState(musicSrv.player.isPlaying() ? PlaybackState.STATE_PAUSED : PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+                .build();
+        mediaSession.setPlaybackState(state);
+
+        mediaSession.setCallback(new MediaSession.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+                btnplaypause();
+                Log.d(TAG, "Callback Play");
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+                btnplaypause();
+                Log.d(TAG, "Callback Pause");
+            }
+
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+                playNext();
+                Log.d(TAG, "Callback Next");
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+                playPrev();
+                Log.d(TAG, "Callback Previous");
+            }
+        });
+
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -1117,12 +1116,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             if (lastSongId != null) {
                 musicSrv.setList(songList);
                 musicSrv.checkShuffle(lastShuffle);
+                musicSrv.checkRepeat(lastRepeat, lastRepeatOne);
                 musicSrv.setSong(Integer.parseInt(lastSongId));
             }
             musicSrv.setUIControls(seekBar, currentPosition, totalDuration);
             musicBound = true;
 
             loadEqualizerSettings();
+            initMediaSessions();
         }
 
         @Override
@@ -1145,6 +1146,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         for (DataUpdateListener listener : mListeners) {
             listener.onDataUpdate();
         }
+        Snackbar.make(slidePanelTop, "Scan Completed", Snackbar.LENGTH_SHORT)
+                .setAnchorView(slidePanelTop).show();
     }
 
 
@@ -1217,8 +1220,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         ad.show();
     }
 
-    private void saveEqualizerSettings(){
-        if (Settings.equalizerModel != null){
+    private void saveEqualizerSettings() {
+        if (Settings.equalizerModel != null) {
 
             EqualizerSettings settings = new EqualizerSettings();
             settings.bassStrength = Settings.equalizerModel.getBassStrength();
@@ -1236,20 +1239,20 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     .apply();
         }
 
-        if (mEqualizer != null){
+        if (mEqualizer != null) {
             mEqualizer.release();
         }
 
-        if (bassBoost != null){
+        if (bassBoost != null) {
             bassBoost.release();
         }
 
-        if (presetReverb != null){
+        if (presetReverb != null) {
             presetReverb.release();
         }
     }
 
-    private void loadEqualizerSettings(){
+    private void loadEqualizerSettings() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         Gson gson = new Gson();
@@ -1273,7 +1276,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         Settings.seekbarpos = settings.seekbarpos;
         Settings.equalizerModel = model;
 
-        if (Settings.equalizerModel == null){
+        if (Settings.equalizerModel == null) {
             Settings.equalizerModel = new EqualizerModel();
             Settings.equalizerModel.setReverbPreset(PresetReverb.PRESET_NONE);
             Settings.equalizerModel.setBassStrength((short) (1000 / 19));
@@ -1294,12 +1297,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         bassBoost.setEnabled(Settings.isEqualizerEnabled);
         presetReverb.setEnabled(Settings.isEqualizerEnabled);
 
-        if (Settings.presetPos == 0){
+        if (Settings.presetPos == 0) {
             for (short bandIdx = 0; bandIdx < mEqualizer.getNumberOfBands(); bandIdx++) {
                 mEqualizer.setBandLevel(bandIdx, (short) Settings.seekbarpos[bandIdx]);
             }
-        }
-        else {
+        } else {
             mEqualizer.usePreset((short) Settings.presetPos);
         }
     }

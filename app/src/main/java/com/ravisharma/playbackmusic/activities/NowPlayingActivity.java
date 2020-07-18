@@ -1,7 +1,6 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -10,44 +9,44 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 import com.ravisharma.playbackmusic.adapters.NowPlayingAdapter;
-import com.ravisharma.playbackmusic.LongClickItems;
+import com.ravisharma.playbackmusic.commoncode.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.prefrences.PrefManager;
+import com.ravisharma.playbackmusic.commoncode.alert.AlertClickListener;
+import com.ravisharma.playbackmusic.commoncode.alert.PlaylistAlert;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public class NowPlayingActivity extends AppCompatActivity implements NowPlayingAdapter.OnItemClicked {
-
-    private final String TAG = "NowPlayingAct";
 
     private FrameLayout adContainerView;
     private AdView adView;
 
-    ImageView imgBack;
+    private RecyclerView.LayoutManager layoutManager;
+    ImageView imgBack, songArt;
     FastScrollRecyclerView recyclerView;
     NowPlayingAdapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
+    TextView songTitle,songArtist,songDuration;
 
     int curpos;
     TinyDB tinydb;
@@ -58,10 +57,32 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         setContentView(R.layout.activity_now_playing);
 
         imgBack = findViewById(R.id.imgBack);
+        songArt = findViewById(R.id.songArt);
+        songTitle = findViewById(R.id.songTitle);
+        songArtist = findViewById(R.id.songArtist);
+        songDuration = findViewById(R.id.songDuration);
 
         Bundle b = getIntent().getExtras();
-
         curpos = b.getInt("songPos");
+
+        Song surrentSong = MainActivity.getInstance().songList.get(curpos);
+
+        songTitle.setText(surrentSong.getTitle());
+        songArtist.setText(surrentSong.getArtist());
+        songDuration.setText((String.format("%d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(surrentSong.getDuration()),
+                TimeUnit.MILLISECONDS.toSeconds(surrentSong.getDuration()) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(surrentSong.getDuration())))));
+
+        /*Song art code here*/
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(R.drawable.logo);
+        requestOptions.error(R.drawable.logo);
+
+        Glide.with(this)
+                .setDefaultRequestOptions(requestOptions)
+                .load(Uri.parse(surrentSong.getArt()))
+                .into(songArt);
 
         tinydb = new TinyDB(getApplicationContext());
 
@@ -127,34 +148,11 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     }
 
     private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
+        AdSize adSize = CustomAdSize.getAdSize(this);
         adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
-    }
-
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
     }
 
     public void updateList(int mposition) {
@@ -166,42 +164,16 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     }
 
     public void showCreateListAlert(final View view) {
-        View v = LayoutInflater.from(this).inflate(R.layout.alert_create_playlist, null);
-
-        final EditText edPlayListName = v.findViewById(R.id.edPlaylistName);
-        TextView tvCancel = v.findViewById(R.id.tvCancel);
-        TextView tvOk = v.findViewById(R.id.tvOk);
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-        dialog.setView(v);
-
-        final AlertDialog alertDialog = dialog.create();
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        alertDialog.show();
-
-        tvCancel.setOnClickListener(new View.OnClickListener() {
+        AlertClickListener listener = new AlertClickListener() {
             @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
+            public void OnOkClicked(String playlistName) {
+                addToPlaylist(playlistName);
+                Snackbar.make(view, "Playlist Saved", Snackbar.LENGTH_SHORT).show();
             }
-        });
+        };
 
-        tvOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = edPlayListName.getText().toString().trim();
-                if (playlistName.length() > 0) {
-                    playlistName = playlistName.substring(0, 1).toUpperCase().concat(playlistName.substring(1));
-                    PrefManager p = new PrefManager(NowPlayingActivity.this);
-                    p.createNewPlaylist(playlistName);
-                    addToPlaylist(playlistName);
-                    Snackbar.make(view, "Playlist Saved", Snackbar.LENGTH_SHORT).show();
-                }
-                edPlayListName.setText("");
-                alertDialog.dismiss();
-            }
-        });
+        PlaylistAlert alert = new PlaylistAlert(this, listener);
+        alert.showCreateListAlert();
     }
 
     private void addToPlaylist(String playListName) {
@@ -248,7 +220,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
         @Override
         public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-            if(!MainActivity.getInstance().played){
+            if (!MainActivity.getInstance().played) {
                 return 0;
             }
             return super.getSwipeDirs(recyclerView, viewHolder);

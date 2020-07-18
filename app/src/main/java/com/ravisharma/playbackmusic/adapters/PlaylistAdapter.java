@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
 
 import java.util.List;
@@ -41,14 +42,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
 
         holder.playlistName.setText(playList);
 
-        if(position==0){
-            holder.playlistIcon.setImageResource(R.drawable.ic_recent_timer);
-        }
-        else if(position ==1){
-            holder.playlistIcon.setImageResource(R.drawable.ic_favtrack_playlist);
-        }
-        else{
-            holder.playlistIcon.setImageResource(R.drawable.ic_created_playlist);
+        if(context instanceof MainActivity) {
+            if (position == 0) {
+                holder.playlistIcon.setImageResource(R.drawable.ic_recent_timer);
+            } else if (position == 1) {
+                holder.playlistIcon.setImageResource(R.drawable.ic_favtrack_playlist);
+            } else {
+                holder.playlistIcon.setImageResource(R.drawable.ic_created_playlist);
+            }
         }
 
         holder.playlistBox.setOnClickListener(new View.OnClickListener() {

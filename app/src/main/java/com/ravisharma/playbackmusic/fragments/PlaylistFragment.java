@@ -13,15 +13,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,7 +30,10 @@ import com.ravisharma.playbackmusic.activities.PlaylistActivity;
 import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.commoncode.alert.AlertClickListener;
+import com.ravisharma.playbackmusic.commoncode.alert.PlaylistAlert;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
@@ -91,36 +91,12 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
     }
 
     private void loadBanner() {
-        // Create an ad request. Check your logcat output for the hashed device ID
-        // to get test ads on a physical device, e.g.,
-        // "Use AdRequest.Builder.addTestDevice("ABCDE0123") to get test ads on this
-        // device."
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-
-        AdSize adSize = getAdSize();
-        // Step 4 - Set the adaptive ad size on the ad view.
+        AdSize adSize = CustomAdSize.getAdSize(getActivity());
         adView.setAdSize(adSize);
-
-        // Step 5 - Start loading the ad in the background.
         adView.loadAd(adRequest);
     }
-
-    private AdSize getAdSize() {
-        // Step 2 - Determine the screen width (less decorations) to use for the ad width.
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        display.getMetrics(outMetrics);
-
-        float widthPixels = outMetrics.widthPixels;
-        float density = outMetrics.density;
-
-        int adWidth = (int) (widthPixels / density);
-
-        // Step 3 - Get adaptive ad size and return for setting on the ad view.
-        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(getContext(), adWidth);
-    }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -178,43 +154,15 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
     @Override
     public void onClick(View view) {
-        View v = LayoutInflater.from(getContext()).inflate(R.layout.alert_create_playlist, null);
-
-        final EditText edPlayListName = v.findViewById(R.id.edPlaylistName);
-        TextView tvCancel = v.findViewById(R.id.tvCancel);
-        TextView tvOk = v.findViewById(R.id.tvOk);
-
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
-        dialog.setView(v);
-
-        final AlertDialog alertDialog = dialog.create();
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        alertDialog.show();
-
-        edPlayListName.requestFocus();
-
-        tvCancel.setOnClickListener(new View.OnClickListener() {
+        AlertClickListener listener = new AlertClickListener() {
             @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
+            public void OnOkClicked(String playlistName) {
+                setUpArrayList();
             }
-        });
+        };
 
-        tvOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = edPlayListName.getText().toString().trim();
-                if (playlistName.length() > 0) {
-                    playlistName = playlistName.substring(0,1).toUpperCase().concat(playlistName.substring(1));
-                    PrefManager p = new PrefManager(getContext());
-                    p.createNewPlaylist(playlistName);
-                    setUpArrayList();
-                }
-                edPlayListName.setText("");
-                alertDialog.dismiss();
-            }
-        });
+        PlaylistAlert alert = new PlaylistAlert(getContext(), listener);
+        alert.showCreateListAlert();
     }
 
     @Override

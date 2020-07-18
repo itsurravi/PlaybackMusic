@@ -11,8 +11,11 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.R;
 
@@ -27,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 public class NowPlayingAdapter extends RecyclerView.Adapter<NowPlayingAdapter.ViewHolder> {
 
     private ArrayList<Song> songs;
-
     Context c;
 
     //declare interface
@@ -57,6 +59,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<NowPlayingAdapter.Vi
         ImageView songart;
         ImageView imgOptions;
         RelativeLayout songbox;
+        LottieAnimationView animationView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -66,6 +69,7 @@ public class NowPlayingAdapter extends RecyclerView.Adapter<NowPlayingAdapter.Vi
             songbox = itemView.findViewById(R.id.song_box);
             songart = itemView.findViewById(R.id.song_art);
             imgOptions = itemView.findViewById(R.id.imgOptions);
+            animationView = itemView.findViewById(R.id.animation_view);
         }
     }
 

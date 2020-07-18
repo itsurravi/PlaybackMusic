@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic;
+package com.ravisharma.playbackmusic.commoncode.longclick;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -22,6 +22,8 @@ import androidx.appcompat.app.AlertDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.activities.AlbumSongsActivity;
 import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;

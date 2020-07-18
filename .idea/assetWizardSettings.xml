@@ -24,9 +24,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\round_equalizer_24.xml" />
+                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\round_favorite_border_24.xml" />
                                                 <entry key="opacityPercent" value="80" />
-                                                <entry key="paddingPercent" value="-10" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -37,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/equalizer/round_equalizer_24.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/favorite_border/round_favorite_border_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -49,7 +48,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\PlayBack Music\icon.png" />
+                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\PlayBack Music\repeat_one.png" />
                                                 <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
@@ -82,10 +81,10 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\icon.png" />
-                                      <entry key="outputName" value="ic_equalizer2" />
+                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\repeat_one.png" />
+                                      <entry key="outputName" value="ic_fav_not" />
                                       <entry key="theme" value="HOLO_DARK" />
-                                      <entry key="themeColor" value="ffffff" />
+                                      <entry key="themeColor" value="ff2851" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -366,7 +365,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/chevron_right/round_chevron_right_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/favorite/round_favorite_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -376,8 +375,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_right" />
+                            <entry key="color" value="fe2851" />
+                            <entry key="outputName" value="ic_fav" />
                             <entry key="sourceFile" value="D:\Android\2.psd" />
                           </map>
                         </option>
