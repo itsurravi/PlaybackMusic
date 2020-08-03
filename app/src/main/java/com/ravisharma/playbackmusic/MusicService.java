@@ -1,9 +1,5 @@
 package com.ravisharma.playbackmusic;
 
-/**
- * Created by Ravi Sharma on 07-Jan-18.
- */
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -134,7 +130,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             repeat = false;
             repeat_one = false;
         } else {
-            if (repeat && !repeat_one) {
+            if (repeat) {
                 repeat_one = true;
                 player.setLooping(true);
                 if (shuffle) {
@@ -288,7 +284,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         try {
             player.setDataSource(getApplicationContext(), trackUri);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
         try {
@@ -302,7 +298,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public IBinder onBind(Intent intent) {
-
         return musicBind;
     }
 
@@ -313,7 +308,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public boolean onUnbind(Intent intent) {
-
         return false;
     }
 
@@ -361,7 +355,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             notificationManagerCompat.notify(id, not);
         }
     }
-
 
     public void notification() {
         fromButton = false;
@@ -412,20 +405,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Glide.with(this)
                 .asBitmap()
                 .load(songs.get(songPosn).getArt())
-
                 .into(target2);
 
-//        Picasso
-//                .with(this)
-//                .load(Uri.parse(songs.get(songPosn).getArt()))
-//                .into(bigView, R.id.status_bar_ex_album_art, id, not);
-//        Picasso
-//                .with(this)
-//                .load(Uri.parse(songs.get(songPosn).getArt()))
-//                .into(smallView, R.id.status_bar_albumart, id, not);
-
         startForeground(id, not);
-
     }
 
     private void createNotification() {
@@ -535,25 +517,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         songPosn--;
         if (songPosn < 0) songPosn = songs.size() - 1;
         playSong();
-        MainActivity.getInstance().checkInFav(MainActivity.getInstance().songList.get(songPosn));
     }
 
     //skip to next
     public void playNext() {
-//        if (shuffle) {
-//            int newSong = songPosn;
-//            while (newSong == songPosn && songs.size() > 1) {
-//                newSong = random.nextInt(songs.size());
-//            }
-//            songPosn = newSong;
-//        } else {
-//            songPosn++;
-//            if (songPosn >= songs.size()) songPosn = 0;
-//        }
         songPosn++;
         if (songPosn >= songs.size()) songPosn = 0;
         playSong();
-        MainActivity.getInstance().checkInFav(MainActivity.getInstance().songList.get(songPosn));
     }
 
     @Override
@@ -614,7 +584,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                                 break;
                         }
                     }
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
             }

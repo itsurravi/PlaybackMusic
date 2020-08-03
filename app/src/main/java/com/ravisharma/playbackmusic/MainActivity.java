@@ -91,7 +91,7 @@ import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 
-public class MainActivity extends AppCompatActivity implements MediaPlayerControl,
+public class MainActivity extends AppCompatActivity implements /*MediaPlayerControl,*/
         View.OnClickListener, NameWise.OnFragmentItemClicked {
 
     public static final String PREF_KEY = "equalizer";
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     public final static int RECENT_ADDED = 6;
 
     public static MainActivity activity;
-    public static String songName, songArtist, songId, lastSongId;
+    public static String songName, songArtist, lastSongId;
     public static boolean lastShuffle = false;
     public static boolean lastRepeat = false;
     public static boolean lastRepeatOne = false;
@@ -178,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
         toolbar.setTitleTextColor(getResources().getColor(R.color.titleColor));
-        toolbar.setNavigationIcon(R.drawable.toolbar_logo);
         setSupportActionBar(toolbar);
 
         getView();
@@ -252,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             songList = tinydb.getListObject(getString(R.string.Songs), Song.class);
             normalList = tinydb.getListObject(getString(R.string.NormalSongs), Song.class);
             setStartingList(songList);
-            checkInFav(songList.get(songPosn));
+
         }
 
         started = start;
@@ -327,15 +326,32 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
     public void addNextSong(Song song) {
-        songList.add(songPosn + 1, song);
+        if (songList.size() > 0) {
+            songList.add(songPosn + 1, song);
+        } else {
+            Snackbar.make(slidePanelTop, "Play A Song Before Adding", Snackbar.LENGTH_SHORT)
+                    .setAnchorView(slidePanelTop).show();
+        }
     }
 
     public void addToQueue(Song song) {
-        songList.add(song);
+        if (songList.size() > 0) {
+            songList.add(song);
+        } else {
+            Snackbar.make(slidePanelTop, "Play A Song Before Adding", Snackbar.LENGTH_SHORT)
+                    .setAnchorView(slidePanelTop).show();
+        }
     }
 
     public void setServiceList() {
         musicSrv.setList(songList);
+    }
+
+    private void setPlayerInfo() {
+        title.setText(songList.get(songPosn).getTitle());
+        artist.setText(songList.get(songPosn).getArtist());
+        glide_images(songPosn);
+        checkInFav(songList.get(songPosn));
     }
 
     @Override
@@ -377,13 +393,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         started = true;
         playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
-        songId = String.valueOf(songPosn);
-        songName = songList.get(songPosn).getTitle();
-        songArtist = songList.get(songPosn).getArtist();
-        title.setText(songName);
-        artist.setText(songArtist);
-        glide_images(songPosn);
-        checkInFav(songList.get(songPosn));
+
+        setPlayerInfo();
     }
 
     public void btnplaypause() {
@@ -551,7 +562,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         }
     }
 
-
     private SlidingUpPanelLayout.PanelSlideListener onSlideListener() {
         return new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -595,9 +605,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
     public void setNextTitle() {
         songPosn = musicSrv.songPosn;
-        glide_images(songPosn);
-        title.setText(songList.get(songPosn).getTitle());
-        artist.setText(songList.get(songPosn).getArtist());
+        setPlayerInfo();
     }
 
     public void glide_images(int songPosn) {
@@ -751,15 +759,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         songList = list;
 
         setPlayingSong(songList.get(songPosn));
+        setPlayerInfo();
 
-        title.setText(songList.get(songPosn).getTitle());
-        artist.setText(songList.get(songPosn).getArtist());
         totalDuration.setText(String.format("%d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(songList.get(songPosn).getDuration()),
                 TimeUnit.MILLISECONDS.toSeconds(songList.get(songPosn).getDuration()) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(songList.get(songPosn).getDuration()))));
-        glide_images(songPosn);
-
     }
 
     //play next
@@ -776,10 +781,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             fromButton = true;
             playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
             playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
-            glide_images(songPosn);
-            title.setText(songList.get(songPosn).getTitle());
-            artist.setText(songList.get(songPosn).getArtist());
-            checkInFav(songList.get(songPosn));
+
+            setPlayerInfo();
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show();
         }
@@ -798,10 +801,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             fromButton = true;
             playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
             playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
-            glide_images(songPosn);
-            title.setText(songList.get(songPosn).getTitle());
-            artist.setText(songList.get(songPosn).getArtist());
-            checkInFav(songList.get(songPosn));
+
+            setPlayerInfo();
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show();
         }
@@ -886,11 +887,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         super.onDestroy();
     }
 
-
-    /*
-    Media Player Control Methods
-    */
-    @Override
     public void start() {
         musicSrv.go();
         control_back_image.resume();
@@ -906,7 +902,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         musicSrv.mProgressRunner.run();
     }
 
-    @Override
     public void pause() {
         playbackPaused = true;
         control_back_image.pause();
@@ -917,54 +912,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         playPauseSlide.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
     }
 
-    @Override
-    public int getDuration() {
-        return musicSrv.getDur();
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        if (musicSrv != null && musicBound && musicSrv.isPng())
-            return musicSrv.getPosn();
-        else return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-        musicSrv.seek(pos);
-    }
-
-    @Override
-    public boolean isPlaying() {
-        if (musicSrv != null && musicBound)
-            return musicSrv.isPng();
-        return false;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
-    }
 
     //Headset button listener
     /*
@@ -1033,28 +980,24 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             public void onPlay() {
                 super.onPlay();
                 btnplaypause();
-                Log.d(TAG, "Callback Play");
             }
 
             @Override
             public void onPause() {
                 super.onPause();
                 btnplaypause();
-                Log.d(TAG, "Callback Pause");
             }
 
             @Override
             public void onSkipToNext() {
                 super.onSkipToNext();
                 playNext();
-                Log.d(TAG, "Callback Next");
             }
 
             @Override
             public void onSkipToPrevious() {
                 super.onSkipToPrevious();
                 playPrev();
-                Log.d(TAG, "Callback Previous");
             }
         });
 
@@ -1180,20 +1123,47 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             currentVersion = BuildConfig.VERSION_NAME;
 
             if (latestVersion != null) {
-                float cVersion = Float.parseFloat(currentVersion);
-                float lVersion = Float.parseFloat(latestVersion);
+                String currentVer = versionStringToLong(currentVersion);
+                String latestVer = versionStringToLong(latestVersion);
+
+                int len = 0;
+                len = (currentVer.length() > latestVer.length()) ? currentVer.length() - latestVer.length() : latestVer.length() - currentVer.length();
+
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0; i < len; i++) {
+                    sb.append("0");
+                }
+
+                if (currentVer.length() > latestVer.length()) {
+                    latestVer += sb.toString();
+                } else {
+                    currentVer += sb.toString();
+                }
+
+                long cVersion = Long.parseLong(currentVer);
+                long lVersion = Long.parseLong(latestVer);
 
                 if (lVersion > cVersion) {
-                    updateAlertDialog(lVersion);
+                    updateAlertDialog();
                 }
             }
         }
     }
 
-    private void updateAlertDialog(float lVersion) {
+    private String versionStringToLong(String version) {
+        String[] split = version.split("\\.");
+        StringBuilder sb = new StringBuilder();
+        for (String s : split) {
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+    private void updateAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.app_name));
-        builder.setMessage("New Update Available \nVersion: " + lVersion);
+        builder.setTitle("New Update Available");
+        builder.setMessage("\nCurrent Version: " + currentVersion + "\nLatest Version: " + latestVersion + "\n");
         builder.setCancelable(false);
 
         builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
@@ -1209,7 +1179,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Not Now", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -1241,14 +1211,17 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         if (mEqualizer != null) {
             mEqualizer.release();
+            mEqualizer = null;
         }
 
         if (bassBoost != null) {
             bassBoost.release();
+            bassBoost = null;
         }
 
         if (presetReverb != null) {
             presetReverb.release();
+            presetReverb = null;
         }
     }
 
@@ -1257,8 +1230,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
         Gson gson = new Gson();
         EqualizerSettings settings = gson.fromJson(preferences.getString(PREF_KEY, "{}"), EqualizerSettings.class);
-
-        Log.d("EQSetting", preferences.getString(PREF_KEY, "{}"));
 
         EqualizerModel model = new EqualizerModel();
         model.setEqualizerEnabled(settings.isEqualizerEnabled);
@@ -1280,6 +1251,16 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             Settings.equalizerModel = new EqualizerModel();
             Settings.equalizerModel.setReverbPreset(PresetReverb.PRESET_NONE);
             Settings.equalizerModel.setBassStrength((short) (1000 / 19));
+        }
+
+        if (mEqualizer != null) {
+            mEqualizer = null;
+        }
+        if (bassBoost != null) {
+            bassBoost = null;
+        }
+        if (presetReverb != null) {
+            presetReverb = null;
         }
 
         mEqualizer = new Equalizer(0, sessionId);

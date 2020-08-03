@@ -5,30 +5,18 @@
     <!--Ads ID-->
     <string name="appAdId">ca-app-pub-8188016146639430~6373052337</string>
 
-    <string name="playlistFragId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="nameFragId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="albumFragId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="artistFragId">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="playlistFragId">ca-app-pub-8188016146639430/7302990629</string>
+    <string name="nameFragId">ca-app-pub-8188016146639430/7111418937</string>
+    <string name="albumFragId">ca-app-pub-8188016146639430/9546010589</string>
+    <string name="artistFragId">ca-app-pub-8188016146639430/8041357220</string>
 
-    <string name="AlbumSongsActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="artistSongsActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="playlistActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="searchActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="recentSongsActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="nowPlayingActId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="mainActId">ca-app-pub-3940256099942544/6300978111</string>
-<!--    <string name="playlistFragId">ca-app-pub-8188016146639430/7302990629</string>-->
-<!--    <string name="nameFragId">ca-app-pub-8188016146639430/7111418937</string>-->
-<!--    <string name="albumFragId">ca-app-pub-8188016146639430/9546010589</string>-->
-<!--    <string name="artistFragId">ca-app-pub-8188016146639430/8041357220</string>-->
-
-<!--    <string name="AlbumSongsActId">ca-app-pub-8188016146639430/4061464203</string>-->
-<!--    <string name="artistSongsActId">ca-app-pub-8188016146639430/3527397146</string>-->
-<!--    <string name="playlistActId">ca-app-pub-8188016146639430/2597458851</string>-->
-<!--    <string name="searchActId">ca-app-pub-8188016146639430/2588600435</string>-->
-<!--    <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>-->
-<!--    <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>-->
-<!--    <string name="mainActId">ca-app-pub-8188016146639430/7494562314</string>-->
+    <string name="AlbumSongsActId">ca-app-pub-8188016146639430/4061464203</string>
+    <string name="artistSongsActId">ca-app-pub-8188016146639430/3527397146</string>
+    <string name="playlistActId">ca-app-pub-8188016146639430/2597458851</string>
+    <string name="searchActId">ca-app-pub-8188016146639430/2588600435</string>
+    <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>
+    <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
+    <string name="mainActId">ca-app-pub-8188016146639430/7494562314</string>
 
     <string name="adSize">FULL_BANNER</string>
 

@@ -70,7 +70,8 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
         initListeners();
 
         edSearch.requestFocus();
-
+        InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        in.showSoftInput(edSearch, 0);
         // Instantiate an AdView object.
         // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
         // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.

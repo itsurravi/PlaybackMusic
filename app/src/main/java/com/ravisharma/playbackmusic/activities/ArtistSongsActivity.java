@@ -49,6 +49,11 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
 
         String artistId = getIntent().getExtras().getString("artistId");
 
+        if (artistId == null) {
+            finish();
+            return;
+        }
+
         Provider p = new Provider(this);
         songList.addAll(p.getSongListByArtist(artistId));
 

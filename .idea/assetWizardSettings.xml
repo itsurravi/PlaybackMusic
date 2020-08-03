@@ -48,7 +48,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\PlayBack Music\repeat_one.png" />
+                                                <entry key="imagePath" value="C:\Users\ravik\Desktop\PlayBack Music\musicnote.png" />
                                                 <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
@@ -81,8 +81,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\repeat_one.png" />
-                                      <entry key="outputName" value="ic_fav_not" />
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\musicnote.png" />
+                                      <entry key="outputName" value="ic_music_note" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ff2851" />
                                     </map>
@@ -365,7 +366,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/favorite/round_favorite_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/person/round_person_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -375,8 +376,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="fe2851" />
-                            <entry key="outputName" value="ic_fav" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_artist" />
                             <entry key="sourceFile" value="D:\Android\2.psd" />
                           </map>
                         </option>
