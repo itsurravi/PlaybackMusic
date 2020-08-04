@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.commoncode.alert;
+package com.ravisharma.playbackmusic.utils.alert;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;

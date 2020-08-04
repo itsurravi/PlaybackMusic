@@ -22,7 +22,7 @@ import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter;
 import com.ravisharma.playbackmusic.DataUpdateListener;
 import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
+import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Artist;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;

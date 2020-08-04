@@ -36,7 +36,7 @@ import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.DataUpdateListener;
 import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
+import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.provider.Provider;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.model.Song;

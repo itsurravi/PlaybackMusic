@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.commoncode.ads;
+package com.ravisharma.playbackmusic.utils.ads;
 
 import android.app.Activity;
 import android.util.DisplayMetrics;

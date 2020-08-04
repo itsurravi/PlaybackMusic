@@ -13,7 +13,7 @@ import com.ravisharma.playbackmusic.activities.EqualizerActivity;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
-import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
+import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
 import com.ravisharma.playbackmusic.fragments.ArtistFragment;
 import com.ravisharma.playbackmusic.fragments.NameWise;
@@ -83,7 +83,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.MediaController.MediaPlayerControl;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -428,7 +427,6 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
     @Override
     public void onClick(View v) {
         if (started) {
-
             if (v == eqalizer) {
                 Intent eq = new Intent(MainActivity.this, EqualizerActivity.class);
                 startActivity(eq);
@@ -498,10 +496,8 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
                 if (musicSrv.repeat && musicSrv.repeat_one) {
                     Toast.makeText(this, getString(R.string.Repeat_One), Toast.LENGTH_SHORT).show();
                     repeat.setImageResource(R.drawable.ic_repeat_one);
-                    shuffle.setImageResource(R.drawable.ic_shuffle_off);
                     lastRepeatOne = true;
                     lastRepeat = true;
-                    lastShuffle = false;
                 } else if (musicSrv.repeat) {
                     lastRepeat = true;
                     lastRepeatOne = false;
@@ -630,14 +626,16 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         }
     }
 
-    public void onCallIncoming() {
+    public void setPlayIcons() {
         playpause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
+        musicBound = !musicBound;
     }
 
-    public void onCallDisConnected() {
+    public void setPauseIcons() {
         playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
+        musicBound = !musicBound;
     }
 
     @Override

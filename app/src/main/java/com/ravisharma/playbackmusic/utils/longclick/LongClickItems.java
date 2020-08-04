@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.commoncode.longclick;
+package com.ravisharma.playbackmusic.utils.longclick;
 
 import android.content.ContentUris;
 import android.content.Context;

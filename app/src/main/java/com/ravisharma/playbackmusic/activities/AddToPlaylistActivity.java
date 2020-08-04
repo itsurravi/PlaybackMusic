@@ -14,8 +14,8 @@ import android.widget.Toast;
 
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.commoncode.alert.AlertClickListener;
-import com.ravisharma.playbackmusic.commoncode.alert.PlaylistAlert;
+import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
+import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;

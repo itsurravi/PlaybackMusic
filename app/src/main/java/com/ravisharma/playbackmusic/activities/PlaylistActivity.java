@@ -28,7 +28,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.commoncode.ads.CustomAdSize;
+import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
