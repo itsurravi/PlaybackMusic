@@ -51,12 +51,12 @@ public class PlaylistAlert {
             public void onClick(View v) {
                 String playlistName = edPlayListName.getText().toString().trim();
                 if (playlistName.length() > 0) {
-                    String[] words = playlistName.split("\\s");
+                    String[] words = playlistName.split("\\s+");
                     StringBuilder capitalizeWord = new StringBuilder();
                     for (String w : words) {
                         String first = w.substring(0, 1);
-                        String afterfirst = w.substring(1);
-                        capitalizeWord.append(first.toUpperCase()).append(afterfirst.toLowerCase()).append(" ");
+                        String second = w.substring(1);
+                        capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
                     }
                     playlistName = capitalizeWord.toString().trim();
                     PrefManager p = new PrefManager(context);

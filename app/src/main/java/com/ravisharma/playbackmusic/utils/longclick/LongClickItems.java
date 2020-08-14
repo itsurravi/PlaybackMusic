@@ -128,7 +128,7 @@ public class LongClickItems {
 
                                         if (fdelete.exists()) {
                                             if (fdelete.delete()) {
-                                                if (MainActivity.getInstance().getPlayingSong() == songList.get(mposition)) {
+                                                if (MainActivity.getInstance().getPlayingSong().equals(songList.get(mposition))) {
                                                     MainActivity.getInstance().songList.remove(mposition);
                                                     MainActivity.getInstance().setServiceList();
                                                     MainActivity.getInstance().playNext();
@@ -252,7 +252,7 @@ public class LongClickItems {
 
                                         if (fdelete.exists()) {
                                             if (fdelete.delete()) {
-                                                if (MainActivity.getInstance().getPlayingSong() == songList.get(mposition)) {
+                                                if (MainActivity.getInstance().getPlayingSong().equals(songList.get(mposition))) {
                                                     MainActivity.getInstance().songList.remove(mposition);
                                                     MainActivity.getInstance().setServiceList();
                                                     MainActivity.getInstance().playNext();

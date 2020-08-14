@@ -280,11 +280,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
         try {
             player.prepare();
+            MainActivity.getInstance().setPlayingSong(playSong);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        MainActivity.getInstance().setPlayingSong(playSong);
     }
 
     @Override

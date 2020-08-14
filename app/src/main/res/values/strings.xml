@@ -11,6 +11,7 @@
     <string name="artistFragId">ca-app-pub-8188016146639430/8041357220</string>
 
     <string name="AlbumSongsActId">ca-app-pub-8188016146639430/4061464203</string>
+    <string name="SingleSongActId">ca-app-pub-8188016146639430/9182947846</string>
     <string name="artistSongsActId">ca-app-pub-8188016146639430/3527397146</string>
     <string name="playlistActId">ca-app-pub-8188016146639430/2597458851</string>
     <string name="searchActId">ca-app-pub-8188016146639430/2588600435</string>

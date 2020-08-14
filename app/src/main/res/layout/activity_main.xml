@@ -8,7 +8,6 @@
     android:background="@color/contentBGclr"
     tools:context="com.ravisharma.playbackmusic.MainActivity">
 
-
     <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
@@ -17,7 +16,7 @@
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="68dp"
+        sothree:umanoPanelHeight="64dp"
         sothree:umanoShadowHeight="4dp">
 
         <!-- MAIN CONTENT -->
@@ -96,7 +95,7 @@
             <LinearLayout
                 android:id="@+id/slidePanelTop"
                 android:layout_width="match_parent"
-                android:layout_height="68dp"
+                android:layout_height="64dp"
                 android:background="@color/colorPrimary"
                 android:orientation="horizontal"
                 android:weightSum="10"

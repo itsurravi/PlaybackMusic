@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.model.Album;
 import com.ravisharma.playbackmusic.model.Artist;
 import com.ravisharma.playbackmusic.model.Song;
@@ -18,6 +19,7 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.SplashScreen;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -137,39 +139,6 @@ public class Provider extends AsyncTask<Void, Void, Void> {
         return songList;
     }
 
-    public Song getSongById(String songId) {
-        ContentResolver musicResolver = c.getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null,
-                MediaStore.Audio.Media._ID + "=" + songId, null, null);
-
-        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-        int titleColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
-        int artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST);
-        int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-        int composerColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER);
-        int pathColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-        int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-        int dateModifyColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
-
-        long thisId = musicCursor.getLong(idColumn);
-        String thisTitle = musicCursor.getString(titleColumn);
-        String thisArtist = musicCursor.getString(artistColumn);
-        String thisAlbum = musicCursor.getString(albumColumn);
-        String thisComposer = musicCursor.getString(composerColumn);
-        String thisPath = musicCursor.getString(pathColumn);
-        String thisDateModify = musicCursor.getString(dateModifyColumn);
-        long thisDuration = musicCursor.getLong(durationColumn);
-        long thisAlbumAid = musicCursor.getLong(albumIdColumn);
-        final Uri ART_CONTENT = Uri.parse("content://media/external/audio/albumart");
-        Uri albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid);
-
-        Song s = new Song(thisId, thisTitle, thisArtist, thisPath, thisDateModify, String.valueOf(albumArt), thisDuration, thisAlbum, thisComposer);
-
-        return s;
-    }
-
     @Override
     protected Void doInBackground(Void... voids) {
         /*
@@ -186,7 +155,7 @@ public class Provider extends AsyncTask<Void, Void, Void> {
         Cursor musicCursor = musicResolver.query(musicUri, null,
                 MediaStore.Audio.Media.IS_MUSIC + "!=0 AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ",
                 new String[]{
-                        "%Record%"}, MediaStore.Audio.Media.TITLE + " ASC");
+                        "%Record%"}, "upper("+MediaStore.Audio.Media.TITLE + ") ASC");
 
         if (musicCursor != null && musicCursor.moveToFirst()) {
             //get columns
@@ -295,11 +264,14 @@ public class Provider extends AsyncTask<Void, Void, Void> {
                     long thisAlbumAid = musicCursor.getLong(idColumn);
                     final Uri ART_CONTENT = Uri.parse("content://media/external/audio/albumart");
                     albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid);
-                } catch (Exception e) {
+
+                    int songs = Integer.parseInt(thisNumberOfSongs);
+                    if (songs > 0) {
+                        albumList.add(new Album(thisId, albumArt, thisAlbum, thisArtist, thisNumberOfSongs));
+                    }
+                } catch (Exception ignored) {
 
                 }
-
-                albumList.add(new Album(thisId, albumArt, thisAlbum, thisArtist, thisNumberOfSongs));
             }
             while (musicCursor.moveToNext());
         }
@@ -343,7 +315,7 @@ public class Provider extends AsyncTask<Void, Void, Void> {
             while (musicCursor.moveToNext());
         }
 
-
+        checkInPlaylists();
         return null;
     }
 
@@ -351,12 +323,10 @@ public class Provider extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         updateMainList();
-        checkInPlaylists();
         if (SplashScreen.shown) {
-            if (c instanceof SplashScreen){
+            if (c instanceof SplashScreen) {
                 ((SplashScreen) c).runIntent();
-            }
-            else {
+            } else {
                 ((MainActivity) c).dataUpdated();
             }
         } else {
@@ -367,15 +337,15 @@ public class Provider extends AsyncTask<Void, Void, Void> {
     }
 
     private void updateMainList() {
-        MainActivity.provider.songListByName=songListByName;
-        MainActivity.provider.songListByDate=songListByDate;
-        MainActivity.provider.albumList=albumList;
-        MainActivity.provider.artistList=artistList;
+        MainActivity.provider.songListByName = songListByName;
+        MainActivity.provider.songListByDate = songListByDate;
+        MainActivity.provider.albumList = albumList;
+        MainActivity.provider.artistList = artistList;
 
-        Log.d("Sizes:","List 1 "+songListByDate.size());
-        Log.d("Sizes:","List 2 "+songListByName.size());
-        Log.d("Sizes:","List 3 "+albumList.size());
-        Log.d("Sizes:","List 4 "+artistList.size());
+        Log.d("Sizes:", "List 1 " + songListByDate.size());
+        Log.d("Sizes:", "List 2 " + songListByName.size());
+        Log.d("Sizes:", "List 3 " + albumList.size());
+        Log.d("Sizes:", "List 4 " + artistList.size());
     }
 
     private void checkInPlaylists() {
@@ -384,14 +354,23 @@ public class Provider extends AsyncTask<Void, Void, Void> {
         PrefManager p = new PrefManager(c);
         ArrayList<String> list = p.getAllPlaylist();
         List<String> playListArrayList = new ArrayList<>();
+        playListArrayList.add("My Favorites");
+        playListArrayList.add("NormalSongs");
+        playListArrayList.add("Songs");
         playListArrayList.addAll(list);
 
         for (String playListName : playListArrayList) {
             ArrayList<Song> songList = tinydb.getListObject(playListName, Song.class);
-            for (Song s : songList) {
-                if (!songListByName.contains(s)) {
-                    songList.remove(s);
+
+            for (Iterator<Song> iterator = songList.iterator(); iterator.hasNext(); ) {
+                Song value = iterator.next();
+                if (!songListByName.contains(value)) {
+                    iterator.remove();
                 }
+            }
+            if (playListName.equals("Songs") && songList.size() == 0) {
+                PrefManager manage = new PrefManager(c);
+                manage.storeInfo(c.getString(R.string.Songs), false);
             }
             tinydb.putListObject(playListName, songList);
         }

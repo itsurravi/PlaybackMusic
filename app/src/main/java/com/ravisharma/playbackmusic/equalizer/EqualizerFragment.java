@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
@@ -85,6 +86,15 @@ public class EqualizerFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         backBtn = view.findViewById(R.id.equalizer_back_btn);
+        fragTitle = view.findViewById(R.id.equalizer_fragment_title);
+        equalizerSwitch = view.findViewById(R.id.equalizer_switch);
+        spinnerDropDownIcon = view.findViewById(R.id.spinner_dropdown_icon);
+        presetSpinner = view.findViewById(R.id.equalizer_preset_spinner);
+        equalizerBlocker = view.findViewById(R.id.equalizerBlocker);
+        bassController = view.findViewById(R.id.controllerBass);
+        reverbController = view.findViewById(R.id.controller3D);
+        mLinearLayout = view.findViewById(R.id.equalizerContainer);
+
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,14 +104,11 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        fragTitle = view.findViewById(R.id.equalizer_fragment_title);
-
-        equalizerSwitch = view.findViewById(R.id.equalizer_switch);
         equalizerSwitch.setChecked(Settings.isEqualizerEnabled);
+
         equalizerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
                 Settings.isEqualizerEnabled = isChecked;
                 Settings.isEqualizerReloaded = isChecked;
                 Settings.equalizerModel.setEqualizerEnabled(isChecked);
@@ -119,7 +126,6 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        spinnerDropDownIcon = view.findViewById(R.id.spinner_dropdown_icon);
         spinnerDropDownIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,18 +133,11 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        presetSpinner = view.findViewById(R.id.equalizer_preset_spinner);
-
-        equalizerBlocker = view.findViewById(R.id.equalizerBlocker);
-
         if (equalizerSwitch.isChecked()) {
             equalizerBlocker.setVisibility(View.INVISIBLE);
         } else {
             equalizerBlocker.setVisibility(View.VISIBLE);
         }
-
-        bassController = view.findViewById(R.id.controllerBass);
-        reverbController = view.findViewById(R.id.controller3D);
 
         bassController.setLabel("BASS");
         reverbController.setLabel("3D");
@@ -194,15 +193,20 @@ public class EqualizerFragment extends Fragment {
             } else {
                 reverbController.setProgress(y);
             }
+
+            Log.d("Opening3DValue", "Opening: " + y);
         }
 
         bassController.setOnProgressChangedListener(new AnalogController.onProgressChangedListener() {
             @Override
             public void onProgressChanged(int progress) {
                 Settings.bassStrength = (short) (((float) 1000 / 19) * (progress));
+                if (Settings.bassStrength < 1000) {
+                    Settings.bassStrength += 1;
+                }
                 try {
-                    MainActivity.getInstance().bassBoost.setStrength(Settings.bassStrength);
                     Settings.equalizerModel.setBassStrength(Settings.bassStrength);
+                    MainActivity.getInstance().bassBoost.setStrength(Settings.bassStrength);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -213,8 +217,9 @@ public class EqualizerFragment extends Fragment {
             @Override
             public void onProgressChanged(int progress) {
                 Settings.reverbPreset = (short) ((progress * 6) / 19);
-                Settings.equalizerModel.setReverbPreset(Settings.reverbPreset);
+                Log.d("3DValue", progress + " " + Settings.reverbPreset + "");
                 try {
+                    Settings.equalizerModel.setReverbPreset(Settings.reverbPreset);
                     MainActivity.getInstance().presetReverb.setPreset(Settings.reverbPreset);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -222,8 +227,6 @@ public class EqualizerFragment extends Fragment {
                 y = progress;
             }
         });
-
-        mLinearLayout = view.findViewById(R.id.equalizerContainer);
 
         TextView equalizerHeading = new TextView(getContext());
         equalizerHeading.setText(R.string.eq);

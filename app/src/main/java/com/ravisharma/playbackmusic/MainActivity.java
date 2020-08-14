@@ -72,6 +72,7 @@ import android.widget.LinearLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -246,11 +247,17 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         String position = manage.get_s_Info("position");
 
         if (manage.get_b_Info(getString(R.string.Songs))) {
-            songPosn = Integer.parseInt(position);
             songList = tinydb.getListObject(getString(R.string.Songs), Song.class);
             normalList = tinydb.getListObject(getString(R.string.NormalSongs), Song.class);
-            setStartingList(songList);
+            if (songList.size() == 0) {
+                start = false;
 
+            } else if (songList.size() <= Integer.parseInt(position)) {
+                songPosn = 0;
+            } else {
+                songPosn = Integer.parseInt(position);
+            }
+            setStartingList(songList);
         }
 
         started = start;
@@ -351,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         artist.setText(songList.get(songPosn).getArtist());
         glide_images(songPosn);
         checkInFav(songList.get(songPosn));
+        setPlayingSong(songList.get(songPosn));
     }
 
     @Override
@@ -409,14 +417,18 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
             }
         } else {
             if (musicBound) {
-                musicBound = false;
-                if (!fromButton) {
-                    musicSrv.playSong();
-                    fromButton = true;
+                Log.d(TAG, "bounded");
+                try {
+                    if (!fromButton) {
+                        musicSrv.playSong();
+                        fromButton = true;
+                    }
+                    start();
+                    played = true;
+                    musicBound = false;
+                } catch (Exception e) {
+                    Toast.makeText(this, "Song is deleted or invalid", Toast.LENGTH_SHORT).show();
                 }
-                start();
-                played = true;
-
             } else {
                 musicBound = true;
                 pause();
@@ -453,12 +465,6 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
                     Collections.shuffle(songList);
 
-                    Song playingSong = MainActivity.getInstance().getPlayingSong();
-                    int position = MainActivity.getInstance().songList.indexOf(playingSong);
-                    MainActivity.getInstance().songPosn = position;
-                    MainActivity.getInstance().musicSrv.setList(songList);
-                    MainActivity.getInstance().musicSrv.setSong(position);
-
                     Toast.makeText(this, getString(R.string.Shuffle_On), Toast.LENGTH_SHORT).show();
                     shuffle.setImageResource(R.drawable.ic_shuffle);
 
@@ -471,17 +477,19 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
                     lastShuffle = true;
                 } else {
+                    if (songList.size() != normalList.size()) {
+                        for (Iterator<Song> songIterator = normalList.iterator(); songIterator.hasNext(); ) {
+                            Song song = songIterator.next();
+                            if (!songList.contains(song)) {
+                                songIterator.remove();
+                            }
+                        }
+                    }
                     songList.removeAll(normalList);
 
                     songList.addAll(normalList);
 
                     normalList.clear();
-
-                    Song playingSong = MainActivity.getInstance().getPlayingSong();
-                    int position = MainActivity.getInstance().songList.indexOf(playingSong);
-                    MainActivity.getInstance().songPosn = position;
-                    MainActivity.getInstance().musicSrv.setList(songList);
-                    MainActivity.getInstance().musicSrv.setSong(position);
 
                     Log.i("POSITION", songPosn + " " + musicSrv.songPosn);
 
@@ -489,6 +497,14 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
                     shuffle.setImageResource(R.drawable.ic_shuffle_off);
                     lastShuffle = false;
                 }
+
+                Song playingSong = getPlayingSong();
+                Log.d(TAG, getPlayingSong().getTitle());
+                int position = songList.indexOf(playingSong);
+                songPosn = position;
+                musicSrv.setList(songList);
+                musicSrv.setSong(position);
+                setPlayingSong(songList.get(songPosn));
             }
 
             if (v == repeat) {
@@ -535,18 +551,22 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
     }
 
     private void addToFavPlaylist() {
-        ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
+        try {
+            ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
 
-        if (list.contains(songList.get(songPosn))) {
-            list.remove(songList.get(songPosn));
-            tinydb.putListObject(getString(R.string.favTracks), list);
-        } else {
-            list.add(songList.get(songPosn));
-            tinydb.putListObject(getString(R.string.favTracks), list);
-            Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
+            if (list.contains(songList.get(songPosn))) {
+                list.remove(songList.get(songPosn));
+                tinydb.putListObject(getString(R.string.favTracks), list);
+            } else {
+                list.add(songList.get(songPosn));
+                tinydb.putListObject(getString(R.string.favTracks), list);
+                Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
+            }
+
+            checkInFav(songList.get(songPosn));
+        } catch (Exception ignored) {
+
         }
-
-        checkInFav(songList.get(songPosn));
     }
 
     public void checkInFav(Song song) {
@@ -680,6 +700,14 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
                 break;
             case R.id.rateUs:
                 launchMarket();
+                break;
+            case R.id.suggestion:
+                Intent email = new Intent(Intent.ACTION_SEND);
+                email.putExtra(Intent.EXTRA_EMAIL, new String[]{"sharmaravi.23960@gmail.com"});
+                email.putExtra(Intent.EXTRA_SUBJECT, "Playback Music Player Suggestion");
+                email.putExtra(Intent.EXTRA_TEXT, "");
+                email.setType("message/rfc822");
+                startActivity(Intent.createChooser(email, "Choose an Email client :"));
                 break;
             case R.id.about:
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
@@ -1087,7 +1115,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         for (DataUpdateListener listener : mListeners) {
             listener.onDataUpdate();
         }
-        Snackbar.make(slidePanelTop, "Scan Completed", Snackbar.LENGTH_SHORT)
+        Snackbar.make(slidePanelTop, "Media Scan Completed", Snackbar.LENGTH_SHORT)
                 .setAnchorView(slidePanelTop).show();
     }
 

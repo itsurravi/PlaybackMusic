@@ -2,14 +2,9 @@ package com.ravisharma.playbackmusic.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
-
-/**
- * Created by Ravi Sharma on 07-Jan-18.
- */
 
 public class Song implements Parcelable {
 

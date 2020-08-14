@@ -6,7 +6,6 @@
     android:orientation="vertical"
     tools:context="com.ravisharma.playbackmusic.fragments.NameWise">
 
-    <!-- TODO: Update blank fragment layout -->
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"
         android:layout_width="match_parent"

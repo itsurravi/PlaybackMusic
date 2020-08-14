@@ -46,8 +46,6 @@ public class SplashScreen extends AppCompatActivity {
             checkPermission();
         } else {
             runTask();
-
-
         }
     }
 
@@ -80,9 +78,7 @@ public class SplashScreen extends AppCompatActivity {
                 (ContextCompat.checkSelfPermission(this,
                         android.Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_GRANTED) &&
                 (ContextCompat.checkSelfPermission(this,
-                        android.Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED) &&
-                (ContextCompat.checkSelfPermission(this,
-                        android.Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)) {
+                        android.Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED)) {
             runTask();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{
@@ -90,43 +86,40 @@ public class SplashScreen extends AppCompatActivity {
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     android.Manifest.permission.WAKE_LOCK,
                     android.Manifest.permission.FOREGROUND_SERVICE,
-                    android.Manifest.permission.MODIFY_AUDIO_SETTINGS,
-                    android.Manifest.permission.READ_PHONE_STATE}, 1);
+                    android.Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        switch (requestCode) {
-            case 1:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    runTask();
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                runTask();
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    finish();
                 } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        finish();
-                    } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setMessage(getString(R.string.permissionAlert))
-                                .setPositiveButton(getString(R.string.Grant), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        finish();
-                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                                Uri.fromParts(getString(R.string.packageName), getPackageName(), null));
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(intent);
-                                    }
-                                })
-                                .setNegativeButton(getString(R.string.dont), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        finish();
-                                    }
-                                });
-                        builder.setCancelable(false);
-                        builder.create().show();
-                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getString(R.string.permissionAlert))
+                            .setPositiveButton(getString(R.string.Grant), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    finish();
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts(getString(R.string.packageName), getPackageName(), null));
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.dont), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    finish();
+                                }
+                            });
+                    builder.setCancelable(false);
+                    builder.create().show();
                 }
-                break;
+            }
         }
     }
 }

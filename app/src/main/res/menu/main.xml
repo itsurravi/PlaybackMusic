@@ -38,8 +38,13 @@
         android:title="Rate Us" />
 
     <item
-        android:id="@+id/about"
+        android:id="@+id/suggestion"
         android:orderInCategory="7"
+        android:title="Suggestion" />
+
+    <item
+        android:id="@+id/about"
+        android:orderInCategory="8"
         android:title="About" />
 
 </menu>

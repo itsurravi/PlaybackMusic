@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +81,12 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_name_wise, container, false);
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(v, savedInstanceState);
         if (songList.size() > 0) {
             songList.clear();
         }
@@ -85,7 +94,6 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         songList.addAll(MainActivity.provider.getSongListByName());
         ((MainActivity) Objects.requireNonNull(getActivity())).registerDataUpdateListener(this);
 
-        li = inflater;
         recyclerView = v.findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
@@ -115,7 +123,6 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         adContainerView.addView(adView);
         loadBanner();
 
-        return v;
     }
 
     private void loadBanner() {
@@ -136,6 +143,8 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     public void onItemLongClick(final int mposition) {
         String[] items = getResources().getStringArray(R.array.longPressItems);
         ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
+
+        LayoutInflater li = LayoutInflater.from(getActivity());
 
         View v = li.inflate(R.layout.alert_list, null);
 
@@ -208,7 +217,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
 
                                         if (fdelete.exists()) {
                                             if (fdelete.delete()) {
-                                                if (MainActivity.getInstance().getPlayingSong() == songList.get(mposition)) {
+                                                if (MainActivity.getInstance().getPlayingSong().equals(songList.get(mposition))) {
                                                     MainActivity.getInstance().songList.remove(mposition);
                                                     MainActivity.getInstance().setServiceList();
                                                     MainActivity.getInstance().playNext();
@@ -266,6 +275,8 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     }
 
     private void songDetails(int pos) {
+        LayoutInflater li = LayoutInflater.from(getActivity());
+
         View v = li.inflate(R.layout.info, null);
         TextView title, artist, album, composer, duration, location;
         title = v.findViewById(R.id.info_title);

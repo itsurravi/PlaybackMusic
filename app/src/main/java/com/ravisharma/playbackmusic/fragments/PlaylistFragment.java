@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -38,6 +39,7 @@ import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +47,7 @@ import static com.ravisharma.playbackmusic.MainActivity.PLAYLIST;
 import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
 
 public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlaylistClicked
-        ,PlaylistAdapter.OnPlaylistLongClicked, View.OnClickListener {
+        , PlaylistAdapter.OnPlaylistLongClicked, View.OnClickListener {
 
     private AdView adView;
     private FrameLayout adContainerView;
@@ -65,8 +67,21 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_playlist, container, false);
-
         playListArrayList = new ArrayList<>();
+        return v;
+    }
+
+    private void loadBanner() {
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+        AdSize adSize = CustomAdSize.getAdSize(getActivity());
+        adView.setAdSize(adSize);
+        adView.loadAd(adRequest);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(v, savedInstanceState);
 
         btnAddNewPlaylist = v.findViewById(R.id.btnAddNewPlaylist);
         recyclerView = v.findViewById(R.id.playlist);
@@ -87,20 +102,6 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         adContainerView.addView(adView);
         loadBanner();
 
-        return v;
-    }
-
-    private void loadBanner() {
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(getActivity());
-        adView.setAdSize(adSize);
-        adView.loadAd(adRequest);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         playlistAdapter = new PlaylistAdapter(getContext(), playListArrayList);
         recyclerView.setAdapter(playlistAdapter);
 
@@ -167,7 +168,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
     @Override
     public void onPlaylistLongClick(final int position) {
-        if(position==0 || position==1){
+        if (position == 0 || position == 1) {
             return;
         }
 
@@ -192,10 +193,15 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
-                switch (i){
+                switch (i) {
                     case 0:
                         ArrayList<Song> songList = tinydb.getListObject(playListArrayList.get(position), Song.class);
-                        MainActivity.getInstance().OnFragmentItemClick(0, songList, false);
+                        if (songList.size() > 0) {
+                            MainActivity.getInstance().OnFragmentItemClick(0, songList, false);
+                        }
+                        else{
+                            Toast.makeText(getContext(), "Playlist is Empty", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 1:
                         tinydb.removeListObject(playListArrayList.get(position));

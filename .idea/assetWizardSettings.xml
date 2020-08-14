@@ -24,7 +24,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\round_favorite_border_24.xml" />
+                                                <entry key="imagePath" value="C:\Users\ravik\AppData\Local\Temp\twotone_music_video_24.xml" />
                                                 <entry key="opacityPercent" value="80" />
                                               </map>
                                             </option>
@@ -36,7 +36,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/favorite_border/round_favorite_border_24.xml" />
+                                                <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconstwotone/music_video/twotone_music_video_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -81,9 +81,8 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="assetType" value="IMAGE" />
                                       <entry key="imageAsset" value="C:\Users\ravik\Desktop\PlayBack Music\musicnote.png" />
-                                      <entry key="outputName" value="ic_music_note" />
+                                      <entry key="outputName" value="ic_created_playlist2" />
                                       <entry key="theme" value="HOLO_DARK" />
                                       <entry key="themeColor" value="ff2851" />
                                     </map>
@@ -366,7 +365,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/person/round_person_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/playlist_play/round_playlist_play_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -377,7 +376,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_artist" />
+                            <entry key="outputName" value="ic_created_playlist" />
                             <entry key="sourceFile" value="D:\Android\2.psd" />
                           </map>
                         </option>
