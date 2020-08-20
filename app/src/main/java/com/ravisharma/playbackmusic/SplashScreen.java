@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -18,6 +19,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.model.DatabaseSetup;
 import com.ravisharma.playbackmusic.provider.Provider;
 
 
@@ -58,8 +61,16 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                finish();
+                PlaylistRepository repository = new PlaylistRepository(SplashScreen.this);
+                repository.isDatabaseRead().observe(SplashScreen.this, new Observer<DatabaseSetup>() {
+                    @Override
+                    public void onChanged(DatabaseSetup databaseSetup) {
+                        if(databaseSetup.isSetup()){
+                            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                            finish();
+                        }
+                    }
+                });
             }
         }, 2000);
     }
