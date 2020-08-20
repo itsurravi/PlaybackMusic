@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
         favorite.setOnClickListener(this);
 
-//        new checkUpdate().execute();
+        new checkUpdate().execute();
 
         adContainerView = findViewById(R.id.banner_container_player);
 
