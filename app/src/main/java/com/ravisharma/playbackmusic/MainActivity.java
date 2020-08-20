@@ -13,6 +13,8 @@ import com.ravisharma.playbackmusic.activities.EqualizerActivity;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
 import com.ravisharma.playbackmusic.fragments.ArtistFragment;
@@ -50,6 +52,7 @@ import com.google.android.material.tabs.TabLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.Observer;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
     public Toolbar toolbar;
     public KenBurnsView control_back_image;
     public ImageView slideImage, cardImage;
-    public ImageButton playpause, prev, next, shuffle, repeat, playPauseSlide, eqalizer, playlist, favorite;
+    public ImageView playpause, prev, next, shuffle, repeat, playPauseSlide, eqalizer, playlist, favorite;
     public ViewPager viewPager;
     public SlidingUpPanelLayout slidingLayout;
     public LinearLayout slidePanelTop;
@@ -148,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
     AlarmManager am;
 
     PrefManager manage;
-    TinyDB tinydb;
+    //    TinyDB tinydb;
+    private PlaylistRepository repository;
+
     public static Provider provider;
 
     Song playingSong;
@@ -225,12 +230,13 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         currentPosition = findViewById(R.id.currentPosition);
         totalDuration = findViewById(R.id.totalDuration);
         slidePanelTop = findViewById(R.id.slidePanelTop);
-        eqalizer = (ImageButton) findViewById(R.id.imgEq);
-        playlist = (ImageButton) findViewById(R.id.imgPlaylist);
-        favorite = (ImageButton) findViewById(R.id.imgFav);
+        eqalizer = (ImageView) findViewById(R.id.imgEq);
+        playlist = (ImageView) findViewById(R.id.imgPlaylist);
+        favorite = (ImageView) findViewById(R.id.imgFav);
 
         manage = new PrefManager(getApplicationContext());
-        tinydb = new TinyDB(getApplicationContext());
+//        tinydb = new TinyDB(getApplicationContext());
+        repository = new PlaylistRepository(this);
 
         control_back_image.pause();
 
@@ -247,8 +253,11 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         String position = manage.get_s_Info("position");
 
         if (manage.get_b_Info(getString(R.string.Songs))) {
-            songList = tinydb.getListObject(getString(R.string.Songs), Song.class);
-            normalList = tinydb.getListObject(getString(R.string.NormalSongs), Song.class);
+//            songList = tinydb.getListObject(getString(R.string.Songs), Song.class);
+//            normalList = tinydb.getListObject(getString(R.string.NormalSongs), Song.class);
+            songList = repository.getShuffleSongs();
+            normalList = repository.getQueueSongs();
+
             if (songList.size() == 0) {
                 start = false;
 
@@ -280,6 +289,22 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
             repeat.setImageResource(R.drawable.ic_repeat_off);
         }
 
+        repository.getPlaylistSong(getString(R.string.favTracks)).observe(this, new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                boolean check = false;
+                for (Playlist playlist : playlists) {
+                    Song song = playlist.getSong();
+                    check = song.equals(songList.get(songPosn));
+                }
+                if (check) {
+                    favorite.setImageResource(R.drawable.ic_fav);
+                } else {
+                    favorite.setImageResource(R.drawable.ic_fav_not);
+                }
+            }
+        });
+
         slidingLayout.addPanelSlideListener(onSlideListener());
 
         slidingLayout.getChildAt(1).setOnClickListener(null);
@@ -304,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
         favorite.setOnClickListener(this);
 
-        new checkUpdate().execute();
+//        new checkUpdate().execute();
 
         adContainerView = findViewById(R.id.banner_container_player);
 
@@ -387,6 +412,8 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         if (!nowPlaying) {
             shuffle.setImageResource(R.drawable.ic_shuffle_off);
             musicSrv.shuffle = false;
+            repository.saveQueueSongs(normalList);
+            repository.saveShuffleSongs(songList);
         }
         musicSrv.setList(songList);
         musicSrv.setSong(songPosn);
@@ -505,6 +532,9 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
                 musicSrv.setList(songList);
                 musicSrv.setSong(position);
                 setPlayingSong(songList.get(songPosn));
+
+                repository.saveQueueSongs(normalList);
+                repository.saveShuffleSongs(songList);
             }
 
             if (v == repeat) {
@@ -552,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
     private void addToFavPlaylist() {
         try {
-            ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
+            /*ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
 
             if (list.contains(songList.get(songPosn))) {
                 list.remove(songList.get(songPosn));
@@ -563,15 +593,30 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
                 Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
             }
 
-            checkInFav(songList.get(songPosn));
+            checkInFav(songList.get(songPosn));*/
+            Song song = songList.get(songPosn);
+            long exist = repository.isSongExist(getString(R.string.favTracks), song.getId());
+            if (exist > 0) {
+                repository.removeSong(getString(R.string.favTracks), song.getId());
+            } else {
+                Playlist playlist = new Playlist(0, getString(R.string.favTracks), song);
+                repository.addSong(playlist);
+                Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception ignored) {
 
         }
     }
 
     public void checkInFav(Song song) {
-        ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
+        /*ArrayList<Song> list = tinydb.getListObject(getString(R.string.favTracks), Song.class);
         if (list.contains(song)) {
+            favorite.setImageResource(R.drawable.ic_fav);
+        } else {
+            favorite.setImageResource(R.drawable.ic_fav_not);
+        }*/
+        long exist = repository.isSongExist(getString(R.string.favTracks), song.getId());
+        if (exist > 0) {
             favorite.setImageResource(R.drawable.ic_fav);
         } else {
             favorite.setImageResource(R.drawable.ic_fav_not);
@@ -883,8 +928,8 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
             manage.storeInfo(getString(R.string.Started), started);
             manage.storeInfo(getString(R.string.Songs), true);
             manage.storeInfo("position", String.valueOf(songPosn));
-            tinydb.putListObject(getString(R.string.Songs), songList);
-            tinydb.putListObject(getString(R.string.NormalSongs), normalList);
+//            tinydb.putListObject(getString(R.string.Songs), songList);
+//            tinydb.putListObject(getString(R.string.NormalSongs), normalList);
         }
         if (TIMER) {
             am.cancel(pi);

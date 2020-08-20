@@ -265,7 +265,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Song playSong = songs.get(songPosn);
         songTitle = playSong.getTitle();
         //get id
-        long currSong = playSong.getID();
+        long currSong = playSong.getId();
         //get Artist name
         artist = playSong.getArtist();
         //set uri

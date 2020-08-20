@@ -23,6 +23,8 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 import com.ravisharma.playbackmusic.adapters.NowPlayingAdapter;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
@@ -46,10 +48,11 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     ImageView imgBack, songArt;
     FastScrollRecyclerView recyclerView;
     NowPlayingAdapter adapter;
-    TextView songTitle,songArtist,songDuration;
+    TextView songTitle, songArtist, songDuration;
 
     int curpos;
-    TinyDB tinydb;
+    //    TinyDB tinydb;
+    private PlaylistRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +87,8 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
                 .load(Uri.parse(surrentSong.getArt()))
                 .into(songArt);
 
-        tinydb = new TinyDB(getApplicationContext());
+//        tinydb = new TinyDB(getApplicationContext());
+        repository = new PlaylistRepository(this);
 
         recyclerView = findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
@@ -178,7 +182,11 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
     private void addToPlaylist(String playListName) {
         ArrayList<Song> list = MainActivity.getInstance().songList;
-        tinydb.putListObject(playListName, list);
+//        tinydb.putListObject(playListName, list);
+        for (Song s : list) {
+            Playlist p = new Playlist(0, playListName, s);
+            repository.addSong(p);
+        }
     }
 
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(

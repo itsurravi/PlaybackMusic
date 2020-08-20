@@ -36,16 +36,16 @@ public class Song implements Parcelable {
     private String composer;
 
 
-    public Song(long songID, String songTitle, String songArtist, String songData, String songDateM, String songArt, long songDur, String songAlbum, String songComposer) {
-        id = songID;
-        title = songTitle;
-        artist = songArtist;
-        data = songData;
-        dateModified = songDateM;
-        art = songArt;
-        duration = songDur;
-        album = songAlbum;
-        composer = songComposer;
+    public Song(long id, String title, String artist, String data, String dateModified, String art, long duration, String album, String composer) {
+        this.id = id;
+        this.title = title;
+        this.artist = artist;
+        this.data = data;
+        this.dateModified = dateModified;
+        this.art = art;
+        this.duration = duration;
+        this.album = album;
+        this.composer = composer;
     }
 
     protected Song(Parcel in) {
@@ -72,7 +72,7 @@ public class Song implements Parcelable {
         }
     };
 
-    public long getID() {
+    public long getId() {
         return id;
     }
 

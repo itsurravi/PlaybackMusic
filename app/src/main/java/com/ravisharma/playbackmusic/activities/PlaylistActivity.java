@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +29,8 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
@@ -35,6 +38,7 @@ import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -49,23 +53,39 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     private SongAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    TinyDB tinydb;
+//    TinyDB tinydb;
     String playlistName;
+
+    private PlaylistRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_playlist);
         songList = new ArrayList<>();
-        tinydb = new TinyDB(getApplicationContext());
+//        tinydb = new TinyDB(getApplicationContext());
+        repository = new PlaylistRepository(this);
 
         playlistName = getIntent().getStringExtra("playlistName");
         txtPlaylistName = findViewById(R.id.txtPlaylistName);
         txtPlaylistName.setText(playlistName);
 
-        fetchPlayList();
-
         initRecyclerView();
+
+        repository.getPlaylistSong(playlistName).observe(this, new Observer<List<Playlist>>() {
+            @Override
+            public void onChanged(List<Playlist> playlists) {
+                songList.clear();
+                for(Playlist p : playlists){
+                    Song song = p.getSong();
+                    songList.add(song);
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+        });
+
+//        fetchPlayList();
 
         // Instantiate an AdView object.
         // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
@@ -87,9 +107,9 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         adView.loadAd(adRequest);
     }
 
-    private void fetchPlayList() {
-        songList.addAll(tinydb.getListObject(playlistName, Song.class));
-    }
+//    private void fetchPlayList() {
+//        songList.addAll(tinydb.getListObject(playlistName, Song.class));
+//    }
 
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.song_list);
@@ -172,14 +192,14 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
                         break;
                     case 3:
                         // Delete Song Code
-                        ArrayList<Song> list = tinydb.getListObject(playlistName, Song.class);
-                        list.remove(songList.get(mposition));
-                        tinydb.putListObject(playlistName, list);
+//                        ArrayList<Song> list = tinydb.getListObject(playlistName, Song.class);
+//                        list.remove(songList.get(mposition));
+//                        tinydb.putListObject(playlistName, list);
+                        repository.removeSong(playlistName, songList.get(mposition).getId());
                         if(playlistName.equals(getString(R.string.favTracks))){
-                            MainActivity.getInstance().checkInFav(songList.get(mposition));
+//                            MainActivity.getInstance().checkInFav(songList.get(mposition));
                         }
                         songList.remove(mposition);
-                        adapter.notifyItemRemoved(mposition);
                         break;
                     case 4:
                         Intent intent = new Intent(Intent.ACTION_SEND);

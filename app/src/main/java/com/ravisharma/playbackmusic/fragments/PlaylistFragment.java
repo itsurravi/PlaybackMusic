@@ -31,6 +31,8 @@ import com.ravisharma.playbackmusic.activities.PlaylistActivity;
 import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
@@ -57,6 +59,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
     private PlaylistAdapter playlistAdapter;
     private List<String> playListArrayList;
     private Button btnAddNewPlaylist;
+    private PlaylistRepository repository;
 
     public PlaylistFragment() {
         // Required empty public constructor
@@ -113,6 +116,8 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         playlistAdapter.setOnPlaylistLongClick(this);
 
         btnAddNewPlaylist.setOnClickListener(this);
+
+        repository = new PlaylistRepository(getContext());
     }
 
     @Override
@@ -189,22 +194,29 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
         alertDialog.show();
-        final TinyDB tinydb = new TinyDB(getContext());
+//        final TinyDB tinydb = new TinyDB(getContext());
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                 switch (i) {
                     case 0:
-                        ArrayList<Song> songList = tinydb.getListObject(playListArrayList.get(position), Song.class);
-                        if (songList.size() > 0) {
-                            MainActivity.getInstance().OnFragmentItemClick(0, songList, false);
-                        }
-                        else{
+//                        ArrayList<Song> songList = tinydb.getListObject(playListArrayList.get(position), Song.class);
+                        List<Playlist> list = repository.getPlaylist(playListArrayList.get(position));
+                        if (list != null && list.size() > 0) {
+                            ArrayList<Song> songList = new ArrayList<>();
+                            for (Playlist p : list) {
+                                songList.add(p.getSong());
+                            }
+                            if (songList.size() > 0) {
+                                MainActivity.getInstance().OnFragmentItemClick(0, songList, false);
+                            }
+                        } else {
                             Toast.makeText(getContext(), "Playlist is Empty", Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 1:
-                        tinydb.removeListObject(playListArrayList.get(position));
+//                        tinydb.removeListObject(playListArrayList.get(position));
+                        repository.removePlayist(playListArrayList.get(position));
                         PrefManager p = new PrefManager(getContext());
                         p.deletePlaylist(playListArrayList.get(position));
                         playListArrayList.remove(position);

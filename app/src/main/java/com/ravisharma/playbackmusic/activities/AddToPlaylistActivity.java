@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert;
@@ -32,7 +34,8 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
     private Song song;
     private ArrayList<String> list;
-    private TinyDB tinydb;
+//    private TinyDB tinydb;
+    private PlaylistRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,8 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
         btnAddNewPlaylist = findViewById(R.id.btnAddNewPlaylist);
 
-        tinydb = new TinyDB(getApplicationContext());
+        repository = new PlaylistRepository(this);
+//        tinydb = new TinyDB(getApplicationContext());
 
         list = new ArrayList<>();
 
@@ -86,13 +90,22 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
     }
 
     private void addToPlaylist(String playListName) {
-        ArrayList<Song> list = tinydb.getListObject(playListName, Song.class);
+        /*ArrayList<Song> list = tinydb.getListObject(playListName, Song.class);
 
         if (list.contains(song)) {
             Toast.makeText(this, "Already Present", Toast.LENGTH_SHORT).show();
         } else {
             list.add(song);
             tinydb.putListObject(playListName, list);
+            Toast.makeText(this, "Song Added To Playlist", Toast.LENGTH_SHORT).show();
+        }*/
+        long exist = repository.isSongExist(playListName, song.getId());
+        if(exist>0){
+            Toast.makeText(this, "Already Present", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Playlist p = new Playlist(0, playListName, song);
+            repository.addSong(p);
             Toast.makeText(this, "Song Added To Playlist", Toast.LENGTH_SHORT).show();
         }
     }

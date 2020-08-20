@@ -8,6 +8,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,5 +23,7 @@ public class PlaybackApp extends Application {
 
             }
         });
+
+        PlaylistRepository repository = new PlaylistRepository(getApplicationContext());
     }
 }

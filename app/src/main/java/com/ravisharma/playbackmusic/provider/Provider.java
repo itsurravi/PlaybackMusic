@@ -8,18 +8,17 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.util.Log;
-
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Album;
 import com.ravisharma.playbackmusic.model.Artist;
+import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.prefrences.PrefManager;
-import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.SplashScreen;
+import com.ravisharma.playbackmusic.prefrences.PrefManager;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -349,7 +348,7 @@ public class Provider extends AsyncTask<Void, Void, Void> {
     }
 
     private void checkInPlaylists() {
-        TinyDB tinydb;
+        /*TinyDB tinydb;
         tinydb = new TinyDB(c);
         PrefManager p = new PrefManager(c);
         ArrayList<String> list = p.getAllPlaylist();
@@ -373,6 +372,29 @@ public class Provider extends AsyncTask<Void, Void, Void> {
                 manage.storeInfo(c.getString(R.string.Songs), false);
             }
             tinydb.putListObject(playListName, songList);
+        }*/
+        PlaylistRepository repository = new PlaylistRepository(c);
+
+        List<Song> shuffleSongs = repository.getShuffleSongs();
+        for(Song s : shuffleSongs){
+            if(!songListByName.contains(s)){
+                repository.deleteSongFromShuffle(s.getId());
+                repository.deleteSongFromQueue(s.getId());
+            }
+        }
+
+        if(repository.getShuffleSongs().size()==0){
+            PrefManager p = new PrefManager(c);
+            p.storeInfo(c.getString(R.string.Songs), false);
+        }
+
+        List<Playlist> playlists = repository.getAllPlaylistSongs();
+
+        for(Playlist playlist: playlists){
+            Song s = playlist.getSong();
+            if(!songListByName.contains(s)){
+                repository.removeSong(s.getId());
+            }
         }
     }
 }
