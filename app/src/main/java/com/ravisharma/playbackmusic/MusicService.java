@@ -181,27 +181,28 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         switch (focusState) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 if (!player.isPlaying()) {
-                    MainActivity.getInstance().playpause.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!player.isPlaying()) {
-                                start();
-                            } else {
-                                pause();
-                            }
-                        }
-                    });
-
-                    MainActivity.getInstance().playPauseSlide.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!player.isPlaying()) {
-                                start();
-                            } else {
-                                pause();
-                            }
-                        }
-                    });
+                    start();
+//                    MainActivity.getInstance().playpause.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            if (!player.isPlaying()) {
+//                                start();
+//                            } else {
+//                                pause();
+//                            }
+//                        }
+//                    });
+//
+//                    MainActivity.getInstance().playPauseSlide.setOnClickListener(new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            if (!player.isPlaying()) {
+//                                start();
+//                            } else {
+//                                pause();
+//                            }
+//                        }
+//                    });
 //                    if (ongoingCall) {
 //                        start();
 //                        ongoingCall = false;

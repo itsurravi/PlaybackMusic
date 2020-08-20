@@ -1,24 +1,33 @@
 package com.ravisharma.playbackmusic.activities;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +76,23 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         this.setFinishOnTouchOutside(false);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermission();
+        } else {
+            runTask();
+        }
+    }
+
+    private void runTask() {
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        tvSongTitle = findViewById(R.id.tvSongTitle);
+        tvSongArtist = findViewById(R.id.tvSongArtist);
+        tvTotalDuration = findViewById(R.id.tvTotalDuration);
+        tvCurrentPosition = findViewById(R.id.tvCurrentPosition);
+        ivSongThumb = findViewById(R.id.ivSongThumb);
+        btn_PlayPause = findViewById(R.id.btn_PlayPause);
+        seekBar = findViewById(R.id.seekBar);
         adContainerView = findViewById(R.id.banner_container_single_song);
 
         adView = new AdView(this);
@@ -88,15 +114,6 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
             }
         });
 
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        tvSongTitle = findViewById(R.id.tvSongTitle);
-        tvSongArtist = findViewById(R.id.tvSongArtist);
-        tvTotalDuration = findViewById(R.id.tvTotalDuration);
-        tvCurrentPosition = findViewById(R.id.tvCurrentPosition);
-        ivSongThumb = findViewById(R.id.ivSongThumb);
-        btn_PlayPause = findViewById(R.id.btn_PlayPause);
-        seekBar = findViewById(R.id.seekBar);
 
         final Intent data = getIntent();
 
@@ -418,5 +435,64 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
 
     private String getSongIdFromMediaProvider(Uri uri) {
         return DocumentsContract.getDocumentId(uri).split(":")[1];
+    }
+
+    /*
+     *  Permissions Checking
+     * */
+
+    public void checkPermission() {
+        if ((ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.FOREGROUND_SERVICE) == PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED)) {
+            runTask();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WAKE_LOCK,
+                    android.Manifest.permission.FOREGROUND_SERVICE,
+                    android.Manifest.permission.MODIFY_AUDIO_SETTINGS}, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                runTask();
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    finish();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage(getString(R.string.permissionAlert))
+                            .setPositiveButton(getString(R.string.Grant), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    finish();
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts(getString(R.string.packageName), getPackageName(), null));
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.dont), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    finish();
+                                }
+                            });
+                    builder.setCancelable(false);
+                    builder.create().show();
+                }
+            }
+        }
     }
 }
