@@ -386,6 +386,7 @@ public class Provider extends AsyncTask<Void, Void, Void> {
         if(repository.getShuffleSongs().size()==0){
             PrefManager p = new PrefManager(c);
             p.storeInfo(c.getString(R.string.Songs), false);
+            p.storeInfo(c.getString(R.string.Started), false);
         }
 
         List<Playlist> playlists = repository.getAllPlaylistSongs();

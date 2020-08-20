@@ -293,15 +293,18 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
             @Override
             public void onChanged(List<Playlist> playlists) {
                 boolean check = false;
-                for (Playlist playlist : playlists) {
-                    Song song = playlist.getSong();
-                    check = song.equals(songList.get(songPosn));
+                if (started) {
+                    for (Playlist playlist : playlists) {
+                        Song song = playlist.getSong();
+                        check = song.equals(songList.get(songPosn));
+                    }
                 }
                 if (check) {
                     favorite.setImageResource(R.drawable.ic_fav);
                 } else {
                     favorite.setImageResource(R.drawable.ic_fav_not);
                 }
+
             }
         });
 
