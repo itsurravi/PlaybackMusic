@@ -895,7 +895,7 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
 
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (musicSrv.isPng()) {
+            if (musicSrv != null && musicSrv.isPng()) {
                 moveTaskToBack(true);
             } else {
                 if (doubleBackToExitPressedOnce) {
@@ -1328,12 +1328,15 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         }
 
         if (mEqualizer != null) {
+            mEqualizer.release();
             mEqualizer = null;
         }
         if (bassBoost != null) {
+            bassBoost.release();
             bassBoost = null;
         }
         if (presetReverb != null) {
+            presetReverb.release();
             presetReverb = null;
         }
 
@@ -1351,13 +1354,19 @@ public class MainActivity extends AppCompatActivity implements /*MediaPlayerCont
         mEqualizer.setEnabled(Settings.isEqualizerEnabled);
         bassBoost.setEnabled(Settings.isEqualizerEnabled);
         presetReverb.setEnabled(Settings.isEqualizerEnabled);
-
-        if (Settings.presetPos == 0) {
+        try {
+            if (Settings.presetPos == 0) {
+                for (short bandIdx = 0; bandIdx < mEqualizer.getNumberOfBands(); bandIdx++) {
+                    mEqualizer.setBandLevel(bandIdx, (short) Settings.seekbarpos[bandIdx]);
+                }
+            } else {
+                mEqualizer.usePreset((short) Settings.presetPos);
+            }
+        } catch (Exception e) {
+            Settings.presetPos = 0;
             for (short bandIdx = 0; bandIdx < mEqualizer.getNumberOfBands(); bandIdx++) {
                 mEqualizer.setBandLevel(bandIdx, (short) Settings.seekbarpos[bandIdx]);
             }
-        } else {
-            mEqualizer.usePreset((short) Settings.presetPos);
         }
     }
 }

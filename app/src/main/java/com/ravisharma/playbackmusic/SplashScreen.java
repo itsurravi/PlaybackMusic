@@ -36,7 +36,7 @@ public class SplashScreen extends AppCompatActivity {
         CHANNEL_ID = getString(R.string.music_Service);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            int imp = NotificationManager.IMPORTANCE_HIGH;
+            int imp = NotificationManager.IMPORTANCE_DEFAULT;
 
             NotificationChannel c = new NotificationChannel(CHANNEL_ID, getString(R.string.PlaybackMusicService), imp);
             c.setSound(null, null);

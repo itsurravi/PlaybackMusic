@@ -477,7 +477,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public boolean isPng() {
-        return player.isPlaying();
+        if (player != null) {
+            return player.isPlaying();
+        } else {
+            return false;
+        }
     }
 
     public void pausePlayer() {

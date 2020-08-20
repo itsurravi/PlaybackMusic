@@ -184,9 +184,10 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
             Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
             Cursor musicCursor = musicResolver.query(musicUri, null,
-                    MediaStore.Audio.Media.TITLE + " LIKE '%" + searchName + "%' OR " +
-                            MediaStore.Audio.Media.ALBUM + " LIKE '%" + searchName + "%' OR " +
-                            MediaStore.Audio.Media.ARTIST + " LIKE '%" + searchName + "%'",
+                    MediaStore.Audio.Media.TITLE + " LIKE \"%" + searchName + "%\" OR " +
+                            MediaStore.Audio.Media.DISPLAY_NAME + " LIKE \"%" + searchName + "%\" OR " +
+                            MediaStore.Audio.Media.ALBUM + " LIKE \"%" + searchName + "%\" OR " +
+                            MediaStore.Audio.Media.ARTIST + " LIKE \"%" + searchName + "%\"",
                     null,
                     MediaStore.Audio.Media.TITLE + " ASC");
 

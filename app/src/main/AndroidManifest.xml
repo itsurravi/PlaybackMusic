@@ -30,7 +30,6 @@
 
         <activity
             android:name=".activities.SingleSongPlayActivity"
-            android:screenOrientation="portrait"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.UserDialog">
