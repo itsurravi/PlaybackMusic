@@ -108,6 +108,15 @@
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/status_bar_ex_fav"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:background="?android:selectableItemBackground"
+            android:src="@drawable/ic_fav_not" />
+
     </LinearLayout>
 
 </RelativeLayout>

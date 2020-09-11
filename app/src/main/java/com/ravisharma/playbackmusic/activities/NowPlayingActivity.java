@@ -1,7 +1,10 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -11,10 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -22,9 +28,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
+import com.ravisharma.playbackmusic.MainActivityViewModel;
 import com.ravisharma.playbackmusic.adapters.NowPlayingAdapter;
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
+import com.ravisharma.playbackmusic.prefrences.PrefManager;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
+import com.ravisharma.playbackmusic.utils.StartDragListener;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
@@ -35,24 +46,33 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-public class NowPlayingActivity extends AppCompatActivity implements NowPlayingAdapter.OnItemClicked {
+import static com.ravisharma.playbackmusic.utils.UtilsKt.getPlayingSong;
+
+public class NowPlayingActivity extends AppCompatActivity implements NowPlayingAdapter.OnItemClicked, StartDragListener {
 
     private FrameLayout adContainerView;
     private AdView adView;
 
     private RecyclerView.LayoutManager layoutManager;
+    private ItemTouchHelper itemTouchHelper;
+
     ImageView imgBack, songArt;
     FastScrollRecyclerView recyclerView;
     NowPlayingAdapter adapter;
     TextView songTitle, songArtist, songDuration;
 
     int curpos;
-    //    TinyDB tinydb;
     private PlaylistRepository repository;
+
+    private Song playingSong;
+    private ArrayList<Song> playingList;
+    private int deletePosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,35 +85,100 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         songArtist = findViewById(R.id.songArtist);
         songDuration = findViewById(R.id.songDuration);
 
+        playingList = new ArrayList<>();
+
+        repository = new PlaylistRepository(this);
+
         Bundle b = getIntent().getExtras();
         curpos = b.getInt("songPos");
 
-        Song surrentSong = MainActivity.getInstance().songList.get(curpos);
+        initRecyclerView();
 
-        songTitle.setText(surrentSong.getTitle());
-        songArtist.setText(surrentSong.getArtist());
-        songDuration.setText((String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(surrentSong.getDuration()),
-                TimeUnit.MILLISECONDS.toSeconds(surrentSong.getDuration()) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(surrentSong.getDuration())))));
+        UtilsKt.getPlayingListData().observe(this, new Observer<ArrayList<Song>>() {
+            @Override
+            public void onChanged(ArrayList<Song> songs) {
+                Log.d("Playing", "NowPlaying Playlist");
+                playingList = songs;
+                adapter.setList(playingList);
+                if (UtilsKt.getSwiped() || UtilsKt.getFileDelete()) {
+                    Log.d("Playing", "Swiped");
+                    if (playingList.size() > 0) {
+                        MainActivity.getInstance().musicSrv.updateList(playingList);
+                        int position = playingList.indexOf(playingSong);
+                        MainActivity.getInstance().musicSrv.setSong(position);
+                    } else {
+                        if (SongsProvider.Companion.getSongListByName().getValue().size() == 0) {
+                            Toast.makeText(NowPlayingActivity.this, "No Song Left in Storage", Toast.LENGTH_SHORT).show();
+                            PrefManager manage = new PrefManager(NowPlayingActivity.this);
+                            manage.storeInfo(getString(R.string.Songs), false);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    System.exit(0);
+                                }
+                            }, 1000);
+                        }
+                        MainActivity.getInstance().musicSrv.updateList(SongsProvider.Companion.getSongListByName().getValue());
+                        MainActivity.getInstance().musicSrv.setSong(0);
+                        MainActivity.getInstance().musicSrv.playSong();
+                    }
+                    UtilsKt.setSwiped(false);
+                    UtilsKt.setFileDelete(false);
+                }
+                if (UtilsKt.getMoved()) {
+                    MainActivity.getInstance().musicSrv.updateList(playingList);
+                    int position = playingList.indexOf(playingSong);
+                    MainActivity.getInstance().musicSrv.setSong(position);
+                    UtilsKt.setMoved(false);
+                }
+            }
+        });
 
-        /*Song art code here*/
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.placeholder(R.drawable.logo);
-        requestOptions.error(R.drawable.logo);
+        UtilsKt.getPlayingSong().observe(this, new Observer<Song>() {
+            @Override
+            public void onChanged(Song song) {
+                Log.d("Playing", "Chnaged");
+                playingSong = song;
+                songTitle.setText(playingSong.getTitle());
+                songArtist.setText(playingSong.getArtist());
+                songDuration.setText((String.format("%d:%02d",
+                        TimeUnit.MILLISECONDS.toMinutes(playingSong.getDuration()),
+                        TimeUnit.MILLISECONDS.toSeconds(playingSong.getDuration()) -
+                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(playingSong.getDuration())))));
 
-        Glide.with(this)
-                .setDefaultRequestOptions(requestOptions)
-                .load(Uri.parse(surrentSong.getArt()))
-                .into(songArt);
+                /*Song art code here*/
+                RequestOptions requestOptions = new RequestOptions();
+                requestOptions.placeholder(R.drawable.logo);
+                requestOptions.error(R.drawable.logo);
 
-//        tinydb = new TinyDB(getApplicationContext());
-        repository = new PlaylistRepository(this);
+                Glide.with(NowPlayingActivity.this)
+                        .setDefaultRequestOptions(requestOptions)
+                        .load(Uri.parse(playingSong.getArt()))
+                        .into(songArt);
 
+            }
+        });
+
+        imgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        adContainerView = findViewById(R.id.banner_container_nowPlaying);
+
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.nowPlayingActId));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void initRecyclerView() {
         recyclerView = findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
 
-        adapter = new NowPlayingAdapter(MainActivity.getInstance().songList, this);
+        adapter = new NowPlayingAdapter(playingList, this, this);
         recyclerView.setAdapter(adapter);
 
         layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
@@ -108,26 +193,8 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
         adapter.setOnClick(this);
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
-        imgBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
-        adContainerView = findViewById(R.id.banner_container_nowPlaying);
-
-        adView = new AdView(this);
-        adView.setAdUnitId(getString(R.string.nowPlayingActId));
-        adContainerView.addView(adView);
-        loadBanner();
     }
 
     @Override
@@ -140,7 +207,8 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
     @Override
     public void onOptionsClick(int position) {
-        new LongClickItems(this, position, MainActivity.getInstance().songList, "NowPlaying");
+        deletePosition = position;
+        new LongClickItems(this, position, playingList, "NowPlaying");
     }
 
     @Override
@@ -159,14 +227,6 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         adView.loadAd(adRequest);
     }
 
-    public void updateList(int mposition) {
-        if (MainActivity.getInstance().songList.size() > 0) {
-            adapter.notifyDataSetChanged();
-        } else {
-            finish();
-        }
-    }
-
     public void showCreateListAlert(final View view) {
         AlertClickListener listener = new AlertClickListener() {
             @Override
@@ -181,8 +241,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     }
 
     private void addToPlaylist(String playListName) {
-        ArrayList<Song> list = MainActivity.getInstance().songList;
-//        tinydb.putListObject(playListName, list);
+        ArrayList<Song> list = playingList;
         for (Song s : list) {
             Playlist p = new Playlist(0, playListName, s);
             repository.addSong(p);
@@ -197,10 +256,8 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
             int fromPosition = viewHolder.getAdapterPosition();
             int toPosition = target.getAdapterPosition();
 
-            Collections.swap(MainActivity.getInstance().songList, fromPosition, toPosition);
-
-            updatePlayingList();
-
+            Collections.swap(playingList, fromPosition, toPosition);
+            UtilsKt.setMoved(true);
             recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
 
             return false;
@@ -209,21 +266,15 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             int position = viewHolder.getAdapterPosition();
-            if (MainActivity.getInstance().songList.get(position).equals(MainActivity.getInstance().getPlayingSong())) {
-                if (MainActivity.getInstance().songList.size() > 0) {
+            if (playingList.get(position).equals(playingSong)) {
+                if (playingList.size() > 0) {
                     MainActivity.getInstance().playNext();
                 }
             }
-            MainActivity.getInstance().songList.remove(position);
+            playingList.remove(position);
             recyclerView.getAdapter().notifyDataSetChanged();
-            if (MainActivity.getInstance().songList.size() == 0) {
-                MainActivity.getInstance().songList = MainActivity.provider.getSongListByName();
-                MainActivity.getInstance().songPosn = 0;
-                MainActivity.getInstance().musicSrv.setList(MainActivity.getInstance().songList);
-                MainActivity.getInstance().musicSrv.setSong(0);
-            } else {
-                updatePlayingList();
-            }
+            UtilsKt.setSwiped(true);
+            updatePlayingList();
         }
 
         @Override
@@ -233,14 +284,40 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
             }
             return super.getSwipeDirs(recyclerView, viewHolder);
         }
+
+        @Override
+        public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            super.clearView(recyclerView, viewHolder);
+            if (UtilsKt.getMoved()) {
+                updatePlayingList();
+            }
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return false;
+        }
     };
 
 
     private void updatePlayingList() {
-        Song playingSong = MainActivity.getInstance().getPlayingSong();
-        int position = MainActivity.getInstance().songList.indexOf(playingSong);
-        MainActivity.getInstance().songPosn = position;
-        MainActivity.getInstance().musicSrv.setList(MainActivity.getInstance().songList);
-        MainActivity.getInstance().musicSrv.setSong(position);
+        UtilsKt.setPlayingList(playingList);
+    }
+
+    @Override
+    public void requestDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
+
+    public void updateList(int mposition) {
+        Song song = playingList.get(mposition);
+        playingList.remove(mposition);
+
+        if (song.equals(playingSong) && playingList.size() > 1) {
+            MainActivity.getInstance().playNext();
+        }
+
+        UtilsKt.setFileDelete(true);
+        UtilsKt.setPlayingList(playingList);
     }
 }

@@ -3,12 +3,8 @@ package com.ravisharma.playbackmusic.equalizer;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
-import android.media.audiofx.BassBoost;
-import android.media.audiofx.Equalizer;
-import android.media.audiofx.PresetReverb;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,7 +22,6 @@ import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public class EqualizerFragment extends Fragment {
 
@@ -36,16 +31,16 @@ public class EqualizerFragment extends Fragment {
 
     int y = 0;
 
-    ImageView spinnerDropDownIcon;
+    private ImageView spinnerPresetDropDownIcon, spinnerRevDropDownIcon;
 
     short numberOfFrequencyBands;
     LinearLayout mLinearLayout;
 
     SeekBar[] seekBarFinal = new SeekBar[5];
 
-    AnalogController bassController, reverbController;
+    AnalogController bassController, virtualizerController;
 
-    Spinner presetSpinner;
+    Spinner presetSpinner, revSpinner;
 
     FrameLayout equalizerBlocker;
 
@@ -88,11 +83,13 @@ public class EqualizerFragment extends Fragment {
         backBtn = view.findViewById(R.id.equalizer_back_btn);
         fragTitle = view.findViewById(R.id.equalizer_fragment_title);
         equalizerSwitch = view.findViewById(R.id.equalizer_switch);
-        spinnerDropDownIcon = view.findViewById(R.id.spinner_dropdown_icon);
+        spinnerPresetDropDownIcon = view.findViewById(R.id.spinner_preset_dropdown_icon);
+        spinnerRevDropDownIcon = view.findViewById(R.id.spinner_rev_dropdown_icon);
         presetSpinner = view.findViewById(R.id.equalizer_preset_spinner);
+        revSpinner = view.findViewById(R.id.equalizer_rev_spinner);
         equalizerBlocker = view.findViewById(R.id.equalizerBlocker);
         bassController = view.findViewById(R.id.controllerBass);
-        reverbController = view.findViewById(R.id.controller3D);
+        virtualizerController = view.findViewById(R.id.controller3D);
         mLinearLayout = view.findViewById(R.id.equalizerContainer);
 
         backBtn.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +113,7 @@ public class EqualizerFragment extends Fragment {
 
                 MainActivity.getInstance().mEqualizer.setEnabled(isChecked);
                 MainActivity.getInstance().bassBoost.setEnabled(isChecked);
+                MainActivity.getInstance().virtualizer.setEnabled(isChecked);
                 MainActivity.getInstance().presetReverb.setEnabled(isChecked);
 
                 if (isChecked) {
@@ -126,10 +124,17 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        spinnerDropDownIcon.setOnClickListener(new View.OnClickListener() {
+        spinnerPresetDropDownIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 presetSpinner.performClick();
+            }
+        });
+
+        spinnerRevDropDownIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                revSpinner.performClick();
             }
         });
 
@@ -140,15 +145,15 @@ public class EqualizerFragment extends Fragment {
         }
 
         bassController.setLabel("BASS");
-        reverbController.setLabel("3D");
+        virtualizerController.setLabel("3D");
 
         bassController.circlePaint2.setColor(themeColor);
         bassController.linePaint.setColor(getResources().getColor(R.color.white));
         bassController.invalidate();
 
-        reverbController.circlePaint2.setColor(themeColor);
-        reverbController.linePaint.setColor(getResources().getColor(R.color.white));
-        reverbController.invalidate();
+        virtualizerController.circlePaint2.setColor(themeColor);
+        virtualizerController.linePaint.setColor(getResources().getColor(R.color.white));
+        virtualizerController.invalidate();
 
         if (!Settings.isEqualizerReloaded) {
             int x = 0;
@@ -160,9 +165,9 @@ public class EqualizerFragment extends Fragment {
                 }
             }
 
-            if (MainActivity.getInstance().presetReverb != null) {
+            if (MainActivity.getInstance().virtualizer != null) {
                 try {
-                    y = (MainActivity.getInstance().presetReverb.getPreset() * 19) / 6;
+                    y = ((MainActivity.getInstance().virtualizer.getRoundedStrength() * 19) / 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -175,13 +180,13 @@ public class EqualizerFragment extends Fragment {
             }
 
             if (y == 0) {
-                reverbController.setProgress(1);
+                virtualizerController.setProgress(1);
             } else {
-                reverbController.setProgress(y);
+                virtualizerController.setProgress(y);
             }
         } else {
             int x = ((Settings.bassStrength * 19) / 1000);
-            y = (Settings.reverbPreset * 19) / 6;
+            y = ((Settings.virtualizerStrength * 19) / 1000);
             if (x == 0) {
                 bassController.setProgress(1);
             } else {
@@ -189,12 +194,10 @@ public class EqualizerFragment extends Fragment {
             }
 
             if (y == 0) {
-                reverbController.setProgress(1);
+                virtualizerController.setProgress(1);
             } else {
-                reverbController.setProgress(y);
+                virtualizerController.setProgress(y);
             }
-
-            Log.d("Opening3DValue", "Opening: " + y);
         }
 
         bassController.setOnProgressChangedListener(new AnalogController.onProgressChangedListener() {
@@ -213,14 +216,16 @@ public class EqualizerFragment extends Fragment {
             }
         });
 
-        reverbController.setOnProgressChangedListener(new AnalogController.onProgressChangedListener() {
+        virtualizerController.setOnProgressChangedListener(new AnalogController.onProgressChangedListener() {
             @Override
             public void onProgressChanged(int progress) {
-                Settings.reverbPreset = (short) ((progress * 6) / 19);
-                Log.d("3DValue", progress + " " + Settings.reverbPreset + "");
+                Settings.virtualizerStrength = (short) (((float) 1000 / 19) * (progress));
+                if (Settings.virtualizerStrength < 1000) {
+                    Settings.virtualizerStrength += 1;
+                }
                 try {
-                    Settings.equalizerModel.setReverbPreset(Settings.reverbPreset);
-                    MainActivity.getInstance().presetReverb.setPreset(Settings.reverbPreset);
+                    Settings.equalizerModel.setVirtualizerStrength(Settings.virtualizerStrength);
+                    MainActivity.getInstance().virtualizer.setStrength(Settings.virtualizerStrength);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -333,15 +338,16 @@ public class EqualizerFragment extends Fragment {
             });
         }
 
-        equalizeSound();
+        setupPresetSpinner();
+        setupRevSpinner();
     }
 
-    public void equalizeSound() {
+    public void setupPresetSpinner() {
         ArrayList<String> equalizerPresetNames = new ArrayList<>();
         ArrayAdapter<String> equalizerPresetSpinnerAdapter = new ArrayAdapter<>(ctx,
                 R.layout.spinner_item,
                 equalizerPresetNames);
-        equalizerPresetSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        equalizerPresetSpinnerAdapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
         equalizerPresetNames.add("Custom");
 
         for (short i = 0; i < MainActivity.getInstance().mEqualizer.getNumberOfPresets(); i++) {
@@ -376,6 +382,50 @@ public class EqualizerFragment extends Fragment {
                     Toast.makeText(ctx, "Error while updating Equalizer", Toast.LENGTH_SHORT).show();
                 }
                 Settings.equalizerModel.setPresetPos(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void setupRevSpinner() {
+        ArrayList<String> equalizerRevNames = new ArrayList<>();
+        ArrayAdapter<String> equalizerRevSpinnerAdapter = new ArrayAdapter<>(ctx,
+                R.layout.spinner_item, equalizerRevNames);
+
+        equalizerRevSpinnerAdapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
+        equalizerRevNames.add("None");
+        equalizerRevNames.add("Small Room");
+        equalizerRevNames.add("Medium Room");
+        equalizerRevNames.add("Large Room");
+        equalizerRevNames.add("Medium Hall");
+        equalizerRevNames.add("Large Hall");
+        equalizerRevNames.add("Plate");
+
+        revSpinner.setAdapter(equalizerRevSpinnerAdapter);
+
+        if (Settings.isEqualizerReloaded) {
+
+            revSpinner.setSelection(Settings.reverbPreset);
+        }
+
+        revSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    Settings.reverbPreset = (short) position;
+                    try {
+                        Settings.equalizerModel.setReverbPreset(Settings.reverbPreset);
+                        MainActivity.getInstance().presetReverb.setPreset(Settings.reverbPreset);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(ctx, "Error while updating Equalizer", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override

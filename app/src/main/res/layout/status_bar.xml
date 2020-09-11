@@ -66,14 +66,15 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/status_bar_prev"
+            android:id="@+id/status_bar_fav"
             android:layout_width="0.0dip"
-            android:layout_height="48dip"
+            android:layout_height="35dip"
+            android:layout_gravity="center"
             android:layout_marginEnd="10dp"
             android:layout_weight="15"
             android:background="?android:selectableItemBackground"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_skip_previous_white_24dp" />
+            android:src="@drawable/ic_fav_not" />
 
         <ImageButton
             android:id="@+id/status_bar_play"

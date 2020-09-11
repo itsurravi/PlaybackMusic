@@ -31,6 +31,7 @@ import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
@@ -53,7 +54,6 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     private SongAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-//    TinyDB tinydb;
     String playlistName;
 
     private PlaylistRepository repository;
@@ -63,7 +63,6 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_playlist);
         songList = new ArrayList<>();
-//        tinydb = new TinyDB(getApplicationContext());
         repository = new PlaylistRepository(this);
 
         playlistName = getIntent().getStringExtra("playlistName");
@@ -85,12 +84,6 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
             }
         });
 
-//        fetchPlayList();
-
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
         adContainerView = findViewById(R.id.banner_container_fav);
 
         adView = new AdView(this);
@@ -106,10 +99,6 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }
-
-//    private void fetchPlayList() {
-//        songList.addAll(tinydb.getListObject(playlistName, Song.class));
-//    }
 
     private void initRecyclerView() {
         recyclerView = findViewById(R.id.song_list);
@@ -147,7 +136,7 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     @Override
     public void onItemLongClick(final int mposition) {
         String[] items = getResources().getStringArray(R.array.longPressItemsRemove);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<String>(this, R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(this).inflate(R.layout.alert_list, null);
 
@@ -185,21 +174,14 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
                         PlaylistActivity.this.onItemClick(mposition);
                         break;
                     case 1:
-                        MainActivity.getInstance().addNextSong(songList.get(mposition));
+                        UtilsKt.addNextSongToPlayingList(songList.get(mposition));
                         break;
                     case 2:
-                        MainActivity.getInstance().addToQueue(songList.get(mposition));
+                        UtilsKt.addSongToPlayingList(songList.get(mposition));
                         break;
                     case 3:
                         // Delete Song Code
-//                        ArrayList<Song> list = tinydb.getListObject(playlistName, Song.class);
-//                        list.remove(songList.get(mposition));
-//                        tinydb.putListObject(playlistName, list);
                         repository.removeSong(playlistName, songList.get(mposition).getId());
-                        if(playlistName.equals(getString(R.string.favTracks))){
-//                            MainActivity.getInstance().checkInFav(songList.get(mposition));
-                        }
-                        songList.remove(mposition);
                         break;
                     case 4:
                         Intent intent = new Intent(Intent.ACTION_SEND);

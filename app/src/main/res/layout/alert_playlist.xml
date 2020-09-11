@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/popupItemBackground"
     app:cardCornerRadius="@dimen/cardCorner">
 
     <LinearLayout
@@ -18,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:textColor="#000"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 

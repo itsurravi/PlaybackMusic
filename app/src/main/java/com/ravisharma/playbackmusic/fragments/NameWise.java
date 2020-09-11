@@ -1,18 +1,22 @@
 package com.ravisharma.playbackmusic.fragments;
 
+import android.app.RecoverableSecurityException;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -37,10 +42,10 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
-import com.ravisharma.playbackmusic.DataUpdateListener;
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
-import com.ravisharma.playbackmusic.provider.Provider;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
@@ -48,15 +53,11 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
 public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
-        SongAdapter.OnItemLongClicked, DataUpdateListener {
-
-    private AdView adView;
-    private FrameLayout adContainerView;
+        SongAdapter.OnItemLongClicked {
 
     FastScrollRecyclerView recyclerView;
     SongAdapter adapter;
@@ -73,26 +74,20 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        songList = new ArrayList<>();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_name_wise, container, false);
-        return v;
+        return inflater.inflate(R.layout.fragment_name_wise, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        if (songList.size() > 0) {
-            songList.clear();
-        }
 
-        songList.addAll(MainActivity.provider.getSongListByName());
-        ((MainActivity) Objects.requireNonNull(getActivity())).registerDataUpdateListener(this);
+        songList = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
@@ -100,9 +95,18 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        /*if(MainActivity.getInstance().lastSongId!=null && !MainActivity.getInstance().fromRecent){
-            MainActivity.getInstance().setStartingList(songList);
-        }*/
+        SongsProvider.Companion.getSongListByName().observe(this, new Observer<ArrayList<Song>>() {
+            @Override
+            public void onChanged(ArrayList<Song> songs) {
+                if (songs.size() > 0) {
+                    songList.clear();
+                    songList.addAll(songs);
+
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
         adapter = new SongAdapter(songList, getContext());
         recyclerView.setAdapter(adapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
@@ -110,27 +114,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
 
         adapter.setOnClick(this);
         adapter.setOnLongClick(this);
-        //Toast.makeText(getContext(), "name", Toast.LENGTH_SHORT).show();
 
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
-        adContainerView = v.findViewById(R.id.banner_container_name);
-
-        adView = new AdView(getContext());
-        adView.setAdUnitId(getString(R.string.nameFragId));
-        adContainerView.addView(adView);
-        loadBanner();
-
-    }
-
-    private void loadBanner() {
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(getActivity());
-        adView.setAdSize(adSize);
-        adView.loadAd(adRequest);
     }
 
     @Override
@@ -140,9 +124,9 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     }
 
     @Override
-    public void onItemLongClick(final int mposition) {
-        String[] items = getResources().getStringArray(R.array.longPressItems);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
+    public void onItemLongClick(final int mPosition) {
+        String[] items = getResources().getStringArray(R.array.longPressNameWise);
+        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), R.layout.adapter_alert_list, items);
 
         LayoutInflater li = LayoutInflater.from(getActivity());
 
@@ -158,10 +142,10 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
 
         Glide.with(v)
                 .setDefaultRequestOptions(requestOptions)
-                .load(songList.get(mposition).getArt())
+                .load(songList.get(mPosition).getArt())
                 .into(songArt);
 
-        tv.setText(songList.get(mposition).getTitle());
+        tv.setText(songList.get(mPosition).getTitle());
         lv.setAdapter(ad);
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
@@ -177,71 +161,80 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
-                    case 0:
+                    case 0: {
                         OnFragmentItemClicked onFragmentItemClicked = (OnFragmentItemClicked) getActivity();
-                        onFragmentItemClicked.OnFragmentItemClick(mposition, songList, false);
-                        break;
-                    case 1:
-                        ((MainActivity) getActivity()).addNextSong(songList.get(mposition));
-                        break;
-                    case 2:
-                        ((MainActivity) getActivity()).addToQueue(songList.get(mposition));
-                        break;
-                    case 3:
-                        ((MainActivity) getActivity()).addNextSong(songList.get(mposition));
+                        onFragmentItemClicked.OnFragmentItemClick(mPosition, songList, false);
+                    }
+                    break;
+                    case 1: {
+                        ArrayList<Song> singleSong = new ArrayList<>();
+                        singleSong.add(songList.get(mPosition));
+                        OnFragmentItemClicked itemClicked = (OnFragmentItemClicked) getActivity();
+                        itemClicked.OnFragmentItemClick(0, singleSong, false);
+                    }
+                    break;
+                    case 2: {
+                        UtilsKt.addNextSongToPlayingList(songList.get(mPosition));
+                    }
+                    break;
+                    case 3: {
+                        UtilsKt.addSongToPlayingList(songList.get(mPosition));
+                    }
+                    break;
+                    case 4: {
                         Intent i = new Intent(getContext(), AddToPlaylistActivity.class);
-                        i.putExtra("Song", songList.get(mposition));
+                        i.putExtra("Song", songList.get(mPosition));
                         startActivity(i);
-                        break;
-                    case 4:
+                    }
+                    break;
+                    case 5: {
                         // Delete Song Code
-                        AlertDialog.Builder b = new AlertDialog.Builder(getContext());
+                        AlertDialog.Builder b = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
                         b.setTitle(getString(R.string.deleteMessage));
-                        b.setMessage(songList.get(mposition).getTitle());
+                        b.setMessage(songList.get(mPosition).getTitle());
                         b.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                if (songList.size() == 1) {
+                                    Toast.makeText(getContext(), "Can't Delete Last Song", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
                                 Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                                 String[] projection = {MediaStore.Audio.Media._ID};
                                 String selection = MediaStore.Audio.Media.DATA + " = ?";
-                                String[] selectionArgs = new String[]{songList.get(mposition).getData()};
+                                String[] selectionArgs = new String[]{songList.get(mPosition).getData()};
                                 Cursor musicCursor = getActivity().getContentResolver().query(musicUri, projection,
                                         selection, selectionArgs, null);
 
                                 if (musicCursor.moveToFirst()) {
+                                    long id = musicCursor.getLong(musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                                    Uri deleteUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
                                     try {
-
-                                        long id = musicCursor.getLong(musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                                        Uri deleteUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
                                         File fdelete = new File(selectionArgs[0]);
-
                                         if (fdelete.exists()) {
-                                            if (fdelete.delete()) {
-                                                if (MainActivity.getInstance().getPlayingSong().equals(songList.get(mposition))) {
-                                                    MainActivity.getInstance().songList.remove(mposition);
-                                                    MainActivity.getInstance().setServiceList();
-                                                    MainActivity.getInstance().playNext();
-                                                } else if (MainActivity.getInstance().songList.contains(songList.get(mposition))) {
-                                                    MainActivity.getInstance().songList.remove(songList.get(mposition));
-                                                    MainActivity.getInstance().setServiceList();
+                                            getActivity().getContentResolver().delete(deleteUri, null, null);
+                                            updateList(mPosition);
+                                            Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } catch (Exception e) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            RecoverableSecurityException recoverableSecurityException;
+                                            if (e instanceof RecoverableSecurityException) {
+                                                recoverableSecurityException = (RecoverableSecurityException) e;
+                                                IntentSender intentSender = recoverableSecurityException.getUserAction()
+                                                        .getActionIntent().getIntentSender();
+                                                try {
+                                                    UtilsKt.setDeleteUri(deleteUri);
+                                                    startIntentSenderForResult(intentSender, 20123,
+                                                            null, 0, 0, 0, null);
+                                                } catch (IntentSender.SendIntentException ex) {
+                                                    ex.printStackTrace();
                                                 }
-                                                getActivity().getContentResolver().delete(deleteUri, null, null);
-                                                Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-
-                                                Provider provider = new Provider(getActivity());
-                                                provider.execute();
-
                                             } else {
-
                                                 Toast.makeText(getContext(), "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
                                             }
                                         }
-
-
-                                    } catch (Exception e) {
-                                        Toast.makeText(getContext(), "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
                                     }
-
                                 } else {
                                     Toast.makeText(getContext(), "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show();
                                 }
@@ -254,20 +247,22 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                                 dialog.dismiss();
                             }
                         });
-
                         AlertDialog d = b.create();
                         d.show();
-                        break;
-                    case 5:
+                    }
+                    break;
+                    case 6: {
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("audio/*");
-                        Uri uri = Uri.parse(songList.get(mposition).getData());
+                        Uri uri = Uri.parse(songList.get(mPosition).getData());
                         intent.putExtra(Intent.EXTRA_STREAM, uri);
                         getActivity().startActivity(Intent.createChooser(intent, "Share Via"));
-                        break;
-                    case 6:
-                        songDetails(mposition);
-                        break;
+                    }
+                    break;
+                    case 7: {
+                        songDetails(mPosition);
+                    }
+                    break;
                 }
                 alertDialog.dismiss();
             }
@@ -305,16 +300,6 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         dialog.show();
     }
 
-    @Override
-    public void onDataUpdate() {
-        if (songList.size() > 0) {
-            songList.clear();
-        }
-        songList.addAll(MainActivity.provider.getSongListByName());
-        adapter.setList(songList);
-        adapter.notifyDataSetChanged();
-    }
-
     public interface OnFragmentItemClicked {
         void OnFragmentItemClick(int position, ArrayList<Song> songsArrayList, boolean nowPlaying);
     }
@@ -323,18 +308,17 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         void OnFragmentItemLongClick(int position, ArrayList<Song> songsArrayList);
     }
 
+    private void updateList(int mposition) {
+        Song song = songList.get(mposition);
+        if (song.equals(UtilsKt.getPlayingSong().getValue())) {
+            MainActivity.getInstance().playNext();
+        }
+        UtilsKt.removeFromPlayingList(song);
+    }
+
     @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
 
-    }
-
-    @Override
-    public void onDestroy() {
-        if (adView != null) {
-            adView.destroy();
-        }
-        super.onDestroy();
-        ((MainActivity) getActivity()).unregisterDataUpdateListener(this);
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,8 +22,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter;
-import com.ravisharma.playbackmusic.DataUpdateListener;
-import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Artist;
 import com.ravisharma.playbackmusic.R;
@@ -31,17 +31,13 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Objects;
 
 import static com.ravisharma.playbackmusic.MainActivity.ARTIST_SONGS;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistClicked,
-        DataUpdateListener {
-    private AdView adView;
-    private FrameLayout adContainerView;
+public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistClicked {
 
     FastScrollRecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
@@ -69,8 +65,7 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        artistList = MainActivity.provider.getArtistList();
-        ((MainActivity) Objects.requireNonNull(getActivity())).registerDataUpdateListener(this);
+        artistList = new ArrayList<Artist>();
 
         recyclerView = v.findViewById(R.id.artist_list);
         recyclerView.setHasFixedSize(true);
@@ -79,11 +74,24 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        Collections.sort(artistList, new Comparator<Artist>() {
-            public int compare(Artist a, Artist b) {
-                return a.getArtistName().compareTo(b.getArtistName());
+        SongsProvider.Companion.getArtistList().observe(this, new Observer<ArrayList<Artist>>() {
+            @Override
+            public void onChanged(ArrayList<Artist> artists) {
+                if (artists.size() > 0) {
+                    artistList.clear();
+                    artistList.addAll(artists);
+
+                    Collections.sort(artistList, new Comparator<Artist>() {
+                        public int compare(Artist a, Artist b) {
+                            return a.getArtistName().compareTo(b.getArtistName());
+                        }
+                    });
+
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
+
 
         adapter = new ArtistAdapter(getContext(), artistList);
         recyclerView.setAdapter(adapter);
@@ -91,26 +99,6 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         adapter.setOnClick(this);
-
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
-        adContainerView = v.findViewById(R.id.banner_container_artist);
-
-        adView = new AdView(getContext());
-        adView.setAdUnitId(getString(R.string.artistFragId));
-        adContainerView.addView(adView);
-        loadBanner();
-
-    }
-
-    private void loadBanner() {
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(getActivity());
-        adView.setAdSize(adSize);
-        adView.loadAd(adRequest);
     }
 
     @Override
@@ -118,21 +106,5 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
         Intent i = new Intent(getContext(), ArtistSongsActivity.class);
         i.putExtra("artistId", String.valueOf(artistList.get(position).getArtistId()));
         getActivity().startActivityForResult(i, ARTIST_SONGS);
-    }
-
-    @Override
-    public void onDataUpdate() {
-        artistList = MainActivity.provider.getArtistList();
-        adapter.setList(artistList);
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (adView != null) {
-            adView.destroy();
-        }
-        ((MainActivity) getActivity()).unregisterDataUpdateListener(this);
-        super.onDestroy();
     }
 }

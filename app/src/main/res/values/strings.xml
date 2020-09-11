@@ -35,6 +35,7 @@
     <string name="prev">prev</string>
     <string name="playPause">playPause</string>
     <string name="next">next</string>
+    <string name="favorite">favorite</string>
 
     <string name="playLists">PlayLists</string>
     <string name="playback_info">playback_info</string>
@@ -88,7 +89,7 @@
     <string name="search">Search</string>
     <string name="playlist_Name">Playlist Name</string>
     <string name="Cancel">Cancel</string>
-    <string name="ok">Ok</string>
+    <string name="ok">Create</string>
     <string name="createNewPlaylist">Create New Playlist</string>
     <string name="location">Location:</string>
     <string name="duration">Duration:</string>
@@ -98,8 +99,9 @@
     <string name="artist">Artist:</string>
     <string name="savePlaylist">Save as Playlist</string>
 
-    <string-array name="longPressItems">
+    <string-array name="longPressNameWise">
         <item>Play</item>
+        <item>Play This Only</item>
         <item>Play Next</item>
         <item>Add To Queue</item>
         <item>Add To Playlist</item>
@@ -108,10 +110,19 @@
         <item>Details</item>
     </string-array>
 
+    <string-array name="longPressItems">
+        <item>Play</item>
+        <item>Play This Only</item>
+        <item>Play Next</item>
+        <item>Add To Queue</item>
+        <item>Add To Playlist</item>
+        <item>Share</item>
+        <item>Details</item>
+    </string-array>
+
     <string-array name="longPressNowPlaying">
         <item>Play</item>
         <item>Add To Playlist</item>
-        <item>Delete</item>
         <item>Share</item>
         <item>Details</item>
     </string-array>

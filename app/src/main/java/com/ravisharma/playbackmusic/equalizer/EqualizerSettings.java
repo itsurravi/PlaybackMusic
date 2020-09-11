@@ -5,6 +5,7 @@ public class EqualizerSettings {
     public int presetPos;
     public short reverbPreset;
     public short bassStrength;
+    public short virtualizerStrength;
     public boolean isEqualizerEnabled=false;
     public boolean isEqualizerReloaded=false;
 }

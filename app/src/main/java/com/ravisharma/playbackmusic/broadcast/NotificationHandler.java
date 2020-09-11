@@ -14,16 +14,18 @@ public class NotificationHandler extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String as = intent.getExtras().getString(context.getString(R.string.doit));
+        if (intent != null && intent.getExtras() != null) {
+            String as = intent.getExtras().getString(context.getString(R.string.doit));
 
-        if(as.equals(context.getString(R.string.prev))){
-            MainActivity.getInstance().playPrev();
-        }
-        else if(as.equals(context.getString(R.string.playPause))){
-            MainActivity.getInstance().btnplaypause();
-        }
-        else if(as.equals(context.getString(R.string.next))){
-            MainActivity.getInstance().playNext();
+            if (as.equals(context.getString(R.string.prev))) {
+                MainActivity.getInstance().playPrev();
+            } else if (as.equals(context.getString(R.string.playPause))) {
+                MainActivity.getInstance().btnplaypause();
+            } else if (as.equals(context.getString(R.string.next))) {
+                MainActivity.getInstance().playNext();
+            } else if (as.equals(context.getString(R.string.favorite))) {
+                MainActivity.getInstance().addToFavPlaylist();
+            }
         }
     }
 }

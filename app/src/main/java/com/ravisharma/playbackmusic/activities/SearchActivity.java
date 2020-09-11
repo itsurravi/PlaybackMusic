@@ -1,6 +1,9 @@
 package com.ravisharma.playbackmusic.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,7 +31,9 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.ravisharma.playbackmusic.activities.viewmodel.SearchViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
@@ -36,21 +41,25 @@ import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SearchActivity extends AppCompatActivity implements SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
 
     private AdView adView;
     private FrameLayout adContainerView;
 
-    ImageView tvSearch;
-    EditText edSearch;
-    ImageView imgBack;
-    FastScrollRecyclerView recyclerView;
-    SongAdapter adapter;
+    private ImageView tvSearch;
+    private EditText edSearch;
+    private ImageView imgBack;
+    private FastScrollRecyclerView recyclerView;
+    private SongAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    ArrayList<Song> songList;
-    String searchName;
+    private ArrayList<Song> songList;
+
+    private SearchViewModel viewModel;
+
+    private int mposition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +74,8 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
 
         songList = new ArrayList<>();
 
+        viewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+
         initRecyclerView();
 
         initListeners();
@@ -72,9 +83,6 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
         edSearch.requestFocus();
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.showSoftInput(edSearch, 0);
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
 
         adContainerView = findViewById(R.id.banner_container_search);
 
@@ -103,6 +111,23 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
+
+        adapter = new SongAdapter(songList, SearchActivity.this);
+        recyclerView.setAdapter(adapter);
+
+        adapter.setOnClick(SearchActivity.this);
+        adapter.setOnLongClick(SearchActivity.this);
+
+        viewModel.getSearchList().observe(this, new Observer<List<Song>>() {
+            @Override
+            public void onChanged(List<Song> songs) {
+                if (songs.size() > 0) {
+                    songList.clear();
+                    songList.addAll(songs);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 
     private void initListeners() {
@@ -143,11 +168,14 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
     }
 
     private void performSearch(String name) {
-        searchName = name;
+        if(name.length()<3){
+            Toast.makeText(this, "Search Length Not Valid", Toast.LENGTH_SHORT).show();
+            return;
+        }
         edSearch.clearFocus();
         InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         in.hideSoftInputFromWindow(edSearch.getWindowToken(), 0);
-        new MySearch().execute();
+        viewModel.search(name, getContentResolver());
     }
 
     @Override
@@ -161,78 +189,19 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
 
     @Override
     public void onItemLongClick(final int mposition) {
+        this.mposition=mposition;
         new LongClickItems(this, mposition, songList);
     }
 
-    public void updateList(int mposition) {
-        songList.remove(mposition);
-        adapter.notifyDataSetChanged();
-    }
-
-    class MySearch extends AsyncTask<Void, Void, ArrayList<Song>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected ArrayList<Song> doInBackground(Void... voids) {
-            songList.clear();
-
-            ContentResolver musicResolver = SearchActivity.this.getContentResolver();
-            Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-            Cursor musicCursor = musicResolver.query(musicUri, null,
-                    MediaStore.Audio.Media.TITLE + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.DISPLAY_NAME + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.ALBUM + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.ARTIST + " LIKE \"%" + searchName + "%\"",
-                    null,
-                    MediaStore.Audio.Media.TITLE + " ASC");
-
-            if (musicCursor != null && musicCursor.moveToFirst()) {
-                //get columns
-                int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-                int titleColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
-                int artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST);
-                int albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
-                int composerColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER);
-                int pathColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-                int durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-                int dateModifyColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
-
-
-                //add songs to list
-                do {
-                    long thisId = musicCursor.getLong(idColumn);
-                    String thisTitle = musicCursor.getString(titleColumn);
-                    String thisArtist = musicCursor.getString(artistColumn);
-                    String thisAlbum = musicCursor.getString(albumColumn);
-                    String thisComposer = musicCursor.getString(composerColumn);
-                    String thisPath = musicCursor.getString(pathColumn);
-                    String thisDateModify = musicCursor.getString(dateModifyColumn);
-                    long thisDuration = musicCursor.getLong(durationColumn);
-                    long thisAlbumAid = musicCursor.getLong(albumIdColumn);
-                    final Uri ART_CONTENT = Uri.parse("content://media/external/audio/albumart");
-                    Uri albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid);
-
-                    songList.add(new Song(thisId, thisTitle, thisArtist, thisPath, thisDateModify, String.valueOf(albumArt), thisDuration, thisAlbum, thisComposer));
-                }
-                while (musicCursor.moveToNext());
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK){
+            if(UtilsKt.getDeleteUri()!=null) {
+                getContentResolver().delete(UtilsKt.getDeleteUri(), null, null);
+                songList.remove(mposition);
+                adapter.notifyDataSetChanged();
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Song> songs) {
-            super.onPostExecute(songs);
-            adapter = new SongAdapter(songList, SearchActivity.this);
-            recyclerView.setAdapter(adapter);
-
-            adapter.setOnClick(SearchActivity.this);
-            adapter.setOnLongClick(SearchActivity.this);
         }
     }
 
@@ -242,5 +211,13 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
             adView.destroy();
         }
         super.onDestroy();
+    }
+
+    public void onItemClick(ArrayList<Song> list) {
+        Intent i = new Intent();
+        i.putExtra("position", 0);
+        i.putExtra("songList", list);
+        setResult(RESULT_OK, i);
+        finish();
     }
 }

@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.ravisharma.playbackmusic.activities.viewmodel.AddToPlaylistViewModel;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
@@ -34,8 +37,9 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
     private Song song;
     private ArrayList<String> list;
-//    private TinyDB tinydb;
-    private PlaylistRepository repository;
+
+
+    private AddToPlaylistViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +54,14 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
         btnAddNewPlaylist = findViewById(R.id.btnAddNewPlaylist);
 
-        repository = new PlaylistRepository(this);
-//        tinydb = new TinyDB(getApplicationContext());
-
         list = new ArrayList<>();
+
+        viewModel = new ViewModelProvider(this).get(AddToPlaylistViewModel.class);
 
         initRecyclerView();
 
         setUpArrayList();
 
-        playlistAdapter.setOnPlaylistClick(this);
-        playlistAdapter.setOnPlaylistLongClick(this);
         imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,32 +88,25 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
         playlistAdapter = new PlaylistAdapter(this, list);
         recyclerView.setAdapter(playlistAdapter);
+
+        playlistAdapter.setOnPlaylistClick(this);
+        playlistAdapter.setOnPlaylistLongClick(this);
     }
 
-    private void addToPlaylist(String playListName) {
-        /*ArrayList<Song> list = tinydb.getListObject(playListName, Song.class);
-
-        if (list.contains(song)) {
-            Toast.makeText(this, "Already Present", Toast.LENGTH_SHORT).show();
-        } else {
-            list.add(song);
-            tinydb.putListObject(playListName, list);
-            Toast.makeText(this, "Song Added To Playlist", Toast.LENGTH_SHORT).show();
-        }*/
-        long exist = repository.isSongExist(playListName, song.getId());
-        if(exist>0){
-            Toast.makeText(this, "Already Present", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Playlist p = new Playlist(0, playListName, song);
-            repository.addSong(p);
-            Toast.makeText(this, "Song Added To Playlist", Toast.LENGTH_SHORT).show();
-        }
+    private void setUpArrayList() {
+        viewModel.getAllPlaylists(this).observe(this, new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> strings) {
+                list.clear();
+                list.addAll(strings);
+                playlistAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
     public void onPlaylistClick(int position) {
-        addToPlaylist(list.get(position));
+        viewModel.addToPlaylist(this, list.get(position), song);
         finish();
     }
 
@@ -131,16 +125,6 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
 
         PlaylistAlert alert = new PlaylistAlert(this, listener);
         alert.showCreateListAlert();
-    }
-
-    private void setUpArrayList() {
-        if (list.size() > 0) {
-            list.clear();
-        }
-        PrefManager p = new PrefManager(this);
-        ArrayList<String> lis = p.getAllPlaylist();
-        list.addAll(lis);
-        playlistAdapter.notifyDataSetChanged();
     }
 
 }

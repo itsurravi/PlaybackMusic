@@ -7,17 +7,23 @@
     <color name="scrollThumb">#FE2851</color>
     <color name="seek_progress">#FE2851</color>
     <color name="notificationBackground">#242424</color>
-    <color name = "listitemTitle">#FFFFFF</color>
-    <color name = "listitemArtist">#bebbb4</color>
-    <color name = "listitemDuration">#bebbb4</color>
-    <color name = "listItemBackground">#FFFFFF</color>
+    <color name="listitemTitle">#FFFFFF</color>
+    <color name="listitemArtist">#bebbb4</color>
+    <color name="listitemDuration">#bebbb4</color>
+    <color name="listItemBackground">#FFFFFF</color>
     <color name="titleColor">#FFFFFF</color>
 
-    <color name = "tabIndicatorColor">#f6414c</color>
-    <color name = "tabSelectedTextColor">#f9d5d4</color>
-    <color name = "tabTextColor">#C3C3C3</color>
-    <color name = "textColor">#FFFFFF</color>
+    <color name="popupItemBackground">#2B3742</color>
+    <color name="tabIndicatorColor">#f6414c</color>
+    <color name="tabSelectedTextColor">#f9d5d4</color>
+    <color name="tabTextColor">#C3C3C3</color>
+    <color name="textColor">#FFFFFF</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="ripple_dark">#19FFFFFF</color>
 
+
+    <color name="colorWhite">#FFFFFF</color>
+
+    <color name="colorSwitchOff">#C7CBCC</color>
 </resources>

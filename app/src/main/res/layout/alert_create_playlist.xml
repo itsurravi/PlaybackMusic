@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/popupItemBackground"
     app:cardCornerRadius="@dimen/cardCorner">
 
     <LinearLayout
@@ -19,20 +20,21 @@
             android:layout_marginBottom="10dp"
             android:gravity="center_horizontal"
             android:text="New Playlist"
-            android:textColor="@color/scrollThumb"
-            android:textSize="20dp" />
+            android:textColor="@color/white"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/edPlaylistName"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/scrollThumb"
             android:hint="@string/playlist_Name"
+            android:inputType="textCapWords"
             android:maxLines="1"
             android:singleLine="true"
-            android:textColor="@color/scrollThumb"
+            android:textColor="@color/white"
             android:textColorHint="#BDBDBD"
-            android:inputType="textCapWords"
             android:textCursorDrawable="@null" />
 
         <LinearLayout
@@ -47,7 +49,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="20dp"
-                android:background="@drawable/btn_background"
                 android:paddingStart="40dp"
                 android:paddingTop="10dp"
                 android:paddingEnd="40dp"

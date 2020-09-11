@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,11 +25,11 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.ravisharma.playbackmusic.activities.viewmodel.AlbumSongViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.provider.Provider;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -41,8 +43,13 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
     ImageView albumArt, imgBack;
     TextView albumTitle, albumSong;
     FastScrollRecyclerView recyclerView;
+    private SongAdapter ad;
 
     private ArrayList<Song> songList;
+
+    private AlbumSongViewModel viewModel;
+
+    String albumId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,37 +69,37 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
         albumSong = findViewById(R.id.albumSong);
         recyclerView = findViewById(R.id.song_list);
 
+        viewModel = new ViewModelProvider(this).get(AlbumSongViewModel.class);
+
         String albumId = getIntent().getExtras().getString("albumId");
 
         if (albumId == null) {
             finish();
             return;
         }
+        this.albumId = albumId;
 
-        Provider p = new Provider(this);
-        songList.addAll(p.getSongList(albumId));
+        initRecyclerView();
 
-        if (songList.size() > 0) {
-            /*Song art code here*/
-            RequestOptions requestOptions = new RequestOptions();
-            requestOptions.placeholder(R.drawable.logo);
-            requestOptions.error(R.drawable.logo);
+        imgBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
-            Glide.with(this)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(Uri.parse(songList.get(0).getArt()))
-                    .into(albumArt);
+        adContainerView = findViewById(R.id.banner_container_albumActivity);
 
-            albumTitle.setText(songList.get(0).getAlbum());
-        } else {
-            finish();
-            Toast.makeText(this, "No Song Found", Toast.LENGTH_SHORT).show();
-        }
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.AlbumSongsActId));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
 
-        albumSong.setText(songList.size() + " Song(s)");
+    private void initRecyclerView() {
         recyclerView.setHasFixedSize(true);
 
-        SongAdapter ad = new SongAdapter(songList, this);
+        ad = new SongAdapter(songList, this);
         recyclerView.setAdapter(ad);
         ad.setOnClick(this);
         ad.setOnLongClick(this);
@@ -102,23 +109,29 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
 
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        imgBack.setOnClickListener(new View.OnClickListener() {
+        viewModel.getAlbumSongs(albumId, getContentResolver()).observe(this, new Observer<ArrayList<Song>>() {
             @Override
-            public void onClick(View v) {
-                finish();
+            public void onChanged(ArrayList<Song> songs) {
+                songList.clear();
+                songList.addAll(songs);
+
+                if (songList.size() > 0) {
+                    /*Song art code here*/
+                    RequestOptions requestOptions = new RequestOptions();
+                    requestOptions.placeholder(R.drawable.logo);
+                    requestOptions.error(R.drawable.logo);
+
+                    Glide.with(AlbumSongsActivity.this)
+                            .setDefaultRequestOptions(requestOptions)
+                            .load(Uri.parse(songList.get(0).getArt()))
+                            .into(albumArt);
+
+                    albumTitle.setText(songList.get(0).getAlbum());
+                    albumSong.setText(songList.size() + " Song(s)");
+                    ad.notifyDataSetChanged();
+                }
             }
         });
-
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
-        adContainerView = findViewById(R.id.banner_container_albumActivity);
-
-        adView = new AdView(this);
-        adView.setAdUnitId(getString(R.string.AlbumSongsActId));
-        adContainerView.addView(adView);
-        loadBanner();
     }
 
     public void setWindowFlag(Activity activity, final int bits, boolean on) {
@@ -157,7 +170,7 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
     public void updateList(int mposition) {
         songList.remove(mposition);
         if (songList.size() > 0) {
-            recyclerView.getAdapter().notifyDataSetChanged();
+            ad.notifyDataSetChanged();
         } else {
             finish();
         }
@@ -170,5 +183,13 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
         }
         songList.clear();
         super.onDestroy();
+    }
+
+    public void onItemClick(ArrayList<Song> list) {
+        Intent i = new Intent();
+        i.putExtra("position", 0);
+        i.putExtra("songList", list);
+        setResult(RESULT_OK, i);
+        finish();
     }
 }

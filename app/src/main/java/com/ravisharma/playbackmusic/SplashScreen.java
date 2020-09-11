@@ -18,15 +18,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.database.model.DatabaseSetup;
-import com.ravisharma.playbackmusic.provider.Provider;
+import com.ravisharma.playbackmusic.model.Playlist;
+import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.prefrences.PrefManager;
+import com.ravisharma.playbackmusic.prefrences.TinyDB;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class SplashScreen extends AppCompatActivity {
 
-    public static boolean shown = false;
     public String CHANNEL_ID;
 
     @Override
@@ -53,8 +61,70 @@ public class SplashScreen extends AppCompatActivity {
     }
 
     private void runTask() {
-        MainActivity.provider = new Provider(this);
-        MainActivity.provider.execute();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SongsProvider provider = new SongsProvider();
+
+                provider.fetchAllData(getContentResolver()).observe(SplashScreen.this, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean aBoolean) {
+                        if (aBoolean) {
+                            checkInPlaylists();
+                            runIntent();
+                        }
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    private void checkInPlaylists() {
+        ArrayList<Song> songListByName = SongsProvider.Companion.getSongListByName().getValue();
+        if(songListByName!=null) {
+            if(songListByName.size()<=1){
+                PrefManager manage = new PrefManager(this);
+                manage.storeInfo(getString(R.string.ID),"remove");
+                manage.storeInfo(getString(R.string.Shuffle), false);
+                manage.storeInfo(getString(R.string.Repeat), false);
+                manage.storeInfo(getString(R.string.RepeatOne), false);
+                manage.storeInfo(getString(R.string.Started), false);
+                manage.storeInfo("position", "remove");
+            }
+            TinyDB tinydb = new TinyDB(this);
+
+            PlaylistRepository repository = new PlaylistRepository(this);
+
+            List<String> playListArrayList = new ArrayList<>();
+            playListArrayList.add("NormalSongs");
+            playListArrayList.add("Songs");
+
+            for (String playListName : playListArrayList) {
+                ArrayList<Song> songList = tinydb.getListObject(playListName, Song.class);
+
+                for (Iterator<Song> iterator = songList.iterator(); iterator.hasNext(); ) {
+                    Song value = iterator.next();
+                    if (!songListByName.contains(value)) {
+                        iterator.remove();
+                    }
+                }
+                if (playListName.equals("Songs") && songList.size() == 0) {
+
+                    PrefManager manage = new PrefManager(this);
+                    manage.storeInfo(getString(R.string.Songs), false);
+                }
+                tinydb.putListObject(playListName, songList);
+            }
+
+            List<Playlist> playlists = repository.getAllPlaylistSongs();
+
+            for (Playlist playlist : playlists) {
+                Song s = playlist.getSong();
+                if (!songListByName.contains(s)) {
+                    repository.removeSong(s.getId());
+                }
+            }
+        }
     }
 
     public void runIntent() {
@@ -65,14 +135,14 @@ public class SplashScreen extends AppCompatActivity {
                 repository.isDatabaseRead().observe(SplashScreen.this, new Observer<DatabaseSetup>() {
                     @Override
                     public void onChanged(DatabaseSetup databaseSetup) {
-                        if(databaseSetup.isSetup()){
+                        if (databaseSetup.isSetup()) {
                             startActivity(new Intent(SplashScreen.this, MainActivity.class));
                             finish();
                         }
                     }
                 });
             }
-        }, 2000);
+        }, 1000);
     }
 
     /*

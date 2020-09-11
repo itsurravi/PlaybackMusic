@@ -6,7 +6,16 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="popupMenuBackground">@color/popupItemBackground</item>
+        <item name="android:colorControlHighlight">@color/ripple_dark</item>
         <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:navigationBarColor">@color/notificationBackground</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="@style/Theme.AppCompat.Dialog.Alert">
+        <item name="android:windowBackground">@color/popupItemBackground</item>
+        <item name="colorAccent">@color/scrollThumb</item>
     </style>
 
     <style name="SearchTheme" parent="AppTheme">
@@ -24,6 +33,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:navigationBarColor">@color/notificationBackground</item>
     </style>
 
     <style name="DialogAnimation_2">

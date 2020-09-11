@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +34,7 @@ import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
@@ -42,8 +45,14 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import kotlin.coroutines.CoroutineContext;
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.Dispatchers;
 
 import static com.ravisharma.playbackmusic.MainActivity.PLAYLIST;
 import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
@@ -51,15 +60,13 @@ import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
 public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlaylistClicked
         , PlaylistAdapter.OnPlaylistLongClicked, View.OnClickListener {
 
-    private AdView adView;
-    private FrameLayout adContainerView;
-
     private FastScrollRecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private PlaylistAdapter playlistAdapter;
     private List<String> playListArrayList;
     private Button btnAddNewPlaylist;
-    private PlaylistRepository repository;
+
+    private PlaylistFragmentViewModel viewModel;
 
     public PlaylistFragment() {
         // Required empty public constructor
@@ -74,37 +81,30 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         return v;
     }
 
-    private void loadBanner() {
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(getActivity());
-        adView.setAdSize(adSize);
-        adView.loadAd(adRequest);
-    }
-
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
         btnAddNewPlaylist = v.findViewById(R.id.btnAddNewPlaylist);
         recyclerView = v.findViewById(R.id.playlist);
+
+        viewModel = new ViewModelProvider(this).get(PlaylistFragmentViewModel.class);
+
+        initRecyclerView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setUpArrayList();
+    }
+
+    private void initRecyclerView() {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,
                 false);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        // Instantiate an AdView object.
-        // NOTE: The placement ID from the Facebook Monetization Manager identifies your App.
-        // To get test ads, add IMG_16_9_APP_INSTALL# to your placement id. Remove this when your app is ready to serve real ads.
-
-        adContainerView = v.findViewById(R.id.banner_container_playlist);
-
-        adView = new AdView(getContext());
-        adView.setAdUnitId(getString(R.string.playlistFragId));
-        adContainerView.addView(adView);
-        loadBanner();
-
         playlistAdapter = new PlaylistAdapter(getContext(), playListArrayList);
         recyclerView.setAdapter(playlistAdapter);
 
@@ -116,34 +116,19 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         playlistAdapter.setOnPlaylistLongClick(this);
 
         btnAddNewPlaylist.setOnClickListener(this);
-
-        repository = new PlaylistRepository(getContext());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setUpArrayList();
     }
 
     private void setUpArrayList() {
-        playListArrayList.clear();
-        playListArrayList.add(getString(R.string.recentAdded));
-        playListArrayList.add(getString(R.string.favTracks));
-
-        PrefManager p = new PrefManager(getContext());
-        ArrayList<String> list = p.getAllPlaylist();
-        playListArrayList.addAll(list);
-
-        playlistAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (adView != null) {
-            adView.destroy();
-        }
-        super.onDestroy();
+        viewModel.getAllPlaylists(getContext()).observe(this, new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> strings) {
+                playListArrayList.clear();
+                playListArrayList.add(getString(R.string.recentAdded));
+                playListArrayList.add(getString(R.string.favTracks));
+                playListArrayList.addAll(strings);
+                playlistAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -178,7 +163,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         }
 
         String[] items = getResources().getStringArray(R.array.longPressItemsPlaylist);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(getContext()).inflate(R.layout.alert_playlist, null);
 
@@ -194,14 +179,13 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
         alertDialog.show();
-//        final TinyDB tinydb = new TinyDB(getContext());
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int i, long id) {
                 switch (i) {
                     case 0:
-//                        ArrayList<Song> songList = tinydb.getListObject(playListArrayList.get(position), Song.class);
-                        List<Playlist> list = repository.getPlaylist(playListArrayList.get(position));
+                        List<Playlist> list = viewModel.getPlaylist(getContext(), playListArrayList.get(position));
                         if (list != null && list.size() > 0) {
                             ArrayList<Song> songList = new ArrayList<>();
                             for (Playlist p : list) {
@@ -215,12 +199,10 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
                         }
                         break;
                     case 1:
-//                        tinydb.removeListObject(playListArrayList.get(position));
-                        repository.removePlayist(playListArrayList.get(position));
+                        viewModel.removePlaylist(getContext(), playListArrayList.get(position));
                         PrefManager p = new PrefManager(getContext());
                         p.deletePlaylist(playListArrayList.get(position));
-                        playListArrayList.remove(position);
-                        playlistAdapter.notifyDataSetChanged();
+                        setUpArrayList();
                         break;
                 }
                 alertDialog.dismiss();

@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
@@ -45,7 +47,7 @@ public class RecentAddedActivity extends AppCompatActivity implements SongAdapte
         imgBack = findViewById(R.id.imgBack);
         recyclerView = findViewById(R.id.recent_song_list);
 
-        recentSongList = MainActivity.provider.getSongListByDate();
+        recentSongList = new ArrayList<>();
 
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL,
@@ -80,6 +82,19 @@ public class RecentAddedActivity extends AppCompatActivity implements SongAdapte
         adView.setAdUnitId(getString(R.string.recentSongsActId));
         adContainerView.addView(adView);
         loadBanner();
+
+        SongsProvider.Companion.getSongListByDate().observe(this, new Observer<ArrayList<Song>>() {
+            @Override
+            public void onChanged(ArrayList<Song> songs) {
+                recentSongList.clear();
+                recentSongList.addAll(songs);
+                if (recentSongList.size() > 0) {
+                    adapter.notifyDataSetChanged();
+                } else {
+                    finish();
+                }
+            }
+        });
     }
 
     private void loadBanner() {
@@ -104,14 +119,14 @@ public class RecentAddedActivity extends AppCompatActivity implements SongAdapte
         new LongClickItems(this, mposition, recentSongList);
     }
 
-    public void updateList(int mposition) {
-        recentSongList.remove(mposition);
-        if (recentSongList.size() > 0) {
-            adapter.notifyDataSetChanged();
-        } else {
-            finish();
-        }
-    }
+//    public void updateList(int mposition) {
+//        recentSongList.remove(mposition);
+//        if (recentSongList.size() > 0) {
+//            adapter.notifyDataSetChanged();
+//        } else {
+//            finish();
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -119,5 +134,13 @@ public class RecentAddedActivity extends AppCompatActivity implements SongAdapte
             adView.destroy();
         }
         super.onDestroy();
+    }
+
+    public void onItemClick(ArrayList<Song> list) {
+        Intent i = new Intent();
+        i.putExtra("position", 0);
+        i.putExtra("songList", list);
+        setResult(RESULT_OK, i);
+        finish();
     }
 }

@@ -42,8 +42,8 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:padding="10dp"
-            app:theme="@style/CustomSwitch" />
-
+            android:thumb="@drawable/switch_thumb"
+            app:track="@drawable/switch_track" />
     </RelativeLayout>
 
     <LinearLayout
@@ -53,30 +53,65 @@
         android:orientation="vertical"
         android:padding="10dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/btn_background">
 
                 <Spinner
-                    android:id="@+id/equalizer_preset_spinner"
+                    android:id="@+id/equalizer_rev_spinner"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="40dp"
                     android:background="@android:color/transparent" />
 
                 <ImageView
-                    android:id="@+id/spinner_dropdown_icon"
+                    android:id="@+id/spinner_rev_dropdown_icon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="10dp"
                     android:src="@drawable/ic_down"
-                    android:tint="#FFFFFF" />
+                    app:tint="#FFFFFF" />
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_background">
+
+                <Spinner
+                    android:id="@+id/equalizer_preset_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@android:color/transparent" />
+
+                <ImageView
+                    android:id="@+id/spinner_preset_dropdown_icon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_down"
+                    app:tint="#FFFFFF" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/equalizerContainer"

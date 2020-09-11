@@ -29,10 +29,13 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +43,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.ybq.android.spinkit.SpinKitView;
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
+import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -60,20 +67,27 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
     private TextView tvSongTitle, tvSongArtist, tvCurrentPosition, tvTotalDuration;
     private ImageView ivSongThumb, btn_PlayPause;
     private SeekBar seekBar;
+    private SpinKitView progressBar;
+
+    private Runnable mProgressRunner;
 
     private MediaPlayer player;
     private AudioManager audioManager;
 
+    private LinearLayout infoLayout;
     private FrameLayout adContainerView;
     private AdView adView;
 
     private int numActivity = 0;
+    private boolean played = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_song_play);
+
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
         this.setFinishOnTouchOutside(false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -93,7 +107,10 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
         ivSongThumb = findViewById(R.id.ivSongThumb);
         btn_PlayPause = findViewById(R.id.btn_PlayPause);
         seekBar = findViewById(R.id.seekBar);
+        infoLayout = findViewById(R.id.infoLayout);
         adContainerView = findViewById(R.id.banner_container_single_song);
+
+        progressBar = findViewById(R.id.spin_kit);
 
         adView = new AdView(this);
         adView.setAdUnitId(getString(R.string.SingleSongActId));
@@ -137,14 +154,25 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
             }
         });
 
+        mProgressRunner = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (seekBar != null) {
+                        seekBar.setProgress(player.getCurrentPosition());
+                        seekBar.postDelayed(mProgressRunner, 100);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
         ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskList = manager.getRunningTasks(10);
 
         numActivity = taskList.get(0).numActivities;
 
-        for (ActivityManager.RunningTaskInfo info : taskList) {
-            Log.d("ActivityName", info.numActivities + " top activity" + info.topActivity.getClassName());
-        }
     }
 
     private void loadBanner() {
@@ -153,42 +181,6 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
         AdSize adSize = CustomAdSize.getAdSize(this);
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
-    }
-
-    public void setPlayerUI(Uri uri) {
-        Song song = null;
-
-        if (uri.getScheme() != null && uri.getAuthority() != null) {
-            if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-                String songId = null;
-                if (uri.getAuthority().equals("com.android.providers.media.documents")) {
-                    songId = getSongIdFromMediaProvider(uri);
-                } else if (uri.getAuthority().equals("media")) {
-                    songId = uri.getLastPathSegment();
-                }
-                if (songId != null) {
-                    song = getSong(MediaStore.Audio.AudioColumns._ID + "=?", new String[]{songId});
-                }
-            }
-        }
-        if (song == null) {
-            File songFile = null;
-            if (uri.getAuthority() != null && uri.getAuthority().equals("com.android.externalstorage.documents")) {
-                songFile = new File(Environment.getExternalStorageDirectory(), uri.getPath().split(":", 2)[1]);
-            }
-            if (songFile == null) {
-                String path = getFilePathFromUri(SingleSongPlayActivity.this, uri);
-                if (path != null)
-                    songFile = new File(path);
-            }
-            if (songFile == null && uri.getPath() != null) {
-                songFile = new File(uri.getPath());
-            }
-
-            if (songFile != null) {
-                song = getSong(MediaStore.Audio.AudioColumns.DATA + "=?", new String[]{songFile.getAbsolutePath()});
-            }
-        }
     }
 
     private void setMediaPlayer(Uri songUri) {
@@ -250,38 +242,6 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
         return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this);
     }
 
-    protected Runnable mProgressRunner = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                if (seekBar != null) {
-                    seekBar.setProgress(player.getCurrentPosition());
-                    seekBar.postDelayed(mProgressRunner, 100);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-        if (player != null) {
-            player.stop();
-            player.release();
-            player = null;
-        }
-        seekBar.removeCallbacks(mProgressRunner);
-        removeAudioFocus();
-        if (numActivity > 1) {
-            finish();
-        } else {
-            finishAndRemoveTask();
-            System.exit(0);
-        }
-    }
-
     @Override
     public void onCompletion(MediaPlayer mp) {
         if (mp.getCurrentPosition() > 0) {
@@ -294,6 +254,7 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        played = true;
         requestAudioFocus();
         mp.start();
         btn_PlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
@@ -321,13 +282,14 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
                     player.pause();
                     btn_PlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
                 }
-
+                killApp();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 if (player.isPlaying()) {
                     player.setVolume(0.1f, 0.1f);
                     player.pause();
                 }
+                killApp();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 if (player.isPlaying()) {
@@ -338,15 +300,36 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
     }
 
     @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (played) {
+            killApp();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        killApp();
+    }
+
+    private void killApp() {
         if (player != null) {
             player.stop();
             player.release();
             player = null;
         }
-        seekBar.removeCallbacks(mProgressRunner);
-        removeAudioFocus();
+        if (seekBar != null) {
+            seekBar.removeCallbacks(mProgressRunner);
+            seekBar = null;
+        }
+        if (mProgressRunner != null) {
+            mProgressRunner = null;
+        }
+        if (audioManager != null) {
+            removeAudioFocus();
+            audioManager = null;
+        }
         if (numActivity > 1) {
             finish();
         } else {
@@ -355,86 +338,167 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
         }
     }
 
+    public void setPlayerUI(Uri uri) {
+        Log.d("SongURI", uri.toString() + "");
+        new FetchSongInfo(getContentResolver()).execute(uri);
+    }
 
-    private Song getSong(String selection, String[] args) {
-        ContentResolver musicResolver = this.getContentResolver();
+    private class MediaFile {
+        Uri trackUri;
+        String thisTitle;
+        String thisArtist;
+        Uri albumArt;
+    }
 
-        Cursor musicCursor = musicResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
-                selection, args, null);
+    private class FetchSongInfo extends AsyncTask<Uri, Void, MediaFile> {
 
-        Log.d("Song", selection + " " + args[0]);
-        try {
-            if (musicCursor != null /*&& musicCursor.getCount() > 0 && musicCursor.moveToFirst()*/) {
-                Log.d("Song", musicCursor.getCount() + "");
-                musicCursor.moveToFirst();
-                String[] ar = musicCursor.getColumnNames();
-                for (String col : ar) {
-                    Log.d("Song", "Col: " + col + " value: " + musicCursor.getString(musicCursor.getColumnIndex(col)) + "");
+        ContentResolver resolver;
+
+        public FetchSongInfo(ContentResolver resolver) {
+            this.resolver = resolver;
+        }
+
+        private MediaFile getSong(String selection, String[] args) {
+            MediaFile mediaFile = new MediaFile();
+
+            ContentResolver musicResolver = resolver;
+
+            Cursor musicCursor = musicResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null,
+                    selection, args, null);
+
+            Log.d("Song", selection + " " + args[0]);
+
+            try {
+                if (musicCursor != null /*&& musicCursor.getCount() > 0*/ && musicCursor.moveToFirst()) {
+                    Log.d("Song", musicCursor.getCount() + "");
+
+                    int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+                    int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+                    int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+                    int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+
+                    long thisId = musicCursor.getLong(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    long thisAlbumAid = musicCursor.getLong(albumIdColumn);
+                    final Uri ART_CONTENT = Uri.parse("content://media/external/audio/albumart");
+                    Uri albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid);
+
+                    Uri trackUri = ContentUris.withAppendedId(
+                            android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            thisId);
+
+                    mediaFile.albumArt = albumArt;
+                    mediaFile.thisArtist = thisArtist;
+                    mediaFile.thisTitle = thisTitle;
+                    mediaFile.trackUri = trackUri;
+
+                    musicCursor.close();
+                }
+                else{
+                    return null;
+                }
+            } catch (Exception e) {
+                Log.d("Error", e.toString());
+                return null;
+            }
+            return mediaFile;
+        }
+
+        @Nullable
+        private String getFilePathFromUri(Context context, Uri uri) {
+            Cursor cursor = null;
+            final String column = "_data";
+            final String[] projection = {
+                    column
+            };
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null,
+                        null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    final int column_index = cursor.getColumnIndexOrThrow(column);
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+            } finally {
+                if (cursor != null)
+                    cursor.close();
+            }
+            return null;
+        }
+
+        private String getSongIdFromMediaProvider(Uri uri) {
+            return DocumentsContract.getDocumentId(uri).split(":")[1];
+        }
+
+        @Override
+        protected MediaFile doInBackground(Uri... uris) {
+            MediaFile song = null;
+
+            Uri uri = uris[0];
+
+            if (uri.getScheme() != null && uri.getAuthority() != null) {
+                if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+                    String songId = null;
+                    if (uri.getAuthority().equals("com.android.providers.media.documents")) {
+                        songId = getSongIdFromMediaProvider(uri);
+                    } else if (uri.getAuthority().equals("media")) {
+                        songId = uri.getLastPathSegment();
+                    }
+                    if (songId != null) {
+                        song = getSong(MediaStore.Audio.AudioColumns._ID + "=?", new String[]{songId});
+                    }
+                }
+            }
+            if (song == null) {
+                File songFile = null;
+                if (uri.getAuthority() != null && uri.getAuthority().equals("com.android.externalstorage.documents")) {
+                    songFile = new File(Environment.getExternalStorageDirectory(), uri.getPath().split(":", 2)[1]);
+                }
+                if (songFile == null) {
+                    String path = getFilePathFromUri(SingleSongPlayActivity.this, uri);
+                    if (path != null)
+                        songFile = new File(path);
+                }
+                if (songFile == null && uri.getPath() != null) {
+                    songFile = new File(uri.getPath());
                 }
 
-                int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-                int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-                int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-                int artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+                if (songFile != null) {
+                    Log.d("Song", songFile.getAbsolutePath() + "");
+                    song = getSong(MediaStore.Audio.AudioColumns.DATA + "=?", new String[]{songFile.getAbsolutePath()});
+                }
+            }
+            return song;
+        }
 
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                long thisAlbumAid = musicCursor.getLong(albumIdColumn);
-                final Uri ART_CONTENT = Uri.parse("content://media/external/audio/albumart");
-                Uri albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid);
-                tvSongTitle.setText(thisTitle);
-                tvSongArtist.setText(thisArtist);
+        @Override
+        protected void onPostExecute(MediaFile mediaFile) {
+            super.onPostExecute(mediaFile);
+            if (mediaFile != null) {
+                tvSongTitle.setText(mediaFile.thisTitle);
+                tvSongArtist.setText(mediaFile.thisArtist);
 
                 RequestOptions requestOptions = new RequestOptions();
                 requestOptions.error(R.drawable.logo);
                 Glide.with(getApplicationContext())
                         .setDefaultRequestOptions(requestOptions)
-                        .load(albumArt)
+                        .load(mediaFile.albumArt)
                         .transition(DrawableTransitionOptions.withCrossFade())
                         .into(ivSongThumb);
 
-                Uri trackUri = ContentUris.withAppendedId(
-                        android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                        thisId);
+                setMediaPlayer(mediaFile.trackUri);
 
-                setMediaPlayer(trackUri);
+                progressBar.setVisibility(View.GONE);
+                infoLayout.setVisibility(View.VISIBLE);
 
+            } else {
+                killApp();
+                Toast.makeText(SingleSongPlayActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
             }
-        } catch (Exception e) {
-            Log.d("Error", e.toString());
-            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
-            finish();
         }
-        return null;
-    }
-
-    @Nullable
-    private String getFilePathFromUri(Context context, Uri uri) {
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {
-                column
-        };
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, null, null,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-
-    private String getSongIdFromMediaProvider(Uri uri) {
-        return DocumentsContract.getDocumentId(uri).split(":")[1];
     }
 
     /*

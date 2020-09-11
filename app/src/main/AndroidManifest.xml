@@ -11,7 +11,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
     <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />
 
     <application
@@ -27,7 +28,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-
         <activity
             android:name=".activities.SingleSongPlayActivity"
             android:excludeFromRecents="true"
@@ -38,16 +38,8 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
+<!--                <data android:scheme="file" />-->
                 <data android:scheme="content" />
-                <data android:mimeType="audio/*" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="file" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
@@ -111,7 +103,7 @@
                 <action android:name="prev" />
                 <action android:name="playPause" />
                 <action android:name="next" />
-                <action android:name="close" />
+                <action android:name="favorite" />
             </intent-filter>
         </receiver>
         <receiver android:name=".broadcast.Timer" />

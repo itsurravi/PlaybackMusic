@@ -23,7 +23,11 @@ public class PrefManager {
     }
 
     public void storeInfo(String key, String data) {
-        ed.putString(key, data);
+        if (data.equals("remove")) {
+            ed.remove(key);
+        } else {
+            ed.putString(key, data);
+        }
         ed.commit();
     }
 

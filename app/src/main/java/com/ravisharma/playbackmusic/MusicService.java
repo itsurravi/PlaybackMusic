@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -35,14 +36,19 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.NotificationTarget;
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
+import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.prefrences.PrefManager;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
+
+import static com.ravisharma.playbackmusic.utils.UtilsKt.setPlayingSong;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
     public static final int id = 123;
     public String CHANNEL_ID;
-
+    private Song playingSong;
     //media player
     protected MediaPlayer player;
     //adap_song alert_list
@@ -53,6 +59,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     boolean shuffle = false;
     boolean repeat = false;
     boolean repeat_one = false;
+    boolean notification = false;
     private Random random;
     protected SeekBar seekBar;
     private TextView mCurrentPosition;
@@ -61,8 +68,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     //Handle incoming phone calls
     private boolean ongoingCall = false;
-    private PhoneStateListener phoneStateListener;
-    private TelephonyManager telephonyManager;
 
     /*For Notifications*/
     RemoteViews smallView, bigView;
@@ -103,7 +108,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         songPosn = 0;
         initMusicPlayer();
         random = new Random();
-//        registerBecomingNoisyReceiver();
+        registerBecomingNoisyReceiver();
 //        callStateListener();
     }
 
@@ -151,11 +156,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setList(ArrayList<Song> theSongs) {
         songs = theSongs;
+        UtilsKt.setPlayingList(songs);
         Log.d("SERVICELISt", "" + songs.size());
+    }
+
+    public void updateList(ArrayList<Song> songList) {
+        songs = songList;
+        UtilsKt.setPlayingList(songs);
     }
 
     public void setSong(int songIndex) {
         songPosn = songIndex;
+        UtilsKt.setSongPosition(songPosn);
     }
 
     private void start() {
@@ -178,41 +190,21 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onAudioFocusChange(int focusState) {
         //Invoked when the audio focus of the system is updated.
+
+        Log.d("AUDIOSTATE", "" + focusState);
         switch (focusState) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (!player.isPlaying()) {
-                    start();
-//                    MainActivity.getInstance().playpause.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if (!player.isPlaying()) {
-//                                start();
-//                            } else {
-//                                pause();
-//                            }
-//                        }
-//                    });
-//
-//                    MainActivity.getInstance().playPauseSlide.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if (!player.isPlaying()) {
-//                                start();
-//                            } else {
-//                                pause();
-//                            }
-//                        }
-//                    });
-//                    if (ongoingCall) {
-//                        start();
-//                        ongoingCall = false;
-//                    }
+                if (!isPng()) {
+                    if (ongoingCall) {
+                        start();
+                        ongoingCall = false;
+                    }
                 }
                 player.setVolume(1.0f, 1.0f);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-                if (player.isPlaying()) {
+                if (isPng()) {
                     pause();
                 }
 
@@ -221,16 +213,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
-                if (player.isPlaying()) {
+                if (isPng()) {
                     player.setVolume(0.1f, 0.1f);
                     pause();
-//                    ongoingCall = true;
+                    ongoingCall = true;
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 // Lost focus for a short time, but it's ok to keep playing
                 // at an attenuated level
-                if (player.isPlaying()) {
+                if (isPng()) {
                     player.setVolume(0.1f, 0.1f);
                 }
                 break;
@@ -250,6 +242,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private boolean removeAudioFocus() {
         return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this);
+    }
+
+    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isPng()) {
+                pause();
+            }
+        }
+    };
+
+    private void registerBecomingNoisyReceiver() {
+        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        registerReceiver(becomingNoisyReceiver, intentFilter);
     }
 
     public class MusicBinder extends Binder {
@@ -274,6 +280,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 currSong);
 
+        playingSong = playSong;
         try {
             player.setDataSource(getApplicationContext(), trackUri);
         } catch (Exception ignored) {
@@ -281,7 +288,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
         try {
             player.prepare();
-            MainActivity.getInstance().setPlayingSong(playSong);
+            UtilsKt.setPlayingSong(playSong);
+
+            PrefManager manage = new PrefManager(this);
+            manage.storeInfo("position", String.valueOf(songPosn));
+            manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -308,7 +320,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         if (player.getCurrentPosition() > 0) {
             mp.reset();
             playNext();
-            MainActivity.getInstance().setNextTitle();
         }
     }
 
@@ -322,6 +333,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onPrepared(MediaPlayer mp) {
         requestAudioFocus();
         mp.start();
+
         if (repeat_one) {
             mp.setLooping(true);
         }
@@ -333,16 +345,30 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(player.getDuration()))
         ));
         notification();
+        notification = true;
     }
 
     public void updateNotification() {
         if (player != null) {
-            if (player.isPlaying()) {
+            if (isPng()) {
                 bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_pause_white_24dp);
                 smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_pause_white_24dp);
-            } else if (!player.isPlaying()) {
+            } else if (!isPng()) {
                 bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_play_arrow_white_24dp);
                 smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_play_arrow_white_24dp);
+            }
+            notificationManagerCompat.notify(id, not);
+        }
+    }
+
+    public void updateFavNotification(boolean check) {
+        if (player != null && notification) {
+            if (check) {
+                bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav);
+                smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav);
+            } else {
+                bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav_not);
+                smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav_not);
             }
             notificationManagerCompat.notify(id, not);
         }
@@ -417,6 +443,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         bigView.setTextViewText(R.id.status_bar_ex_track_name, songTitle);
         bigView.setTextViewText(R.id.status_bar_ex_artist_name, artist);
 
+        PlaylistRepository repository = new PlaylistRepository(this);
+        long exist = repository.isSongExist(getString(R.string.favTracks), playingSong.getId());
+        if (exist > 0) {
+            smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav);
+            bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav);
+        } else {
+            smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav_not);
+            bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav_not);
+        }
 
         Intent previousIntent = new Intent(this, NotificationHandler.class);
         previousIntent.putExtra(getString(R.string.doit), getString(R.string.prev));
@@ -430,13 +465,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         nextIntent.putExtra(getString(R.string.doit), getString(R.string.next));
         PendingIntent pnextIntent = PendingIntent.getBroadcast(this, 7, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        smallView.setOnClickPendingIntent(R.id.status_bar_prev, ppreviousIntent);
+        Intent favIntent = new Intent(this, NotificationHandler.class);
+        favIntent.putExtra(getString(R.string.doit), getString(R.string.favorite));
+        PendingIntent pFavIntentIntent = PendingIntent.getBroadcast(this, 6, favIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        smallView.setOnClickPendingIntent(R.id.status_bar_fav, pFavIntentIntent);
         smallView.setOnClickPendingIntent(R.id.status_bar_play, pplayPauseIntent);
         smallView.setOnClickPendingIntent(R.id.status_bar_next, pnextIntent);
 
         bigView.setOnClickPendingIntent(R.id.status_bar_ex_prev, ppreviousIntent);
         bigView.setOnClickPendingIntent(R.id.status_bar_ex_play, pplayPauseIntent);
         bigView.setOnClickPendingIntent(R.id.status_bar_ex_next, pnextIntent);
+        bigView.setOnClickPendingIntent(R.id.status_bar_ex_fav, pFavIntentIntent);
     }
 
     public void setUIControls(SeekBar mseekBar, TextView currentPosition, TextView totalDuration) {
@@ -469,14 +509,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         });
     }
 
-    public int getPosn() {
-        return player.getCurrentPosition();
-    }
-
-    public int getDur() {
-        return player.getDuration();
-    }
-
     public boolean isPng() {
         if (player != null) {
             return player.isPlaying();
@@ -486,7 +518,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void pausePlayer() {
-        if (player.isPlaying()) player.pause();
+        if (isPng()) player.pause();
         if (fromButton) {
             notification();
         }
@@ -498,7 +530,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void go() {
-        if (!player.isPlaying()) {
+        if (!isPng()) {
             requestAudioFocus();
             player.start();
         }
@@ -512,6 +544,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void playPrev() {
         songPosn--;
         if (songPosn < 0) songPosn = songs.size() - 1;
+        UtilsKt.setSongPosition(songPosn);
         playSong();
     }
 
@@ -519,6 +552,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void playNext() {
         songPosn++;
         if (songPosn >= songs.size()) songPosn = 0;
+        UtilsKt.setSongPosition(songPosn);
         playSong();
     }
 
@@ -527,69 +561,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         stopForeground(true);
         player.stop();
         player.release();
-//        unregisterReceiver(becomingNoisyReceiver);
+        unregisterReceiver(becomingNoisyReceiver);
         removeAudioFocus();
-        seekBar.removeCallbacks(mProgressRunner);
+        if (seekBar != null) {
+            seekBar.removeCallbacks(mProgressRunner);
+        }
         super.onDestroy();
     }
-
-    /*//Becoming noisy
-    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            pausePlayer();
-            MainActivity.getInstance().onCallIncoming();
-        }
-    };
-
-    private void registerBecomingNoisyReceiver() {
-        //register after getting audio focus
-        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        registerReceiver(becomingNoisyReceiver, intentFilter);
-    }
-
-    //Handle incoming phone calls
-    private void callStateListener() {
-        // Get the telephony manager
-        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        //Starting listening for PhoneState changes
-        phoneStateListener = new PhoneStateListener() {
-            @Override
-            public void onCallStateChanged(int state, String incomingNumber) {
-                try {
-                    if (player != null && player.isPlaying()) {
-                        switch (state) {
-                            //if at least one call exists or the phone is ringing
-                            //pause the MediaPlayer
-                            case TelephonyManager.CALL_STATE_OFFHOOK:
-                                break;
-                            case TelephonyManager.CALL_STATE_RINGING:
-                                if (player.isPlaying()) {
-                                    player.setVolume(0.5f, 0.5f);
-//                                pause();
-                                    //Toast.makeText(MusicService.this, "working", Toast.LENGTH_SHORT).show();
-                                }
-                                ongoingCall = true;
-                                break;
-                            case TelephonyManager.CALL_STATE_IDLE:
-                                // Phone idle. Start playing.
-                                if (ongoingCall) {
-                                    ongoingCall = false;
-                                    start();
-                                }
-                                break;
-                        }
-                    }
-                } catch (Exception ignored) {
-
-                }
-            }
-        };
-        // Register the listener with the telephony manager
-        // Listen for changes to the device call state.
-        telephonyManager.listen(phoneStateListener,
-                PhoneStateListener.LISTEN_CALL_STATE);
-    }*/
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
