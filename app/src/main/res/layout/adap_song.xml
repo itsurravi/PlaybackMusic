@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -21,7 +20,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="10dp">
+            app:cardCornerRadius="@dimen/cardCorner">
 
             <ImageView
                 android:id="@+id/song_art"

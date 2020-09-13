@@ -14,7 +14,6 @@ import com.ravisharma.playbackmusic.utils.songPosition
 class MainActivityViewModel : ViewModel() {
 
     private var repository: PlaylistRepository? = null
-    private var playingList: MutableLiveData<ArrayList<Song>> = MutableLiveData();
     private var pSong: MutableLiveData<Song> = MutableLiveData()
     private var sPostion: MutableLiveData<Int> = MutableLiveData()
 

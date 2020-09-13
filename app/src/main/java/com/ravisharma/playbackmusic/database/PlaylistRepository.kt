@@ -5,12 +5,10 @@ import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
-import com.ravisharma.playbackmusic.database.dao.SetupDao
-import com.ravisharma.playbackmusic.database.model.DatabaseSetup
 import com.ravisharma.playbackmusic.model.Playlist
 
 class PlaylistRepository(context: Context?) {
-    private val setupDao: SetupDao
+//    private val setupDao: SetupDao
     private val playlistDao: PlaylistDao
     private var playlistSong: LiveData<List<Playlist>> = MutableLiveData()
 
@@ -18,12 +16,12 @@ class PlaylistRepository(context: Context?) {
 
     init {
         database = PlaylistDatabase.getInstance(context)
-        setupDao = database.setupDao()
+//        setupDao = database.setupDao()
         playlistDao = database.playlistDao()
     }
 
-    val isDatabaseRead: LiveData<DatabaseSetup>
-        get() = setupDao.dataSetup()
+//    val isDatabaseRead: LiveData<DatabaseSetup>
+//        get() = setupDao.dataSetup()
 
     //Playlist Operations
     fun getPlaylistSong(playlistName: String): LiveData<List<Playlist>> {

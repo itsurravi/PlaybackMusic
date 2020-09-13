@@ -1,26 +1,15 @@
 package com.ravisharma.playbackmusic.provider
 
-import android.R
-import android.app.NotificationManager
-import android.app.PendingIntent
+
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.Context.NOTIFICATION_SERVICE
-import android.content.Intent
-import android.database.ContentObserver
-import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Handler
 import android.provider.MediaStore
-import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.model.Album
 import com.ravisharma.playbackmusic.model.Artist
 import com.ravisharma.playbackmusic.model.Song
 import kotlinx.coroutines.*
-import kotlin.system.measureTimeMillis
-
 
 class SongsProvider {
 
@@ -36,7 +25,7 @@ class SongsProvider {
     }
 
 
-    var s5: MutableLiveData<Boolean> = MutableLiveData()
+    private var s5: MutableLiveData<Boolean> = MutableLiveData()
 
     fun fetchAllData(musicResolver: ContentResolver): MutableLiveData<Boolean> {
         startDataFetch(musicResolver)
@@ -58,12 +47,11 @@ class SongsProvider {
                 s5.postValue(false)
                 this.cancel()
             }
-//            Log.d("COROUTINE_CHECK", "$time is taken")
         }
     }
 
     private fun getSongByName(musicResolver: ContentResolver): Boolean {
-        var songList = ArrayList<Song>()
+        val songList = ArrayList<Song>()
         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val musicCursor = musicResolver.query(musicUri, null,
                 MediaStore.Audio.Media.IS_MUSIC + "!=0 AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf(
@@ -104,9 +92,11 @@ class SongsProvider {
                     }
                 } while (musicCursor.moveToNext())
 
+                musicCursor.close()
                 songListByName.postValue(songList)
                 return true
             } else {
+                musicCursor.close()
                 return true
             }
         } else {
@@ -115,7 +105,7 @@ class SongsProvider {
     }
 
     private fun getSongByDate(musicResolver: ContentResolver): Boolean {
-        var songList = ArrayList<Song>()
+        val songList = ArrayList<Song>()
         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val musicCursor = musicResolver.query(musicUri, null,
                 MediaStore.Audio.Media.IS_MUSIC + "!=0 AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%"), MediaStore.Audio.Media.DATE_MODIFIED + " DESC")
@@ -154,9 +144,12 @@ class SongsProvider {
 
                     }
                 } while (musicCursor.moveToNext())
+
+                musicCursor.close()
                 songListByDate.postValue(songList)
                 return true
             } else {
+                musicCursor.close()
                 return true
             }
         } else {
@@ -165,7 +158,7 @@ class SongsProvider {
     }
 
     private fun getAlbums(musicResolver: ContentResolver): Boolean {
-        var songList = ArrayList<Album>()
+        val songList = ArrayList<Album>()
         val musicUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
 
         val albumProjection = arrayOf(
@@ -207,10 +200,13 @@ class SongsProvider {
                     }
                 } while (musicCursor.moveToNext())
 
+                musicCursor.close()
+
                 albumList.postValue(songList)
 
                 return true
             } else {
+                musicCursor.close()
                 return true
             }
         } else {
@@ -220,7 +216,7 @@ class SongsProvider {
     }
 
     private fun getArtists(musicResolver: ContentResolver): Boolean {
-        var songList = ArrayList<Artist>()
+        val songList = ArrayList<Artist>()
         val musicUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
 
         val artistProjection = arrayOf(
@@ -257,10 +253,12 @@ class SongsProvider {
                     }
                 } while (musicCursor.moveToNext())
 
+                musicCursor.close()
                 artistList.postValue(songList)
 
                 return true
             } else {
+                musicCursor.close()
                 return true
             }
         } else {

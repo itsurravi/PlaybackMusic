@@ -38,6 +38,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
+import android.media.MediaMetadata;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.PresetReverb;
@@ -46,7 +47,6 @@ import android.media.session.MediaSession;
 import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.AsyncTask;
-import android.os.CountDownTimer;
 import android.os.Handler;
 
 import androidx.annotation.Nullable;
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         TAG = getString(R.string.app_name);
 
-        mediaSession = new MediaSession(getApplicationContext(), TAG);
+//        mediaSession = new MediaSession(getApplicationContext(), TAG);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
@@ -288,6 +288,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 artist.setText(playingSong.getArtist());
                 glide_images();
                 checkInFav(playingSong);
+
+                PrefManager manage = new PrefManager(MainActivity.this);
+                manage.storeInfo("position", String.valueOf(songPosn));
+                manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
 
                 totalDuration.setText(String.format("%d:%02d",
                         TimeUnit.MILLISECONDS.toMinutes(playingSong.getDuration()),
@@ -564,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             if (v == shuffle) {
-                musicSrv.setShuffle();
+                musicSrv.shuffleOnOff();
                 if (musicSrv.shuffle) {
                     normalList.clear();
 
@@ -945,7 +949,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if (musicSrv != null && musicSrv.isPng()) {
+            if (viewPager.getCurrentItem() > 0) {
+                viewPager.setCurrentItem(0, true);
+            } else if (musicSrv != null && musicSrv.isPng()) {
                 moveTaskToBack(true);
             } else {
                 if (doubleBackToExitPressedOnce) {
@@ -986,8 +992,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             unbindService(musicConnection);
         }
 
-        mediaSession.release();
-
+        if (mediaSession != null) {
+            mediaSession.release();
+        }
         saveEqualizerSettings();
 
         unRegisterMediaChangeObserver();
@@ -1093,6 +1100,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .build();
         mediaSession.setPlaybackState(state);
 
+        mediaSession.setMetadata(new MediaMetadata.Builder()
+                .putLong(MediaMetadata.METADATA_KEY_DURATION, -1)
+                .build());
+
         mediaSession.setCallback(new MediaSession.Callback() {
             @Override
             public void onPlay() {
@@ -1174,7 +1185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //pass alert_list
             if (lastSongId != null) {
                 musicSrv.setList(songList);
-                musicSrv.checkShuffle(lastShuffle);
+                musicSrv.setShuffle(lastShuffle);
                 musicSrv.checkRepeat(lastRepeat, lastRepeatOne);
                 musicSrv.setSong(Integer.parseInt(lastSongId));
             }

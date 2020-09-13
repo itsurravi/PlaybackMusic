@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import android.app.Service;
@@ -9,7 +11,10 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -19,22 +24,17 @@ import android.os.PowerManager;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.NotificationTarget;
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Song;
@@ -48,34 +48,32 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public static final int id = 123;
     public String CHANNEL_ID;
-    private Song playingSong;
-    //media player
-    protected MediaPlayer player;
-    //adap_song alert_list
-    private ArrayList<Song> songs;
-    //current position
-    protected int songPosn;
     private String songTitle, artist;
+
+    protected int songPosn;
+    private Song playingSong;
+    private ArrayList<Song> songs;
+
+    protected MediaPlayer player;
+
     boolean shuffle = false;
     boolean repeat = false;
     boolean repeat_one = false;
     boolean notification = false;
-    private Random random;
+    boolean fromButton = true;
+
     protected SeekBar seekBar;
     private TextView mCurrentPosition;
     private TextView mTotalDuration;
+
     private AudioManager audioManager;
 
     //Handle incoming phone calls
     private boolean ongoingCall = false;
 
     /*For Notifications*/
-    RemoteViews smallView, bigView;
-    NotificationCompat.Builder builder;
-    Notification not;
+    Notification playerNotification;
     NotificationManagerCompat notificationManagerCompat;
-
-    boolean fromButton = true;
 
     private final IBinder musicBind = new MusicBinder();
 
@@ -107,13 +105,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //initialize position
         songPosn = 0;
         initMusicPlayer();
-        random = new Random();
-        registerBecomingNoisyReceiver();
-//        callStateListener();
-    }
 
-    public void checkShuffle(boolean shuff) {
-        shuffle = shuff;
+        registerBecomingNoisyReceiver();
     }
 
     public void checkRepeat(boolean repeat, boolean repeat_one) {
@@ -136,7 +129,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    public void setShuffle() {
+    public void setShuffle(boolean shuff) {
+        shuffle = shuff;
+    }
+
+    public void shuffleOnOff() {
         shuffle = !shuffle;
     }
 
@@ -157,7 +154,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void setList(ArrayList<Song> theSongs) {
         songs = theSongs;
         UtilsKt.setPlayingList(songs);
-        Log.d("SERVICELISt", "" + songs.size());
     }
 
     public void updateList(ArrayList<Song> songList) {
@@ -173,18 +169,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void start() {
         player.start();
         mProgressRunner.run();
-        bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_pause_white_24dp);
-        smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_pause_white_24dp);
+        togglePlayPauseNotification(true);
         MainActivity.getInstance().setPauseIcons();
-        notificationManagerCompat.notify(id, not);
     }
 
     private void pause() {
         player.pause();
-        bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_play_arrow_white_24dp);
-        smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_play_arrow_white_24dp);
+        togglePlayPauseNotification(false);
         MainActivity.getInstance().setPlayIcons();
-        notificationManagerCompat.notify(id, not);
     }
 
     @Override
@@ -294,6 +286,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             manage.storeInfo("position", String.valueOf(songPosn));
             manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
 
+            Log.d("SONGPOSITION", songPosn + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -344,139 +337,140 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 TimeUnit.MILLISECONDS.toSeconds(player.getDuration()) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(player.getDuration()))
         ));
-        notification();
+        createMediaStyleNotification();
         notification = true;
     }
 
     public void updateNotification() {
         if (player != null) {
             if (isPng()) {
-                bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_pause_white_24dp);
-                smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_pause_white_24dp);
+                togglePlayPauseNotification(true);
             } else if (!isPng()) {
-                bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_play_arrow_white_24dp);
-                smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_play_arrow_white_24dp);
+                togglePlayPauseNotification(false);
             }
-            notificationManagerCompat.notify(id, not);
         }
     }
 
     public void updateFavNotification(boolean check) {
         if (player != null && notification) {
             if (check) {
-                bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav);
-                smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav);
+                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_favorite_24, "Favorite", retrievePlaybackIntent(1));
             } else {
-                bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav_not);
-                smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav_not);
+                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_favorite_not_24, "Favorite", retrievePlaybackIntent(1));
             }
-            notificationManagerCompat.notify(id, not);
+            notificationManagerCompat.notify(id, playerNotification);
         }
     }
 
-    public void notification() {
-        fromButton = false;
-
-        createNotification();
-
-        Intent intent1 = new Intent(this, MainActivity.class);
-        intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent1 = PendingIntent.getActivity(getApplicationContext(), 0,
-                intent1, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        builder = new NotificationCompat.Builder(this, CHANNEL_ID);
-
-        builder.setSmallIcon(R.drawable.ic_music_note)
-                .setCustomContentView(smallView)
-                .setCustomBigContentView(bigView)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setTicker(songTitle)
-                .setOngoing(true)
-                .setContentIntent(pendingIntent1);
-
-        bigView.setImageViewResource(R.id.status_bar_ex_play, R.drawable.uamp_ic_pause_white_24dp);
-        smallView.setImageViewResource(R.id.status_bar_play, R.drawable.uamp_ic_pause_white_24dp);
-
-        not = builder.build();
-
-        NotificationTarget target1 = new NotificationTarget(
-                this,
-                R.id.status_bar_ex_album_art,
-                bigView,
-                not,
-                id
-        );
-
-        NotificationTarget target2 = new NotificationTarget(
-                this,
-                R.id.status_bar_albumart,
-                smallView,
-                not,
-                id
-        );
-
-        Glide.with(this)
-                .asBitmap()
-                .load(songs.get(songPosn).getArt())
-                .into(target1);
-
-        Glide.with(this)
-                .asBitmap()
-                .load(songs.get(songPosn).getArt())
-                .into(target2);
-
-        startForeground(id, not);
-    }
-
-    private void createNotification() {
+    private void createMediaStyleNotification() {
         notificationManagerCompat = NotificationManagerCompat.from(this);
 
-        smallView = new RemoteViews(getPackageName(), R.layout.status_bar);
-        bigView = new RemoteViews(getPackageName(), R.layout.status_bar_expanded);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(songs.get(songPosn).getData());
+        InputStream inputStream = null;
+        if (mmr.getEmbeddedPicture() != null) {
+            inputStream = new ByteArrayInputStream(mmr.getEmbeddedPicture());
+        }
 
-        smallView.setImageViewResource(R.id.status_bar_albumart, R.drawable.logo);
-        smallView.setTextViewText(R.id.status_bar_track_name, songTitle);
-        smallView.setTextViewText(R.id.status_bar_artist_name, artist);
+        mmr.release();
 
+        Bitmap artWork;
 
-        bigView.setImageViewResource(R.id.status_bar_ex_album_art, R.drawable.logo);
-        bigView.setTextViewText(R.id.status_bar_ex_track_name, songTitle);
-        bigView.setTextViewText(R.id.status_bar_ex_artist_name, artist);
+        if (inputStream != null) {
+            artWork = BitmapFactory.decodeStream(inputStream);
+        } else {
+            artWork = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo);
+        }
+
+        NotificationCompat.Action favorite;
 
         PlaylistRepository repository = new PlaylistRepository(this);
         long exist = repository.isSongExist(getString(R.string.favTracks), playingSong.getId());
         if (exist > 0) {
-            smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav);
-            bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav);
+            favorite = new NotificationCompat.Action
+                    .Builder(R.drawable.ic_favorite_24, "Favorite", retrievePlaybackIntent(1))
+                    .build();
         } else {
-            smallView.setImageViewResource(R.id.status_bar_fav, R.drawable.ic_fav_not);
-            bigView.setImageViewResource(R.id.status_bar_ex_fav, R.drawable.ic_fav_not);
+            favorite = new NotificationCompat.Action
+                    .Builder(R.drawable.ic_favorite_not_24, "Favorite", retrievePlaybackIntent(1))
+                    .build();
         }
 
-        Intent previousIntent = new Intent(this, NotificationHandler.class);
-        previousIntent.putExtra(getString(R.string.doit), getString(R.string.prev));
-        PendingIntent ppreviousIntent = PendingIntent.getBroadcast(this, 9, previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Action previous = new NotificationCompat.Action
+                .Builder(R.drawable.ic_previous_24, "Previous", retrievePlaybackIntent(2))
+                .build();
+        NotificationCompat.Action playPause = new NotificationCompat.Action
+                .Builder(R.drawable.ic_pause_24, "PlayPause", retrievePlaybackIntent(3))
+                .build();
+        NotificationCompat.Action next = new NotificationCompat.Action
+                .Builder(R.drawable.ic_next_24, "Next", retrievePlaybackIntent(4))
+                .build();
 
-        Intent playPauseIntent = new Intent(this, NotificationHandler.class);
-        playPauseIntent.putExtra(getString(R.string.doit), getString(R.string.playPause));
-        PendingIntent pplayPauseIntent = PendingIntent.getBroadcast(this, 8, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent nextIntent = new Intent(this, NotificationHandler.class);
-        nextIntent.putExtra(getString(R.string.doit), getString(R.string.next));
-        PendingIntent pnextIntent = PendingIntent.getBroadcast(this, 7, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        playerNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.ic_music_note)
+                .setContentTitle(songTitle)
+                .setContentText(artist)
+//                .setColorized(false)
+                .setLargeIcon(artWork)
+                .addAction(favorite)
+                .addAction(previous)
+                .addAction(playPause)
+                .addAction(next)
+                .setContentIntent(pendingIntent)
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(1, 2, 3)
+                        .setMediaSession(MediaSessionCompat.Token.fromToken(MainActivity.getInstance().mediaSession.getSessionToken())))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build();
 
-        Intent favIntent = new Intent(this, NotificationHandler.class);
-        favIntent.putExtra(getString(R.string.doit), getString(R.string.favorite));
-        PendingIntent pFavIntentIntent = PendingIntent.getBroadcast(this, 6, favIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        startForeground(id, playerNotification);
+    }
 
-        smallView.setOnClickPendingIntent(R.id.status_bar_fav, pFavIntentIntent);
-        smallView.setOnClickPendingIntent(R.id.status_bar_play, pplayPauseIntent);
-        smallView.setOnClickPendingIntent(R.id.status_bar_next, pnextIntent);
+    private void togglePlayPauseNotification(boolean playing){
+        if(playing){
+            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_pause_24, "PlayPause", retrievePlaybackIntent(3));
+        }
+        else{
+            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_play_24, "PlayPause", retrievePlaybackIntent(3));
+        }
+        notificationManagerCompat.notify(id, playerNotification);
+    }
 
-        bigView.setOnClickPendingIntent(R.id.status_bar_ex_prev, ppreviousIntent);
-        bigView.setOnClickPendingIntent(R.id.status_bar_ex_play, pplayPauseIntent);
-        bigView.setOnClickPendingIntent(R.id.status_bar_ex_next, pnextIntent);
-        bigView.setOnClickPendingIntent(R.id.status_bar_ex_fav, pFavIntentIntent);
+    private PendingIntent retrievePlaybackIntent(int which) {
+        Intent intent = new Intent(this, NotificationHandler.class);
+        PendingIntent pendingIntent;
+        switch (which) {
+            case 1:
+                // fav
+                intent.putExtra(getString(R.string.doit), getString(R.string.favorite));
+                pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                return pendingIntent;
+            case 2:
+                // previous
+                intent.putExtra(getString(R.string.doit), getString(R.string.prev));
+                pendingIntent = PendingIntent.getBroadcast(this, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                return pendingIntent;
+            case 3:
+                // playPause track
+                intent.putExtra(getString(R.string.doit), getString(R.string.playPause));
+                pendingIntent = PendingIntent.getBroadcast(this, 3, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                return pendingIntent;
+
+            case 4:
+                // next track
+                intent.putExtra(getString(R.string.doit), getString(R.string.next));
+                pendingIntent = PendingIntent.getBroadcast(this, 4, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                return pendingIntent;
+            default:
+                break;
+        }
+        return null;
     }
 
     public void setUIControls(SeekBar mseekBar, TextView currentPosition, TextView totalDuration) {
@@ -520,7 +514,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void pausePlayer() {
         if (isPng()) player.pause();
         if (fromButton) {
-            notification();
+            createMediaStyleNotification();
         }
         updateNotification();
     }
@@ -535,7 +529,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             player.start();
         }
         if (fromButton) {
-            notification();
+            createMediaStyleNotification();
         }
         updateNotification();
     }

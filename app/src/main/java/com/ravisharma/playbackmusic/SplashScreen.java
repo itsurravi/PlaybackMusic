@@ -21,7 +21,6 @@ import android.provider.Settings;
 import android.util.Log;
 
 import com.ravisharma.playbackmusic.database.PlaylistRepository;
-import com.ravisharma.playbackmusic.database.model.DatabaseSetup;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
@@ -81,10 +80,10 @@ public class SplashScreen extends AppCompatActivity {
 
     private void checkInPlaylists() {
         ArrayList<Song> songListByName = SongsProvider.Companion.getSongListByName().getValue();
-        if(songListByName!=null) {
-            if(songListByName.size()<=1){
+        if (songListByName != null) {
+            if (songListByName.size() <= 1) {
                 PrefManager manage = new PrefManager(this);
-                manage.storeInfo(getString(R.string.ID),"remove");
+                manage.storeInfo(getString(R.string.ID), "remove");
                 manage.storeInfo(getString(R.string.Shuffle), false);
                 manage.storeInfo(getString(R.string.Repeat), false);
                 manage.storeInfo(getString(R.string.RepeatOne), false);
@@ -131,16 +130,8 @@ public class SplashScreen extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                PlaylistRepository repository = new PlaylistRepository(SplashScreen.this);
-                repository.isDatabaseRead().observe(SplashScreen.this, new Observer<DatabaseSetup>() {
-                    @Override
-                    public void onChanged(DatabaseSetup databaseSetup) {
-                        if (databaseSetup.isSetup()) {
-                            startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                            finish();
-                        }
-                    }
-                });
+                startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                finish();
             }
         }, 1000);
     }

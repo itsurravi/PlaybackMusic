@@ -1,17 +1,15 @@
 package com.ravisharma.playbackmusic.database
 
 import android.content.Context
-import android.os.AsyncTask
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.dao.QueueSongsDao
-import com.ravisharma.playbackmusic.database.dao.SetupDao
 import com.ravisharma.playbackmusic.database.dao.ShuffleSongsDao
-import com.ravisharma.playbackmusic.database.model.DatabaseSetup
 import com.ravisharma.playbackmusic.database.model.QueueSongs
 import com.ravisharma.playbackmusic.database.model.ShuffleSongs
 import com.ravisharma.playbackmusic.model.Playlist
@@ -23,15 +21,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-@Database(entities = [Playlist::class, QueueSongs::class, ShuffleSongs::class, DatabaseSetup::class], version = 1)
+
+@Database(entities = [Playlist::class, QueueSongs::class, ShuffleSongs::class], version = 2)
 abstract class PlaylistDatabase : RoomDatabase() {
 
     abstract fun playlistDao(): PlaylistDao
     abstract fun queueSongsDao(): QueueSongsDao
     abstract fun shuffleSongsDao(): ShuffleSongsDao
-    abstract fun setupDao(): SetupDao
+//    abstract fun setupDao(): SetupDao
 
     companion object {
+        @Volatile
         private var instance: PlaylistDatabase? = null
         private var context: Context? = null
 
@@ -43,10 +43,17 @@ abstract class PlaylistDatabase : RoomDatabase() {
                         PlaylistDatabase::class.java,
                         "PlaylistDB")
                         .addCallback(callback)
+                        .addMigrations(MIGRATION_1_2)
                         .allowMainThreadQueries()
                         .build()
             }
             return instance as PlaylistDatabase
+        }
+
+        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS setupTable")
+            }
         }
 
         private val callback: Callback = object : Callback() {
@@ -63,7 +70,7 @@ abstract class PlaylistDatabase : RoomDatabase() {
 
             val list = ArrayList<String>()
 
-            CoroutineScope(Dispatchers.IO).launch{
+            CoroutineScope(Dispatchers.IO).launch {
                 list.add(fav)
                 list.addAll(p.allPlaylist)
                 for (pName in list) {
@@ -74,8 +81,6 @@ abstract class PlaylistDatabase : RoomDatabase() {
                         instance!!.playlistDao().addSong(playlist)
                     }
                 }
-                val setup = DatabaseSetup(1, true)
-                instance!!.setupDao().setUp(setup)
             }
         }
     }
