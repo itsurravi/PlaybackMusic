@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             songList.clear();
             normalList.clear();
 
-            songList.addAll(viewModel.getSuffleSongs(this));
+            songList.addAll(viewModel.getShuffleSongs(this));
             normalList.addAll(viewModel.getQueueSongs(this));
             Log.d("Playing", songList.size() + "");
             UtilsKt.setPlayingList(songList);
@@ -333,8 +333,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     start = false;
 
                 } else if (songList.size() <= Integer.parseInt(position)) {
+                    songPosn = 0;
                     UtilsKt.setSongPosition(0);
                 } else {
+                    songPosn = Integer.parseInt(position);
                     UtilsKt.setSongPosition(Integer.parseInt(position));
                 }
             }
@@ -404,8 +406,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         favorite.setOnClickListener(this);
 
-        new checkUpdate().execute();
-
         adContainerView = findViewById(R.id.banner_container_player);
         adContainerView2 = findViewById(R.id.banner_container_name);
 
@@ -435,6 +435,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+
+        new checkUpdate().execute();
+
         String[] adIds = {
                 getString(R.string.playlistFragId),
                 getString(R.string.nameFragId),
@@ -462,14 +465,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if (requestCode == ALBUM_SONGS || requestCode == ARTIST_SONGS ||
+            if ((requestCode == ALBUM_SONGS || requestCode == ARTIST_SONGS ||
                     requestCode == RECENT_ADDED ||
-                    requestCode == SEARCH_RESULT || requestCode == PLAYLIST) {
+                    requestCode == SEARCH_RESULT || requestCode == PLAYLIST) && data != null) {
                 int position = data.getIntExtra("position", -1);
                 ArrayList<Song> songsArrayList = data.getParcelableArrayListExtra("songList");
                 OnFragmentItemClick(position, songsArrayList, false);
             }
-            if (requestCode == NOW_PLAYING) {
+            if (requestCode == NOW_PLAYING && data != null) {
                 int position = data.getIntExtra("position", -1);
                 OnFragmentItemClick(position, songList, true);
             }
@@ -612,8 +615,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 manage.storeInfo(getString(R.string.Shuffle), lastShuffle);
 
                 Log.d(TAG, playingSong.getTitle());
-                int position = songList.indexOf(playingSong);
-                songPosn = position;
+
+                songPosn = songList.indexOf(playingSong);
 
                 musicSrv.setList(songList);
                 musicSrv.setSong(songPosn);
@@ -965,7 +968,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 this.doubleBackToExitPressedOnce = true;
-                showSnackBar("Press Again to Exit");
+                showSnackBar("Tap Again to Exit");
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -1516,8 +1519,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showSnackBar(String message) {
-        Snackbar.make(slidePanelTop, message, Snackbar.LENGTH_SHORT)
-                .setAnchorView(slidePanelTop).show();
+        Snackbar.make(slidingLayout, message, Snackbar.LENGTH_SHORT).show();
     }
 
 }

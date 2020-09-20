@@ -32,9 +32,9 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
     private AdView adView;
     private FrameLayout adContainerView;
 
-    ImageView imgBack;
-    TextView artistName;
-    FastScrollRecyclerView recyclerView;
+    private ImageView imgBack;
+    private TextView artistName;
+    private FastScrollRecyclerView recyclerView;
     private SongAdapter ad;
 
     private ArrayList<Song> songList;

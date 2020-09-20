@@ -15,7 +15,7 @@ class MainActivityViewModel : ViewModel() {
 
     private var repository: PlaylistRepository? = null
     private var pSong: MutableLiveData<Song> = MutableLiveData()
-    private var sPostion: MutableLiveData<Int> = MutableLiveData()
+    private var sPosition: MutableLiveData<Int> = MutableLiveData()
 
     fun getPlayingSong() : MutableLiveData<Song>{
         pSong = playingSong
@@ -23,18 +23,18 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun getSongPosition() : MutableLiveData<Int>{
-        sPostion = songPosition
-        return sPostion
+        sPosition = songPosition
+        return sPosition
     }
 
-    fun getSuffleSongs(context: Context): ArrayList<Song> {
+    fun getShuffleSongs(context: Context): ArrayList<Song> {
         val tinydb = TinyDB(context)
         return tinydb.getListObject(context.getString(R.string.Songs), Song::class.java)
     }
 
     fun getQueueSongs(context: Context): ArrayList<Song> {
-        val tinydb = TinyDB(context)
-        return tinydb.getListObject(context.getString(R.string.NormalSongs), Song::class.java)
+        val tinyDb = TinyDB(context)
+        return tinyDb.getListObject(context.getString(R.string.NormalSongs), Song::class.java)
     }
 
     fun getPlaylistSong(context: Context, playlistName: String): LiveData<List<Playlist>> {
@@ -43,13 +43,13 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun saveQueueSongs(context: Context, songList: java.util.ArrayList<Song>) {
-        val tinydb = TinyDB(context)
-        tinydb.putListObject(context.getString(R.string.NormalSongs), songList)
+        val tinyDb = TinyDB(context)
+        tinyDb.putListObject(context.getString(R.string.NormalSongs), songList)
     }
 
     fun saveShuffleSongs(context: Context, songList: java.util.ArrayList<Song>) {
-        val tinydb = TinyDB(context)
-        tinydb.putListObject(context.getString(R.string.Songs), songList)
+        val tinyDb = TinyDB(context)
+        tinyDb.putListObject(context.getString(R.string.Songs), songList)
     }
 
     fun isSongExist(context: Context, playlistName: String, songId: Long): Long {

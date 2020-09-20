@@ -16,12 +16,8 @@ class PlaylistRepository(context: Context?) {
 
     init {
         database = PlaylistDatabase.getInstance(context)
-//        setupDao = database.setupDao()
         playlistDao = database.playlistDao()
     }
-
-//    val isDatabaseRead: LiveData<DatabaseSetup>
-//        get() = setupDao.dataSetup()
 
     //Playlist Operations
     fun getPlaylistSong(playlistName: String): LiveData<List<Playlist>> {
@@ -57,14 +53,14 @@ class PlaylistRepository(context: Context?) {
     }
 
     private inner class AddSong : AsyncTask<Playlist, Void?, Void?>() {
-        protected override fun doInBackground(vararg playlists: Playlist): Void? {
+        override fun doInBackground(vararg playlists: Playlist): Void? {
             playlistDao.addSong(playlists[0])
             return null
         }
     }
 
     private inner class RemoveSong(var playlistName: String?, var songId: Long) : AsyncTask<Void, Void?, Void?>() {
-        protected override fun doInBackground(vararg voids: Void): Void? {
+        override fun doInBackground(vararg voids: Void): Void? {
             if (playlistName == null) {
                 playlistDao.removeSong(songId)
             } else {
@@ -76,7 +72,7 @@ class PlaylistRepository(context: Context?) {
     }
 
     private inner class RemovePlaylist : AsyncTask<String, Void?, Void?>() {
-        protected override fun doInBackground(vararg playlist: String): Void? {
+        override fun doInBackground(vararg playlist: String): Void? {
             playlistDao.removePlaylist(playlist[0])
             return null
         }

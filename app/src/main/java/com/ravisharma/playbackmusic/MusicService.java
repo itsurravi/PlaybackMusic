@@ -366,19 +366,25 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         notificationManagerCompat = NotificationManagerCompat.from(this);
 
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(songs.get(songPosn).getData());
-        InputStream inputStream = null;
-        if (mmr.getEmbeddedPicture() != null) {
-            inputStream = new ByteArrayInputStream(mmr.getEmbeddedPicture());
-        }
-
-        mmr.release();
 
         Bitmap artWork;
 
-        if (inputStream != null) {
-            artWork = BitmapFactory.decodeStream(inputStream);
-        } else {
+        try{
+            mmr.setDataSource(songs.get(songPosn).getData());
+            InputStream inputStream = null;
+            if (mmr.getEmbeddedPicture() != null) {
+                inputStream = new ByteArrayInputStream(mmr.getEmbeddedPicture());
+            }
+
+            mmr.release();
+
+            if (inputStream != null) {
+                artWork = BitmapFactory.decodeStream(inputStream);
+            } else {
+                artWork = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo);
+            }
+        }
+        catch(Exception e){
             artWork = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo);
         }
 
