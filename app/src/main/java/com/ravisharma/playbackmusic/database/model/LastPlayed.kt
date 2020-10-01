@@ -6,9 +6,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.ravisharma.playbackmusic.model.Song
 
-@Entity(tableName = "queueSongs")
-class QueueSongs(
-        @field:ColumnInfo(name = "queueId")
-        @field:PrimaryKey(autoGenerate = true) var id: Long,
-        @field:Embedded var song: Song
-)
+@Entity(tableName = "lastPlayed")
+data class LastPlayed(
+        @Embedded var song: Song
+) {
+    @ColumnInfo(name = "playedId")
+    @PrimaryKey(autoGenerate = true)
+    var id: Long? = null
+}

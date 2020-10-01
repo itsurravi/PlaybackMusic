@@ -22,6 +22,17 @@ public class PrefManager {
         Playlist = c.getString(R.string.playLists);
     }
 
+    public void clearAllData() {
+        ed.remove("ID");
+        ed.remove("Shuffle");
+        ed.remove("RepeatOne");
+        ed.remove("Repeat");
+        ed.remove("Songs");
+        ed.remove("position");
+        ed.remove("Started");
+        ed.commit();
+    }
+
     public void storeInfo(String key, String data) {
         if (data.equals("remove")) {
             ed.remove(key);
@@ -34,6 +45,15 @@ public class PrefManager {
     public void storeInfo(String key, boolean data) {
         ed.putBoolean(key, data);
         ed.commit();
+    }
+
+    public void storeAppVersion(int data) {
+        ed.putInt("appVersion", data);
+        ed.commit();
+    }
+
+    public int getAppVersion() {
+        return sp.getInt("appVersion", -1);
     }
 
     public String get_s_Info(String key) {

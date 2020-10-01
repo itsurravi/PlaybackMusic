@@ -18,10 +18,6 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
 
     private lateinit var onClick: OnAlbumClicked
 
-    fun setList(albumsList: ArrayList<Album>) {
-        this.albumsList = albumsList
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
         val v = LayoutInflater.from(c).inflate(R.layout.adapter_albums, parent, false)
         return AlbumViewHolder(v)

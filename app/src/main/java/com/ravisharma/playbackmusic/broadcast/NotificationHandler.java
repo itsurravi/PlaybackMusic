@@ -20,7 +20,7 @@ public class NotificationHandler extends BroadcastReceiver {
             if (as.equals(context.getString(R.string.prev))) {
                 MainActivity.getInstance().playPrev();
             } else if (as.equals(context.getString(R.string.playPause))) {
-                MainActivity.getInstance().btnplaypause();
+                MainActivity.getInstance().btnPlayPause();
             } else if (as.equals(context.getString(R.string.next))) {
                 MainActivity.getInstance().playNext();
             } else if (as.equals(context.getString(R.string.favorite))) {

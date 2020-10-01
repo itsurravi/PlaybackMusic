@@ -28,6 +28,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
+        <activity android:name=".activities.LastAndMostPlayed"></activity>
         <activity
             android:name=".activities.SingleSongPlayActivity"
             android:excludeFromRecents="true"
@@ -38,7 +39,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
-<!--                <data android:scheme="file" />-->
+                <!-- <data android:scheme="file" /> -->
                 <data android:scheme="content" />
                 <data android:mimeType="audio/*" />
             </intent-filter>

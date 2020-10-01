@@ -31,6 +31,7 @@ public class PlaylistAlert {
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setView(v);
+        dialog.setCancelable(false);
 
         final AlertDialog alertDialog = dialog.create();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));

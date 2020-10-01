@@ -40,21 +40,20 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
     private FrameLayout adContainerView;
     private AdView adView;
 
-    ImageView albumArt, imgBack;
-    TextView albumTitle, albumSong;
-    FastScrollRecyclerView recyclerView;
+    private ImageView albumArt, imgBack;
+    private TextView albumTitle, albumSong;
+    private FastScrollRecyclerView recyclerView;
     private SongAdapter ad;
 
     private ArrayList<Song> songList;
 
     private AlbumSongViewModel viewModel;
 
-    String albumId;
+    private String albumId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // In Activity's onCreate() for instance
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
@@ -127,7 +126,11 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
                             .into(albumArt);
 
                     albumTitle.setText(songList.get(0).getAlbum());
-                    albumSong.setText(songList.size() + " Song(s)");
+
+                    int size = songList.size();
+                    String noOfSongs = getResources().getQuantityString(R.plurals.numberOfSongs, size, size);
+
+                    albumSong.setText(noOfSongs);
                     ad.notifyDataSetChanged();
                 }
             }

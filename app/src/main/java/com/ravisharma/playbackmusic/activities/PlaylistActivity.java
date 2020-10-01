@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -28,13 +29,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
-import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
@@ -53,8 +52,9 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     private FastScrollRecyclerView recyclerView;
     private SongAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+    private ConstraintLayout noDataLayout;
 
-    String playlistName;
+    private String playlistName;
 
     private PlaylistRepository repository;
 
@@ -64,6 +64,7 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         setContentView(R.layout.activity_favorite_playlist);
         songList = new ArrayList<>();
         repository = new PlaylistRepository(this);
+        noDataLayout = findViewById(R.id.noDataLayout);
 
         playlistName = getIntent().getStringExtra("playlistName");
         txtPlaylistName = findViewById(R.id.txtPlaylistName);
@@ -81,6 +82,12 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
                 }
 
                 adapter.notifyDataSetChanged();
+
+                if (songList.size() == 0) {
+                    noDataLayout.setVisibility(View.VISIBLE);
+                } else {
+                    noDataLayout.setVisibility(View.GONE);
+                }
             }
         });
 

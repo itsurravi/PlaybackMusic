@@ -13,7 +13,7 @@ import com.ravisharma.playbackmusic.activities.EqualizerActivity;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
@@ -69,7 +69,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
@@ -103,15 +102,15 @@ import org.jsoup.Jsoup;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         NameWise.OnFragmentItemClicked {
 
-    public static final String PREF_KEY = "equalizer";
+    private static final String PREF_KEY = "equalizer";
 
     private AdView adView2;
     private FrameLayout adContainerView2;
     private FrameLayout adContainerView;
     private AdView adView;
 
-    private static String TAG;
-    String latestVersion, currentVersion;
+    private String TAG;
+    private String latestVersion, currentVersion;
 
     public static int d = 0;
     public int sessionId = 0;
@@ -123,40 +122,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public final static int PLAYLIST = 5;
     public final static int RECENT_ADDED = 6;
 
-    public static MainActivity activity;
-    public static String lastSongId;
-    public boolean lastShuffle = false;
-    public static boolean lastRepeat = false;
-    public static boolean lastRepeatOne = false;
-    public SeekBar seekBar;
+    private static MainActivity activity;
+    private String lastSongId;
+    private boolean lastShuffle = false;
+    private boolean lastRepeat = false;
+    private boolean lastRepeatOne = false;
     public MusicService musicSrv;
 
-    public TextView title, artist, currentPosition, totalDuration;
-    public Toolbar toolbar;
-    public KenBurnsView control_back_image;
-    public ImageView slideImage, cardImage;
-    public ImageView playpause, prev, next, shuffle, repeat, playPauseSlide, eqalizer, playlist, favorite;
-    public ViewPager viewPager;
-    public SlidingUpPanelLayout slidingLayout;
-    public LinearLayout slidePanelTop;
-    public RelativeLayout player_controller;
-    public Menu menu;
-    public LayoutInflater li;
+    private SeekBar seekBar;
+    private TextView title, artist, currentPosition, totalDuration;
+    private Toolbar toolbar;
+    private KenBurnsView control_back_image;
+    private ImageView slideImage, cardImage;
+    private ImageView playPause, prev, next, shuffle, repeat, playPauseSlide, equalizer, playlist, favorite;
+    private ViewPager viewPager;
+    private SlidingUpPanelLayout slidingLayout;
+    private LinearLayout slidePanelTop;
+    private RelativeLayout player_controller;
 
-    public boolean musicBound = false, fromlist = false, started = false, deletionProcess = false,
+    public boolean musicBound = false, fromList = false, started = false, deletionProcess = false,
             fromButton = false, played = false, playbackPaused = false, TIMER = false;
 
-    boolean doubleBackToExitPressedOnce = false;
+    private boolean doubleBackToExitPressedOnce = false;
 
     public ArrayList<Song> songList, normalList;
     public int songPosn;
-    private Intent playIntent, i;
+    private Intent playIntent;
     private PendingIntent pi;
 
-    int checkedItem = 0;
-    AlarmManager am;
+    private int checkedItem = 0;
+    private AlarmManager am;
 
-    PrefManager manage;
+    private PrefManager manage;
 
     private MainActivityViewModel viewModel;
 
@@ -165,10 +162,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public PresetReverb presetReverb;
     public Virtualizer virtualizer;
 
-    Song playingSong;
+    private Song playingSong;
 
-    MediaSessionManager mediaSessionManager;
-    MediaSession mediaSession;
+    private MediaSessionManager mediaSessionManager;
+    protected MediaSession mediaSession;
 
     public static MainActivity getInstance() {
         return activity;
@@ -181,8 +178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         activity = this;
 
         TAG = getString(R.string.app_name);
-
-//        mediaSession = new MediaSession(getApplicationContext(), TAG);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
@@ -198,14 +193,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-//            startService(playIntent);
         }
 
         player_controller = (RelativeLayout) findViewById(R.id.player_cotroller);
         player_controller.setVisibility(View.INVISIBLE);
         musicSrv = new MusicService();
-
-        li = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
         SectionsPagerAdapter sectionsPagerAdapter;
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -225,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         title = findViewById(R.id.txtSongName);
         artist = findViewById(R.id.txtSongArtist);
         playPauseSlide = findViewById(R.id.btn_PlayPause_slide);
-        playpause = findViewById(R.id.btn_PlayPause);
+        playPause = findViewById(R.id.btn_PlayPause);
         prev = findViewById(R.id.btn_Prev);
         next = findViewById(R.id.btn_Next);
         shuffle = findViewById(R.id.btn_Shuffle);
@@ -235,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentPosition = findViewById(R.id.currentPosition);
         totalDuration = findViewById(R.id.totalDuration);
         slidePanelTop = findViewById(R.id.slidePanelTop);
-        eqalizer = (ImageView) findViewById(R.id.imgEq);
+        equalizer = (ImageView) findViewById(R.id.imgEq);
         playlist = (ImageView) findViewById(R.id.imgPlaylist);
         favorite = (ImageView) findViewById(R.id.imgFav);
 
@@ -345,7 +337,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         started = start;
         if (lastSongId != null) {
             songPosn = Integer.parseInt(lastSongId);
-            UtilsKt.setPlayingSong(songList.get(songPosn));
+            if (songList.size() != 0) {
+                if(songList.size()<=songPosn){
+                    UtilsKt.setPlayingSong(songList.get(0));
+                }
+                else{
+                    UtilsKt.setPlayingSong(songList.get(songPosn));
+                }
+            }
         }
         if (lastShuffle) {
             shuffle.setImageResource(R.drawable.ic_shuffle);
@@ -388,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         playPauseSlide.setOnClickListener(this);
 
-        playpause.setOnClickListener(this);
+        playPause.setOnClickListener(this);
 
         next.setOnClickListener(this);
 
@@ -400,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         slidePanelTop.setOnClickListener(this);
 
-        eqalizer.setOnClickListener(this);
+        equalizer.setOnClickListener(this);
 
         playlist.setOnClickListener(this);
 
@@ -502,11 +501,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList = (ArrayList<Song>) songsArrayList.clone();
         songPosn = position;
 
-        fromlist = true;
+        fromList = true;
         if (!nowPlaying) {
             normalList.clear();
             shuffle.setImageResource(R.drawable.ic_shuffle_off);
             musicSrv.shuffle = false;
+            setRepeatOff();
             manage.storeInfo(getString(R.string.Shuffle), false);
         }
         musicSrv.setList(songList);
@@ -519,12 +519,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         musicBound = true;
         played = true;
         started = true;
-        playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
+        playPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
     }
 
-    public void btnplaypause() {
-        if (fromlist) {
+    public void btnPlayPause() {
+        if (fromList) {
             if (musicBound) {
                 pause();
 
@@ -553,13 +553,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (started) {
-            if (v == eqalizer) {
+            if (v == equalizer) {
                 Intent eq = new Intent(MainActivity.this, EqualizerActivity.class);
                 startActivity(eq);
             }
 
-            if (v == playPauseSlide || v == playpause) {
-                btnplaypause();
+            if (v == playPauseSlide || v == playPause) {
+                btnPlayPause();
             }
 
             if (v == next) {
@@ -582,12 +582,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, getString(R.string.Shuffle_On), Toast.LENGTH_SHORT).show();
                     shuffle.setImageResource(R.drawable.ic_shuffle);
 
-                    musicSrv.player.setLooping(false);
-                    musicSrv.repeat = false;
-                    musicSrv.repeat_one = false;
-                    lastRepeatOne = false;
-                    lastRepeat = false;
-                    repeat.setImageResource(R.drawable.ic_repeat_off);
+                    setRepeatOff();
 
                     lastShuffle = true;
                 } else {
@@ -636,10 +631,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(this, getString(R.string.Repeat_On), Toast.LENGTH_SHORT).show();
                     repeat.setImageResource(R.drawable.ic_repeat_all);
                 } else {
-                    lastRepeatOne = false;
-                    lastRepeat = false;
+                    setRepeatOff();
                     Toast.makeText(this, getString(R.string.Repeat_Off), Toast.LENGTH_SHORT).show();
-                    repeat.setImageResource(R.drawable.ic_repeat_off);
                 }
                 manage.storeInfo(getString(R.string.Repeat), lastRepeat);
                 manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne);
@@ -668,17 +661,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void setRepeatOff() {
+        musicSrv.player.setLooping(false);
+        musicSrv.repeat = false;
+        musicSrv.repeat_one = false;
+        lastRepeatOne = false;
+        lastRepeat = false;
+        repeat.setImageResource(R.drawable.ic_repeat_off);
+        manage.storeInfo(getString(R.string.Repeat), lastRepeat);
+        manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne);
+    }
+
     public void addToFavPlaylist() {
         try {
             Song song = songList.get(songPosn);
             long exist = viewModel.isSongExist(MainActivity.this, getString(R.string.favTracks), song.getId());
             if (exist > 0) {
                 musicSrv.updateFavNotification(false);
+                favorite.setImageResource(R.drawable.ic_fav_not);
                 viewModel.removeSong(MainActivity.this, getString(R.string.favTracks), song.getId());
             } else {
                 Playlist playlist = new Playlist(0, getString(R.string.favTracks), song);
                 viewModel.addSong(MainActivity.this, playlist);
                 musicSrv.updateFavNotification(true);
+                favorite.setImageResource(R.drawable.ic_fav);
                 Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
             }
         } catch (Exception ignored) {
@@ -765,20 +771,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setPlayIcons() {
-        playpause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
+        playPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp);
         musicBound = !musicBound;
     }
 
     public void setPauseIcons() {
-        playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
+        playPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         musicBound = !musicBound;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -894,7 +899,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTimer(int time) {
-        i = new Intent(this, Timer.class);
+        Intent i = new Intent(this, Timer.class);
         pi = PendingIntent.getBroadcast(this, 1234, i, 0);
         am = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (time == 0) {
@@ -916,9 +921,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             songPosn = musicSrv.songPosn;
-            musicBound = fromlist;
+            musicBound = fromList;
             fromButton = true;
-            playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
+            playPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
             playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
 
         } else {
@@ -935,9 +940,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 playbackPaused = false;
             }
             songPosn = musicSrv.songPosn;
-            musicBound = fromlist;
+            musicBound = fromList;
             fromButton = true;
-            playpause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
+            playPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
             playPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp);
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show();
@@ -1068,7 +1073,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     if (d == 1) {
-                        btnplaypause();
+                        btnPlayPause();
                     }
                     if (d == 2) {
                         playNext();
@@ -1111,13 +1116,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onPlay() {
                 super.onPlay();
-                btnplaypause();
+                btnPlayPause();
             }
 
             @Override
             public void onPause() {
                 super.onPause();
-                btnplaypause();
+                btnPlayPause();
             }
 
             @Override
@@ -1273,7 +1278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
         builder.setTitle("New Update Available");
         builder.setMessage("\nCurrent Version: " + currentVersion + "\nLatest Version: " + latestVersion + "\n");
         builder.setCancelable(false);

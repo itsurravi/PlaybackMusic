@@ -23,8 +23,11 @@ import android.os.PowerManager;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.media.session.MediaButtonReceiver;
 
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
@@ -36,9 +39,10 @@ import android.widget.TextView;
 
 
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository;
+import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
+import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 
 import static com.ravisharma.playbackmusic.utils.UtilsKt.setPlayingSong;
@@ -75,6 +79,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     Notification playerNotification;
     NotificationManagerCompat notificationManagerCompat;
 
+    private MostPlayedRepository mostPlayedRepository;
+    private LastPlayedRepository lastPlayedRepository;
+
     private final IBinder musicBind = new MusicBinder();
 
     protected Runnable mProgressRunner = new Runnable() {
@@ -105,6 +112,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //initialize position
         songPosn = 0;
         initMusicPlayer();
+
+        mostPlayedRepository = new MostPlayedRepository(this);
+        lastPlayedRepository = new LastPlayedRepository(this);
 
         registerBecomingNoisyReceiver();
     }
@@ -282,9 +292,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             player.prepare();
             UtilsKt.setPlayingSong(playSong);
 
-            PrefManager manage = new PrefManager(this);
-            manage.storeInfo("position", String.valueOf(songPosn));
-            manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
+            MainActivity.getInstance().songPosn = songPosn;
+
+            mostPlayedRepository.addSongToMostPlayed(playSong);
+            lastPlayedRepository.addSongToLastPlayed(playSong);
 
             Log.d("SONGPOSITION", songPosn + "");
         } catch (IOException e) {
@@ -369,7 +380,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         Bitmap artWork;
 
-        try{
+        try {
             mmr.setDataSource(songs.get(songPosn).getData());
             InputStream inputStream = null;
             if (mmr.getEmbeddedPicture() != null) {
@@ -383,8 +394,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } else {
                 artWork = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             artWork = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo);
         }
 
@@ -422,7 +432,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setSmallIcon(R.drawable.ic_music_note)
                 .setContentTitle(songTitle)
                 .setContentText(artist)
-//                .setColorized(false)
                 .setLargeIcon(artWork)
                 .addAction(favorite)
                 .addAction(previous)
@@ -438,11 +447,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         startForeground(id, playerNotification);
     }
 
-    private void togglePlayPauseNotification(boolean playing){
-        if(playing){
+    private void togglePlayPauseNotification(boolean playing) {
+        if (playing) {
             playerNotification.actions[2] = new Notification.Action(R.drawable.ic_pause_24, "PlayPause", retrievePlaybackIntent(3));
-        }
-        else{
+        } else {
             playerNotification.actions[2] = new Notification.Action(R.drawable.ic_play_24, "PlayPause", retrievePlaybackIntent(3));
         }
         notificationManagerCompat.notify(id, playerNotification);

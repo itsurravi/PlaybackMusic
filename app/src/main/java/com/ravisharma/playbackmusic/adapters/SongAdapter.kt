@@ -21,11 +21,6 @@ class SongAdapter(private var songs: ArrayList<Song>, var c: Context) : Recycler
     private lateinit var onClick: OnItemClicked
     private lateinit var onLongClick: OnItemLongClicked
 
-    fun setList(songList: ArrayList<Song>) {
-        songs = songList
-        notifyDataSetChanged()
-    }
-
     //make interface like this
     interface OnItemClicked {
         fun onItemClick(position: Int)

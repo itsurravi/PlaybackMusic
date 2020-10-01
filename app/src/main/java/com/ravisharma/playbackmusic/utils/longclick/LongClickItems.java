@@ -33,6 +33,7 @@ import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.activities.AlbumSongsActivity;
 import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
+import com.ravisharma.playbackmusic.activities.LastAndMostPlayed;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
@@ -305,6 +306,8 @@ public class LongClickItems {
             ((AlbumSongsActivity) context).onItemClick(list);
         } else if (context instanceof SearchActivity) {
             ((SearchActivity) context).onItemClick(list);
+        }else if (context instanceof LastAndMostPlayed) {
+            ((LastAndMostPlayed) context).onItemClick(list);
         }
     }
 

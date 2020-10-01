@@ -22,6 +22,8 @@
     <string name="adSize">FULL_BANNER</string>
 
     <string name="recentAdded">Recent Added</string>
+    <string name="lastPlayed">Last Played</string>
+    <string name="mostPlayed">Most Played</string>
     <string name="favTracks">My Favorites</string>
     <string name="appVersion">v1.0</string>
     <string name="support">Thanks for your Support.\nMade in India.</string>
@@ -98,6 +100,13 @@
     <string name="album">Album:</string>
     <string name="artist">Artist:</string>
     <string name="savePlaylist">Save as Playlist</string>
+    <string name="noSong">No Song for This Category</string>
+
+    <plurals name="numberOfSongs">
+        <item quantity="one">%d Song</item>
+        <item quantity="other">%d Songs</item>
+    </plurals>
+
 
     <string-array name="longPressNameWise">
         <item>Play</item>

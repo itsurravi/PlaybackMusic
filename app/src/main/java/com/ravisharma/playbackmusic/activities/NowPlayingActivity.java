@@ -1,10 +1,8 @@
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -28,9 +26,8 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
-import com.ravisharma.playbackmusic.MainActivityViewModel;
 import com.ravisharma.playbackmusic.adapters.NowPlayingAdapter;
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
@@ -42,17 +39,12 @@ import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert;
-import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-
-import static com.ravisharma.playbackmusic.utils.UtilsKt.getPlayingSong;
 
 public class NowPlayingActivity extends AppCompatActivity implements NowPlayingAdapter.OnItemClicked, StartDragListener {
 
@@ -62,12 +54,12 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     private RecyclerView.LayoutManager layoutManager;
     private ItemTouchHelper itemTouchHelper;
 
-    ImageView imgBack, songArt;
-    FastScrollRecyclerView recyclerView;
-    NowPlayingAdapter adapter;
-    TextView songTitle, songArtist, songDuration;
+    private ImageView imgBack, songArt;
+    private FastScrollRecyclerView recyclerView;
+    private NowPlayingAdapter adapter;
+    private TextView songTitle, songArtist, songDuration;
 
-    int curpos;
+    private int curpos;
     private PlaylistRepository repository;
 
     private Song playingSong;

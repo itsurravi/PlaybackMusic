@@ -119,15 +119,6 @@ public class RecentAddedActivity extends AppCompatActivity implements SongAdapte
         new LongClickItems(this, mposition, recentSongList);
     }
 
-//    public void updateList(int mposition) {
-//        recentSongList.remove(mposition);
-//        if (recentSongList.size() > 0) {
-//            adapter.notifyDataSetChanged();
-//        } else {
-//            finish();
-//        }
-//    }
-
     @Override
     protected void onDestroy() {
         if (adView != null) {

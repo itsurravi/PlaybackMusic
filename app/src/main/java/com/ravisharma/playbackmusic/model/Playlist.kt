@@ -1,14 +1,14 @@
-package com.ravisharma.playbackmusic.database.model
+package com.ravisharma.playbackmusic.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ravisharma.playbackmusic.model.Song
 
-@Entity(tableName = "shuffledSongs")
-class ShuffleSongs(
-        @field:ColumnInfo(name = "shuffleId")
+@Entity(tableName = "playlistTable")
+data class Playlist(
+        @field:ColumnInfo(name = "playlistId")
         @field:PrimaryKey(autoGenerate = true) var id: Long,
+        @field:ColumnInfo(name = "playlistName") var name: String,
         @field:Embedded var song: Song
 )

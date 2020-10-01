@@ -14,10 +14,6 @@ import com.ravisharma.playbackmusic.model.Artist
 class ArtistAdapter(var c: Context, private var artistList: ArrayList<Artist>) : RecyclerView.Adapter<ArtistViewHolder>() {
     private lateinit var onClick: OnArtistClicked
 
-    fun setList(artistList: ArrayList<Artist>) {
-        this.artistList = artistList
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {
         val v = LayoutInflater.from(c).inflate(R.layout.adapter_artist, parent, false)
         return ArtistViewHolder(v)

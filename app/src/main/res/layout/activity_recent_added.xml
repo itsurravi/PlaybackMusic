@@ -23,7 +23,6 @@
             android:src="@drawable/ic_left"
             tools:ignore="RtlSymmetry" />
 
-
         <TextView
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"

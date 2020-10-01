@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,38 +22,26 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
+import com.ravisharma.playbackmusic.activities.LastAndMostPlayed;
 import com.ravisharma.playbackmusic.activities.PlaylistActivity;
 import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
 import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel;
 import com.ravisharma.playbackmusic.model.Playlist;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
-import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import kotlin.coroutines.CoroutineContext;
-import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.Dispatchers;
 
 import static com.ravisharma.playbackmusic.MainActivity.PLAYLIST;
 import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
@@ -60,6 +49,7 @@ import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
 public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlaylistClicked
         , PlaylistAdapter.OnPlaylistLongClicked, View.OnClickListener {
 
+    private CardView cardRecentAdded, cardLastPlayed, cardMostPlayed;
     private FastScrollRecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private PlaylistAdapter playlistAdapter;
@@ -87,10 +77,17 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
         btnAddNewPlaylist = v.findViewById(R.id.btnAddNewPlaylist);
         recyclerView = v.findViewById(R.id.playlist);
+        cardRecentAdded = v.findViewById(R.id.card_recentAdded);
+        cardLastPlayed = v.findViewById(R.id.card_lastPlayed);
+        cardMostPlayed = v.findViewById(R.id.card_mostPlayed);
 
         viewModel = new ViewModelProvider(this).get(PlaylistFragmentViewModel.class);
 
         initRecyclerView();
+
+        cardRecentAdded.setOnClickListener(this);
+        cardLastPlayed.setOnClickListener(this);
+        cardMostPlayed.setOnClickListener(this);
     }
 
     @Override
@@ -123,7 +120,6 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
             @Override
             public void onChanged(ArrayList<String> strings) {
                 playListArrayList.clear();
-                playListArrayList.add(getString(R.string.recentAdded));
                 playListArrayList.add(getString(R.string.favTracks));
                 playListArrayList.addAll(strings);
                 playlistAdapter.notifyDataSetChanged();
@@ -133,32 +129,40 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
     @Override
     public void onPlaylistClick(int position) {
-        if (position == 0) {
-            Intent i = new Intent(getContext(), RecentAddedActivity.class);
-            getActivity().startActivityForResult(i, RECENT_ADDED);
-        } else if (position >= 1) {
-            Intent i = new Intent(getContext(), PlaylistActivity.class);
-            i.putExtra("playlistName", playListArrayList.get(position));
-            getActivity().startActivityForResult(i, PLAYLIST);
-        }
+        Intent i = new Intent(getContext(), PlaylistActivity.class);
+        i.putExtra("playlistName", playListArrayList.get(position));
+        getActivity().startActivityForResult(i, PLAYLIST);
     }
 
     @Override
     public void onClick(View view) {
-        AlertClickListener listener = new AlertClickListener() {
-            @Override
-            public void OnOkClicked(String playlistName) {
-                setUpArrayList();
-            }
-        };
+        if (cardRecentAdded.equals(view)) {
+            Intent i = new Intent(getContext(), RecentAddedActivity.class);
+            getActivity().startActivityForResult(i, RECENT_ADDED);
+        } else if (cardLastPlayed.equals(view)) {
+            Intent i = new Intent(getContext(), LastAndMostPlayed.class);
+            i.putExtra("actName","Last Played");
+            getActivity().startActivityForResult(i, RECENT_ADDED);
+        } else if (cardMostPlayed.equals(view)) {
+            Intent i = new Intent(getContext(), LastAndMostPlayed.class);
+            i.putExtra("actName","Most Played");
+            getActivity().startActivityForResult(i, RECENT_ADDED);
+        } else if (btnAddNewPlaylist.equals(view)) {
+            AlertClickListener listener = new AlertClickListener() {
+                @Override
+                public void OnOkClicked(String playlistName) {
+                    setUpArrayList();
+                }
+            };
 
-        PlaylistAlert alert = new PlaylistAlert(getContext(), listener);
-        alert.showCreateListAlert();
+            PlaylistAlert alert = new PlaylistAlert(getContext(), listener);
+            alert.showCreateListAlert();
+        }
     }
 
     @Override
     public void onPlaylistLongClick(final int position) {
-        if (position == 0 || position == 1) {
+        if (position == 0/* || position == 1*/) {
             return;
         }
 

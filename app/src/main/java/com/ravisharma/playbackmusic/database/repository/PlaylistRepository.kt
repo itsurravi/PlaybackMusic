@@ -1,9 +1,10 @@
-package com.ravisharma.playbackmusic.database
+package com.ravisharma.playbackmusic.database.repository
 
 import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.model.Playlist
 

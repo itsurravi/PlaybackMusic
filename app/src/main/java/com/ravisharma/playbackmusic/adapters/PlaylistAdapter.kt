@@ -28,9 +28,6 @@ class PlaylistAdapter(private val context: Context, private val playlistArrayLis
         if (context is MainActivity) {
             when (position) {
                 0 -> {
-                    holder.playlistIcon.setImageResource(R.drawable.ic_recent_timer)
-                }
-                1 -> {
                     holder.playlistIcon.setImageResource(R.drawable.ic_favtrack_playlist)
                 }
                 else -> {

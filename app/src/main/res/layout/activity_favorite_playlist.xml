@@ -24,7 +24,6 @@
             android:src="@drawable/ic_left"
             tools:ignore="RtlSymmetry" />
 
-
         <TextView
             android:id="@+id/txtPlaylistName"
             style="@style/TextAppearance.AppCompat.Medium"
@@ -38,6 +37,8 @@
 
 
     </LinearLayout>
+
+    <include layout="@layout/no_data_found"/>
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"

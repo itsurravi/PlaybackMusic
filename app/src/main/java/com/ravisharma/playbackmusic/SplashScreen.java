@@ -18,9 +18,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
 
-import com.ravisharma.playbackmusic.database.PlaylistRepository;
+import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
@@ -60,6 +59,7 @@ public class SplashScreen extends AppCompatActivity {
     }
 
     private void runTask() {
+        clearPrefDataOnAppUpdate();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -78,6 +78,19 @@ public class SplashScreen extends AppCompatActivity {
         }, 1000);
     }
 
+    private void clearPrefDataOnAppUpdate() {
+        PrefManager manage = new PrefManager(this);
+        int version = manage.getAppVersion();
+        int buildVersion = BuildConfig.VERSION_CODE;
+
+        if (version == buildVersion) {
+            return;
+        }
+
+        manage.clearAllData();
+        manage.storeAppVersion(buildVersion);
+    }
+
     private void checkInPlaylists() {
         ArrayList<Song> songListByName = SongsProvider.Companion.getSongListByName().getValue();
         if (songListByName != null) {
@@ -88,6 +101,7 @@ public class SplashScreen extends AppCompatActivity {
                 manage.storeInfo(getString(R.string.Repeat), false);
                 manage.storeInfo(getString(R.string.RepeatOne), false);
                 manage.storeInfo(getString(R.string.Started), false);
+                manage.storeInfo(getString(R.string.Songs), false);
                 manage.storeInfo("position", "remove");
             }
             TinyDB tinydb = new TinyDB(this);
