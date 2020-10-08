@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -123,6 +124,7 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
                     Glide.with(AlbumSongsActivity.this)
                             .setDefaultRequestOptions(requestOptions)
                             .load(Uri.parse(songList.get(0).getArt()))
+                            .diskCacheStrategy(DiskCacheStrategy.DATA)
                             .into(albumArt);
 
                     albumTitle.setText(songList.get(0).getAlbum());

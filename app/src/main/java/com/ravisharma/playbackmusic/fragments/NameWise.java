@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -143,6 +144,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         Glide.with(v)
                 .setDefaultRequestOptions(requestOptions)
                 .load(songList.get(mPosition).getArt())
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(songArt);
 
         tv.setText(songList.get(mPosition).getTitle());

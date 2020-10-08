@@ -439,7 +439,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .addAction(next)
                 .setContentIntent(pendingIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(1, 2, 3)
+                        .setShowActionsInCompactView(0, 2, 3)
                         .setMediaSession(MediaSessionCompat.Token.fromToken(MainActivity.getInstance().mediaSession.getSessionToken())))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build();

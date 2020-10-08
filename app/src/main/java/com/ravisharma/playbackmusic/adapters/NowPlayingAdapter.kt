@@ -11,6 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.model.Song
@@ -68,6 +69,7 @@ class NowPlayingAdapter(private var songs: ArrayList<Song>, var c: Context, var 
         Glide.with(c)
                 .setDefaultRequestOptions(requestOptions)
                 .load(Uri.parse(currSong.art))
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(art)
         holder.songbox.setOnClickListener { onClick.onItemClick(position) }
         holder.imgOptions.setOnClickListener { onClick.onOptionsClick(position) }

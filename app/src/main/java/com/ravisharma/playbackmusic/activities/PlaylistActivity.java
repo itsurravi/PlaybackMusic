@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
@@ -158,6 +159,7 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
         Glide.with(v)
                 .setDefaultRequestOptions(requestOptions)
                 .load(songList.get(mposition).getArt())
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(songArt);
 

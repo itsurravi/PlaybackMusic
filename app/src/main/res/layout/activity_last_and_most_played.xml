@@ -11,7 +11,7 @@
     <RelativeLayout
         android:id="@+id/firstLayout"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="180dp"
         android:visibility="gone">
 
         <ImageView
@@ -50,6 +50,13 @@
             android:paddingBottom="20dp"
             android:text="@string/lastPlayed"
             android:textColor="@color/listitemTitle" />
+
+        <View
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="1dp"
+            android:background="@color/scrollThumb" />
 
     </RelativeLayout>
 

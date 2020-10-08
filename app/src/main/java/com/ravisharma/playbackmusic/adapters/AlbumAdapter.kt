@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.AlbumViewHolder
@@ -34,6 +35,7 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
         Glide.with(c)
                 .setDefaultRequestOptions(requestOptions)
                 .load(currAlbum.albumArt)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(holder.albumArt)
         holder.albumBox.setOnClickListener { onClick.onAlbumClick(position) }
     }

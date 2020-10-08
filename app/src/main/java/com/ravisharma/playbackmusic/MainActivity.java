@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
@@ -723,7 +724,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         requestOptions.error(R.drawable.logo);
                         if (songList.size() > 0) {
                             Glide.with(getApplicationContext()).setDefaultRequestOptions(requestOptions)
-                                    .load(Uri.parse(songList.get(songPosn).getArt())).into(slideImage);
+                                    .load(Uri.parse(songList.get(songPosn).getArt()))
+                                    .diskCacheStrategy(DiskCacheStrategy.DATA).into(slideImage);
                         } else {
                             slideImage.setImageResource(R.drawable.logo);
                         }
@@ -751,18 +753,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Glide.with(getApplicationContext())
                 .setDefaultRequestOptions(requestOptions)
                 .load(Uri.parse(playingSong.getArt()))
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(control_back_image);
 
         Glide.with(getApplicationContext())
                 .setDefaultRequestOptions(requestOptions)
                 .load(Uri.parse(playingSong.getArt()))
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(cardImage);
         if (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) {
             Glide.with(getApplicationContext())
                     .setDefaultRequestOptions(requestOptions)
                     .load(Uri.parse(playingSong.getArt()))
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(slideImage);
         } else {
             playPauseSlide.setVisibility(View.GONE);

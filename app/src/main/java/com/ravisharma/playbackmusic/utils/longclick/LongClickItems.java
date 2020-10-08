@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.ravisharma.playbackmusic.MainActivity;
@@ -81,6 +82,7 @@ public class LongClickItems {
         Glide.with(v)
                 .setDefaultRequestOptions(requestOptions)
                 .load(songList.get(mposition).getArt())
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(songArt);
 
@@ -162,6 +164,7 @@ public class LongClickItems {
         Glide.with(v)
                 .setDefaultRequestOptions(requestOptions)
                 .load(songList.get(mposition).getArt())
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(songArt);
 

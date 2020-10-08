@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -146,6 +147,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
                 Glide.with(NowPlayingActivity.this)
                         .setDefaultRequestOptions(requestOptions)
                         .load(Uri.parse(playingSong.getArt()))
+                        .diskCacheStrategy(DiskCacheStrategy.DATA)
                         .into(songArt);
 
             }
