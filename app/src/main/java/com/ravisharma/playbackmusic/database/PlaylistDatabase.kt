@@ -58,6 +58,8 @@ abstract class PlaylistDatabase : RoomDatabase() {
                 database.execSQL("INSERT INTO `playlistTable_tmp` (playlistId, playlistName, id, title, artist, art, duration, data, dateModified, album, composer) SELECT playlistId, playlistName, id, title, artist, art, duration, data, dateModified, album, composer FROM playlistTable")
                 database.execSQL("DROP TABLE playlistTable")
                 database.execSQL("ALTER TABLE playlistTable_tmp RENAME TO playlistTable")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `lastPlayed` (`playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `mostPlayed` (`playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `playedCount` INTEGER NOT NULL, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)")
             }
         }
         private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
@@ -70,6 +72,8 @@ abstract class PlaylistDatabase : RoomDatabase() {
                 database.execSQL("INSERT INTO `playlistTable_tmp` (playlistId, playlistName, id, title, artist, art, duration, data, dateModified, album, composer) SELECT playlistId, playlistName, id, title, artist, art, duration, data, dateModified, album, composer FROM playlistTable")
                 database.execSQL("DROP TABLE playlistTable")
                 database.execSQL("ALTER TABLE playlistTable_tmp RENAME TO playlistTable")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `lastPlayed` (`playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)")
+                database.execSQL("CREATE TABLE IF NOT EXISTS `mostPlayed` (`playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `playedCount` INTEGER NOT NULL, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)")
             }
         }
 
