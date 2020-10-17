@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.equalizer;
+package com.ravisharma.playbackmusic.equalizer.model;
 
 public class Settings {
     public static boolean isEqualizerEnabled = true;

@@ -141,28 +141,20 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (cardLastPlayed.equals(view)) {
             Intent i = new Intent(getContext(), LastAndMostPlayed.class);
-            i.putExtra("actName","Last Played");
+            i.putExtra("actName", "Last Played");
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (cardMostPlayed.equals(view)) {
             Intent i = new Intent(getContext(), LastAndMostPlayed.class);
-            i.putExtra("actName","Most Played");
+            i.putExtra("actName", "Most Played");
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (btnAddNewPlaylist.equals(view)) {
-            AlertClickListener listener = new AlertClickListener() {
-                @Override
-                public void OnOkClicked(String playlistName) {
-                    setUpArrayList();
-                }
-            };
-
-            PlaylistAlert alert = new PlaylistAlert(getContext(), listener);
-            alert.showCreateListAlert();
+            showCreateUpdatePlaylistDialog(true, null);
         }
     }
 
     @Override
     public void onPlaylistLongClick(final int position) {
-        if (position == 0/* || position == 1*/) {
+        if (position == 0) {
             return;
         }
 
@@ -203,6 +195,9 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
                         }
                         break;
                     case 1:
+                        showCreateUpdatePlaylistDialog(false, playListArrayList.get(position));
+                        break;
+                    case 2:
                         viewModel.removePlaylist(getContext(), playListArrayList.get(position));
                         PrefManager p = new PrefManager(getContext());
                         p.deletePlaylist(playListArrayList.get(position));
@@ -212,5 +207,24 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
                 alertDialog.dismiss();
             }
         });
+    }
+
+    private void showCreateUpdatePlaylistDialog(final boolean createList, final String oldPlaylistName) {
+        AlertClickListener listener = new AlertClickListener() {
+            @Override
+            public void OnOkClicked(String newPlaylistName) {
+                if (!createList) {
+                    viewModel.renamePlaylist(getContext(), oldPlaylistName, newPlaylistName);
+                }
+                setUpArrayList();
+            }
+        };
+
+        PlaylistAlert alert = new PlaylistAlert(getContext(), listener);
+        if (createList) {
+            alert.showCreateListAlert();
+        } else {
+            alert.showUpdateListAlert(oldPlaylistName);
+        }
     }
 }

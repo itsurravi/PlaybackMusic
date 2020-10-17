@@ -20,7 +20,6 @@ import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.viewmodel.ArtistSongViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -100,9 +99,10 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
             public void onChanged(ArrayList<Song> songs) {
                 songList.clear();
                 songList.addAll(songs);
-                ad.notifyDataSetChanged();
-                artistName.setText(songList.get(0).getArtist());
-
+                if(songList.size()>0) {
+                    ad.notifyDataSetChanged();
+                    artistName.setText(songList.get(0).getArtist());
+                }
             }
         });
     }
@@ -110,7 +110,7 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
     private void loadBanner() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }

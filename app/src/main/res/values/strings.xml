@@ -6,7 +6,7 @@
     <string name="appAdId">ca-app-pub-8188016146639430~6373052337</string>
 
     <string name="playlistFragId">ca-app-pub-8188016146639430/7302990629</string>
-    <string name="nameFragId">ca-app-pub-8188016146639430/7111418937</string>
+    <string name="addToPlaylist">ca-app-pub-8188016146639430/7111418937</string>
     <string name="albumFragId">ca-app-pub-8188016146639430/9546010589</string>
     <string name="artistFragId">ca-app-pub-8188016146639430/8041357220</string>
 
@@ -147,6 +147,7 @@
 
     <string-array name="longPressItemsPlaylist">
         <item>Play Playlist</item>
+        <item>Rename Playlist</item>
         <item>Delete Playlist</item>
     </string-array>
     <string-array name="timer">

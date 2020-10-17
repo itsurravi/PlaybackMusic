@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.equalizer;
+package com.ravisharma.playbackmusic.equalizer.model;
 
 import java.io.Serializable;
 

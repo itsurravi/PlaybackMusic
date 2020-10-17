@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -25,6 +26,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.activities.viewmodel.LastAndMostPlayedViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
@@ -38,6 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LastAndMostPlayed extends AppCompatActivity implements SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
+
+    private FrameLayout adContainerView;
+    private AdView adView;
 
     private ImageView albumArt;
     private TextView txtTitle1, txtTitle2;
@@ -74,10 +81,13 @@ public class LastAndMostPlayed extends AppCompatActivity implements SongAdapter.
 
         initRecyclerView();
 
+        String adId = getString(R.string.albumFragId);
+
         if (actName != null) {
             txtTitle1.setText(actName);
             txtTitle2.setText(actName);
             if (actName.equals("Last Played")) {
+                adId = getString(R.string.albumFragId);
                 viewModel.getLastPlayedSongsList(this).observe(this,
                         new Observer<List<LastPlayed>>() {
                             @Override
@@ -93,6 +103,7 @@ public class LastAndMostPlayed extends AppCompatActivity implements SongAdapter.
                             }
                         });
             } else {
+                adId = getString(R.string.artistFragId);
                 viewModel.getMostPlayedSongsList(this).observe(this,
                         new Observer<List<MostPlayed>>() {
                             @Override
@@ -110,6 +121,21 @@ public class LastAndMostPlayed extends AppCompatActivity implements SongAdapter.
                         });
             }
         }
+
+        adContainerView = findViewById(R.id.banner_container_lastMostPlayed);
+
+        adView = new AdView(this);
+        adView.setAdUnitId(adId);
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void loadBanner() {
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+        AdSize adSize = AdSize.BANNER;
+        adView.setAdSize(adSize);
+        adView.loadAd(adRequest);
     }
 
     private void setUpLayout() {

@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -20,24 +19,16 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
-import androidx.media.session.MediaButtonReceiver;
 
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-
 import java.util.concurrent.TimeUnit;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
 import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository;
 import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
@@ -192,8 +183,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onAudioFocusChange(int focusState) {
         //Invoked when the audio focus of the system is updated.
-
-        Log.d("AUDIOSTATE", "" + focusState);
         switch (focusState) {
             case AudioManager.AUDIOFOCUS_GAIN:
                 if (!isPng()) {
@@ -231,15 +220,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    private boolean requestAudioFocus() {
+    private void requestAudioFocus() {
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             //Focus gained
             mProgressRunner.run();
-            return true;
         }
-        //Could not gain focus
-        return false;
     }
 
     private boolean removeAudioFocus() {
@@ -297,7 +283,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mostPlayedRepository.addSongToMostPlayed(playSong);
             lastPlayedRepository.addSongToLastPlayed(playSong);
 
-            Log.d("SONGPOSITION", songPosn + "");
         } catch (IOException e) {
             e.printStackTrace();
         }

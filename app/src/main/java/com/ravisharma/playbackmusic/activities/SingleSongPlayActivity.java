@@ -6,7 +6,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -29,13 +28,11 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,20 +42,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.ybq.android.spinkit.SpinKitView;
-import com.github.ybq.android.spinkit.sprite.Sprite;
-import com.github.ybq.android.spinkit.style.DoubleBounce;
-import com.github.ybq.android.spinkit.style.Wave;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.R;
-import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -179,7 +170,7 @@ public class SingleSongPlayActivity extends AppCompatActivity implements MediaPl
     private void loadBanner() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }

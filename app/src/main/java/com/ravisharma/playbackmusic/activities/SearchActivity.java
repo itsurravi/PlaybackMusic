@@ -9,15 +9,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -35,7 +29,6 @@ import com.ravisharma.playbackmusic.activities.viewmodel.SearchViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -95,7 +88,7 @@ public class SearchActivity extends AppCompatActivity implements SongAdapter.OnI
     private void loadBanner() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }

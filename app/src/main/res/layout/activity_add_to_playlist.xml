@@ -54,4 +54,9 @@
         android:layout_weight="1"
         app:fastScrollThumbColor="@color/scrollThumb" />
 
+    <FrameLayout
+        android:id="@+id/banner_container_addToPlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

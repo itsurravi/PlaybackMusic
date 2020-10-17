@@ -7,9 +7,12 @@ import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.model.Playlist
+import kotlinx.coroutines.CoroutineScope
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 class PlaylistRepository(context: Context?) {
-//    private val setupDao: SetupDao
+    //    private val setupDao: SetupDao
     private val playlistDao: PlaylistDao
     private var playlistSong: LiveData<List<Playlist>> = MutableLiveData()
 
@@ -47,6 +50,10 @@ class PlaylistRepository(context: Context?) {
 
     fun removeSong(playlistName: String?, songId: Long) {
         RemoveSong(playlistName, songId).execute()
+    }
+
+    suspend fun renamePlaylist(oldPlaylistName: String, newPlaylistName: String) {
+        playlistDao.renamePlaylist(oldPlaylistName, newPlaylistName)
     }
 
     fun removePlaylist(playlistName: String) {

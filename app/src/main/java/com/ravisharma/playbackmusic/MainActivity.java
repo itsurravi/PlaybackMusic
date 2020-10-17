@@ -19,7 +19,6 @@ import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
 import com.ravisharma.playbackmusic.fragments.ArtistFragment;
 import com.ravisharma.playbackmusic.fragments.NameWise;
@@ -28,9 +27,9 @@ import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.prefrences.PrefManager;
 import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.flaviofaria.kenburnsview.RandomTransitionGenerator;
-import com.ravisharma.playbackmusic.equalizer.EqualizerModel;
-import com.ravisharma.playbackmusic.equalizer.EqualizerSettings;
-import com.ravisharma.playbackmusic.equalizer.Settings;
+import com.ravisharma.playbackmusic.equalizer.model.EqualizerModel;
+import com.ravisharma.playbackmusic.equalizer.model.EqualizerSettings;
+import com.ravisharma.playbackmusic.equalizer.model.Settings;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.AlarmManager;
@@ -82,7 +81,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import android.net.Uri;
@@ -414,12 +412,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adContainerView.addView(adView);
         loadBanner1();
 
+        adView2 = new AdView(this);
+        adView2.setAdUnitId(getString(R.string.playlistFragId));
+        adContainerView2.addView(adView2);
+        loadBanner2();
+
     }
 
     private void loadBanner1() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }
@@ -427,7 +430,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void loadBanner2() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView2.setAdSize(adSize);
         adView2.loadAd(adRequest);
     }
@@ -435,22 +438,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-
         new checkUpdate().execute();
-
-        String[] adIds = {
-                getString(R.string.playlistFragId),
-                getString(R.string.nameFragId),
-                getString(R.string.albumFragId),
-                getString(R.string.artistFragId),
-        };
-        Random random = new Random();
-        int id = random.nextInt(adIds.length);
-
-        adView2 = new AdView(this);
-        adView2.setAdUnitId(adIds[id]);
-        adContainerView2.addView(adView2);
-        loadBanner2();
     }
 
     @Override
@@ -725,7 +713,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (songList.size() > 0) {
                             Glide.with(getApplicationContext()).setDefaultRequestOptions(requestOptions)
                                     .load(Uri.parse(songList.get(songPosn).getArt()))
-                                    .diskCacheStrategy(DiskCacheStrategy.DATA).into(slideImage);
+                                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                                    .into(slideImage);
                         } else {
                             slideImage.setImageResource(R.drawable.logo);
                         }

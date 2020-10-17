@@ -16,15 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter;
 import com.ravisharma.playbackmusic.activities.AlbumSongsActivity;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Album;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;

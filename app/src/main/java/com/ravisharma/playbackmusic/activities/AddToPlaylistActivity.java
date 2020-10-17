@@ -11,8 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.viewmodel.AddToPlaylistViewModel;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.model.Song;
@@ -25,6 +29,9 @@ import java.util.ArrayList;
 
 public class AddToPlaylistActivity extends AppCompatActivity implements PlaylistAdapter.OnPlaylistClicked
         , PlaylistAdapter.OnPlaylistLongClicked {
+
+    private FrameLayout adContainerView;
+    private AdView adView;
 
     private FastScrollRecyclerView recyclerView;
     private PlaylistAdapter playlistAdapter;
@@ -67,6 +74,21 @@ public class AddToPlaylistActivity extends AppCompatActivity implements Playlist
                 showCreateListAlert();
             }
         });
+
+        adContainerView = findViewById(R.id.banner_container_addToPlaylist);
+
+        adView = new AdView(this);
+        adView.setAdUnitId(getString(R.string.addToPlaylist));
+        adContainerView.addView(adView);
+        loadBanner();
+    }
+
+    private void loadBanner() {
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+        AdSize adSize = AdSize.BANNER;
+        adView.setAdSize(adSize);
+        adView.loadAd(adRequest);
     }
 
     private void initRecyclerView() {

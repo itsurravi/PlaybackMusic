@@ -20,6 +20,9 @@ interface PlaylistDao {
     @Query("DELETE FROM playlistTable WHERE playlistName=:playlistName")
     fun removePlaylist(playlistName: String)
 
+    @Query("UPDATE playlistTable SET playlistName=:newPlaylistName WHERE playlistName=:oldPlaylistName")
+    suspend fun renamePlaylist(oldPlaylistName: String, newPlaylistName: String)
+
     @get:Query("SELECT * FROM playlistTable")
     val allPlaylistSongs: List<Playlist>
 

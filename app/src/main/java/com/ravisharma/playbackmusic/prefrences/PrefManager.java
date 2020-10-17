@@ -78,6 +78,18 @@ public class PrefManager {
         ed.commit();
     }
 
+    public void renamePlaylist(String oldName, String newName){
+        Set<String> list = sp.getStringSet(Playlist, null);
+        List<String> l;
+        if (list != null) {
+            l = new ArrayList<>(list);
+            l.set(l.indexOf(oldName), newName);
+            Set<String> list2 = new LinkedHashSet<>(l);
+            ed.putStringSet(Playlist, list2);
+            ed.commit();
+        }
+    }
+
     public ArrayList<String> getAllPlaylist() {
         Set<String> list = sp.getStringSet(Playlist, null);
         if (list == null) {

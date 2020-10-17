@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
+import com.ravisharma.playbackmusic.equalizer.model.Settings;
 
 import java.util.ArrayList;
 

@@ -36,7 +36,6 @@ import com.ravisharma.playbackmusic.utils.StartDragListener;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
 import com.ravisharma.playbackmusic.MainActivity;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener;
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert;
@@ -216,7 +215,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     private void loadBanner() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }

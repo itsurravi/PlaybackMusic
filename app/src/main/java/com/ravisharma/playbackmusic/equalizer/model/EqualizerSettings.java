@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.equalizer;
+package com.ravisharma.playbackmusic.equalizer.model;
 
 public class EqualizerSettings {
     public int[] seekbarpos = new int[5];

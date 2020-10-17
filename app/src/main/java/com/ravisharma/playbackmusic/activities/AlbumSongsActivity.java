@@ -18,7 +18,6 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -29,7 +28,6 @@ import com.google.android.gms.ads.AdView;
 import com.ravisharma.playbackmusic.activities.viewmodel.AlbumSongViewModel;
 import com.ravisharma.playbackmusic.adapters.SongAdapter;
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems;
-import com.ravisharma.playbackmusic.utils.ads.CustomAdSize;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -153,7 +151,7 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
     private void loadBanner() {
         AdRequest adRequest =
                 new AdRequest.Builder().build();
-        AdSize adSize = CustomAdSize.getAdSize(this);
+        AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
     }

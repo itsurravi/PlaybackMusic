@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.prefrences.PrefManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PlaylistFragmentViewModel : ViewModel() {
@@ -24,11 +25,18 @@ class PlaylistFragmentViewModel : ViewModel() {
 
     fun getPlaylist(context: Context, playlistName: String): List<Playlist> {
         val repository = PlaylistRepository(context)
-        return repository.getPlaylist(playlistName);
+        return repository.getPlaylist(playlistName)
+    }
+
+    fun renamePlaylist(context: Context, oldPlaylistName: String, newPlaylistName: String) {
+        val repository = PlaylistRepository(context)
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.renamePlaylist(oldPlaylistName, newPlaylistName)
+        }
     }
 
     fun removePlaylist(context: Context, playlistName: String) {
         val repository = PlaylistRepository(context)
-        repository.removePlaylist(playlistName);
+        repository.removePlaylist(playlistName)
     }
 }
