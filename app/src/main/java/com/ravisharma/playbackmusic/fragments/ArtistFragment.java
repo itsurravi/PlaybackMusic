@@ -60,7 +60,7 @@ public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistCl
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
-        artistList = new ArrayList<Artist>();
+        artistList = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.artist_list);
         recyclerView.setHasFixedSize(true);

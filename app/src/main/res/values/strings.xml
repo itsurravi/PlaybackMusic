@@ -37,6 +37,7 @@
     <string name="prev">prev</string>
     <string name="playPause">playPause</string>
     <string name="next">next</string>
+    <string name="close">close</string>
     <string name="favorite">favorite</string>
 
     <string name="playLists">PlayLists</string>
@@ -59,10 +60,12 @@
     <string name="added_To_Favorite">Song Added To Favorite</string>
     <string name="choose_Timer">Choose Timer</string>
     <string name="timeOff">Timer Off</string>
+    <string name="mins15">Timer Set To 15 Mins</string>
     <string name="mins30">Timer Set To 30 Mins</string>
-    <string name="mins60">Timer Set To 1 Hour</string>
-    <string name="mins90">Timer Set To 1 hour 30 Min</string>
-    <string name="mins120">Timer Set To 2 Hour</string>
+    <string name="mins45">Timer Set To 45 Mins</string>
+    <string name="mins60">Timer Set To 60 Mins</string>
+    <string name="mins90">Timer Set To 90 Mins</string>
+    <string name="mins120">Timer Set To 120 Mins</string>
     <string name="playlist">Playlist</string>
     <string name="Tracks">Tracks</string>
     <string name="Albums">Albums</string>
@@ -125,6 +128,7 @@
         <item>Play Next</item>
         <item>Add To Queue</item>
         <item>Add To Playlist</item>
+        <item>Delete</item>
         <item>Share</item>
         <item>Details</item>
     </string-array>
@@ -151,11 +155,20 @@
         <item>Delete Playlist</item>
     </string-array>
     <string-array name="timer">
-        <item> Off </item>
+        <item>15 Minutes</item>
         <item>30 Minutes</item>
-        <item>1 Hour</item>
-        <item>1 Hour 30 Minutes</item>
-        <item>2 hours</item>
+        <item>45 Minutes</item>
+        <item>60 Minutes</item>
+        <item>90 Minutes</item>
+        <item>120 Minutes</item>
+    </string-array>
+    <string-array name="tracks">
+        <item>1 Track</item>
+        <item>2 Tracks</item>
+        <item>3 Tracks</item>
+        <item>4 Tracks</item>
+        <item>5 Tracks</item>
+        <item>6 Tracks</item>
     </string-array>
 
 

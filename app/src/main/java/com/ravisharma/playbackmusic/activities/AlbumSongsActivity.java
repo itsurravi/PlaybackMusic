@@ -59,7 +59,7 @@ public class AlbumSongsActivity extends AppCompatActivity implements SongAdapter
 
         setContentView(R.layout.activity_album_songs);
 
-        songList = new ArrayList<Song>();
+        songList = new ArrayList<>();
 
         albumArt = findViewById(R.id.albumArt);
         imgBack = findViewById(R.id.imgBack);

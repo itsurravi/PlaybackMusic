@@ -15,8 +15,8 @@ import java.util.Arrays;
 
 public class TinyDB {
 
-    private SharedPreferences preferences;
-    private Context context;
+    private final SharedPreferences preferences;
+    private final Context context;
 
     public TinyDB(Context appContext) {
         preferences = appContext.getSharedPreferences(appContext.getString(R.string.DB), Context.MODE_PRIVATE);
@@ -38,13 +38,13 @@ public class TinyDB {
 
 
     public ArrayList<String> getListString(String key) {
-        return new ArrayList<String>(Arrays.asList(TextUtils.split(preferences.getString(key, ""), "‚‗‚")));
+        return new ArrayList<>(Arrays.asList(TextUtils.split(preferences.getString(key, ""), "‚‗‚")));
     }
 
     public void putListObject(String key, ArrayList<Song> objArray) {
         checkForNullKey(key);
         Gson gson = new Gson();
-        ArrayList<String> objStrings = new ArrayList<String>();
+        ArrayList<String> objStrings = new ArrayList<>();
         for (Song obj : objArray) {
             objStrings.add(gson.toJson(obj));
         }
@@ -55,7 +55,7 @@ public class TinyDB {
         Gson gson = new Gson();
 
         ArrayList<String> objStrings = getListString(key);
-        ArrayList<Song> objects = new ArrayList<Song>();
+        ArrayList<Song> objects = new ArrayList<>();
 
         for (String jObjString : objStrings) {
             Song value = gson.fromJson(jObjString, mClass);

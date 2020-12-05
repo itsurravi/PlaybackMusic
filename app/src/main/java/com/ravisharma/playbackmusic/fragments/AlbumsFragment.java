@@ -61,7 +61,7 @@ public class AlbumsFragment extends Fragment implements AlbumAdapter.OnAlbumClic
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(v, savedInstanceState);
 
-        albumsList = new ArrayList<Album>();
+        albumsList = new ArrayList<>();
 
         recyclerView = v.findViewById(R.id.album_list);
         recyclerView.setHasFixedSize(true);

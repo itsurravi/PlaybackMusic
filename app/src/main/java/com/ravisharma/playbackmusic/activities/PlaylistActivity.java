@@ -143,7 +143,7 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     @Override
     public void onItemLongClick(final int mposition) {
         String[] items = getResources().getStringArray(R.array.longPressItemsRemove);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(this, R.layout.adapter_alert_list, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(this, R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(this).inflate(R.layout.alert_list, null);
 

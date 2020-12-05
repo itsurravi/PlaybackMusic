@@ -365,7 +365,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/pause/round_pause_24.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/close/round_close_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -376,7 +376,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_round_pause_24" />
+                            <entry key="outputName" value="ic_close_24" />
                             <entry key="sourceFile" value="D:\Android\2.psd" />
                           </map>
                         </option>

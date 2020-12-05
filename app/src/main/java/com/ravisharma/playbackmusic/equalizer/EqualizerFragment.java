@@ -155,8 +155,9 @@ public class EqualizerFragment extends Fragment {
         virtualizerController.linePaint.setColor(getResources().getColor(R.color.white));
         virtualizerController.invalidate();
 
+        int x;
         if (!Settings.isEqualizerReloaded) {
-            int x = 0;
+            x = 0;
             if (MainActivity.getInstance().bassBoost != null) {
                 try {
                     x = ((MainActivity.getInstance().bassBoost.getRoundedStrength() * 19) / 1000);
@@ -173,31 +174,20 @@ public class EqualizerFragment extends Fragment {
                 }
             }
 
-            if (x == 0) {
-                bassController.setProgress(1);
-            } else {
-                bassController.setProgress(x);
-            }
-
-            if (y == 0) {
-                virtualizerController.setProgress(1);
-            } else {
-                virtualizerController.setProgress(y);
-            }
         } else {
-            int x = ((Settings.bassStrength * 19) / 1000);
+            x = ((Settings.bassStrength * 19) / 1000);
             y = ((Settings.virtualizerStrength * 19) / 1000);
-            if (x == 0) {
-                bassController.setProgress(1);
-            } else {
-                bassController.setProgress(x);
-            }
 
-            if (y == 0) {
-                virtualizerController.setProgress(1);
-            } else {
-                virtualizerController.setProgress(y);
-            }
+        }
+        if (x == 0) {
+            bassController.setProgress(1);
+        } else {
+            bassController.setProgress(x);
+        }
+        if (y == 0) {
+            virtualizerController.setProgress(1);
+        } else {
+            virtualizerController.setProgress(y);
         }
 
         bassController.setOnProgressChangedListener(new AnalogController.onProgressChangedListener() {

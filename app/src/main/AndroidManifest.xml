@@ -28,7 +28,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".activities.LastAndMostPlayed"></activity>
+        <activity android:name=".activities.LastAndMostPlayed" />
         <activity
             android:name=".activities.SingleSongPlayActivity"
             android:excludeFromRecents="true"
@@ -104,6 +104,7 @@
                 <action android:name="prev" />
                 <action android:name="playPause" />
                 <action android:name="next" />
+                <action android:name="close" />
                 <action android:name="favorite" />
             </intent-filter>
         </receiver>

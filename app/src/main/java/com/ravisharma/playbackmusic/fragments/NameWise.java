@@ -120,7 +120,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     @Override
     public void onItemLongClick(final int mPosition) {
         String[] items = getResources().getStringArray(R.array.longPressNameWise);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), R.layout.adapter_alert_list, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(getContext(), R.layout.adapter_alert_list, items);
 
         LayoutInflater li = LayoutInflater.from(getActivity());
 

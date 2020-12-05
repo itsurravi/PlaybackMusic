@@ -7,9 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.model.Playlist
-import kotlinx.coroutines.CoroutineScope
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 class PlaylistRepository(context: Context?) {
     //    private val setupDao: SetupDao

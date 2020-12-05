@@ -11,7 +11,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter.ArtistViewHolder
 import com.ravisharma.playbackmusic.model.Artist
 
-class ArtistAdapter(var c: Context, private var artistList: ArrayList<Artist>) : RecyclerView.Adapter<ArtistViewHolder>() {
+class ArtistAdapter(private var c: Context, private var artistList: ArrayList<Artist>) : RecyclerView.Adapter<ArtistViewHolder>() {
     private lateinit var onClick: OnArtistClicked
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {

@@ -14,8 +14,8 @@ import com.ravisharma.playbackmusic.prefrences.PrefManager;
 
 public class PlaylistAlert {
 
-    private Context context;
-    private AlertClickListener listener;
+    private final Context context;
+    private final AlertClickListener listener;
 
     public PlaylistAlert(Context context, AlertClickListener listener) {
         this.context = context;

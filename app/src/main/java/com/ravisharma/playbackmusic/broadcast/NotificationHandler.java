@@ -25,6 +25,8 @@ public class NotificationHandler extends BroadcastReceiver {
                 MainActivity.getInstance().playNext();
             } else if (as.equals(context.getString(R.string.favorite))) {
                 MainActivity.getInstance().addToFavPlaylist();
+            } else if (as.equals(context.getString(R.string.close))) {
+                MainActivity.getInstance().stopApp();
             }
         }
     }

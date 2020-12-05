@@ -1,7 +1,6 @@
 package com.ravisharma.playbackmusic.database.repository
 
 import android.content.Context
-import androidx.lifecycle.viewModelScope
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.LastPlayedDao
 import com.ravisharma.playbackmusic.database.model.LastPlayed

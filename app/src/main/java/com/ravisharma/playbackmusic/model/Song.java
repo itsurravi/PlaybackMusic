@@ -9,31 +9,31 @@ import java.util.Objects;
 public class Song implements Parcelable {
 
     @SerializedName("id")
-    private long id;
+    private final long id;
 
     @SerializedName("title")
-    private String title;
+    private final String title;
 
     @SerializedName("artist")
-    private String artist;
+    private final String artist;
 
     @SerializedName("art")
-    private String art;
+    private final String art;
 
     @SerializedName("duration")
-    private long duration;
+    private final long duration;
 
     @SerializedName("data")
-    private String data;
+    private final String data;
 
     @SerializedName("dateModified")
-    private String dateModified;
+    private final String dateModified;
 
     @SerializedName("album")
-    private String album;
+    private final String album;
 
     @SerializedName("composer")
-    private String composer;
+    private final String composer;
 
 
     public Song(long id, String title, String artist, String data, String dateModified, String art, long duration, String album, String composer) {

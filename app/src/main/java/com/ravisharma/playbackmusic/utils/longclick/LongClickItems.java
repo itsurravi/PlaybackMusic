@@ -23,13 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.activities.AlbumSongsActivity;
@@ -47,8 +45,8 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class LongClickItems {
-    private Context context;
-    private ArrayList<Song> songList;
+    private final Context context;
+    private final ArrayList<Song> songList;
     private int position = -1;
 
     public LongClickItems(Context context, int position, ArrayList<Song> songList) {
@@ -67,7 +65,7 @@ public class LongClickItems {
 
     private void showDialog(final int mposition) {
         String[] items = context.getResources().getStringArray(R.array.longPressItems);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(context, R.layout.adapter_alert_list, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(context, R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(context).inflate(R.layout.alert_list, null);
 
@@ -124,12 +122,12 @@ public class LongClickItems {
                         context.startActivity(i);
                     }
                     break;
-                   /* case 5: {
+                    case 5: {
                         //Delete Song Code
                         showDeleteSongDialog(songList.get(mposition));
                     }
-                    break;*/
-                    case 5: {
+                    break;
+                    case 6: {
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("audio/*");
                         Uri uri = Uri.parse(songList.get(mposition).getData());
@@ -137,7 +135,7 @@ public class LongClickItems {
                         context.startActivity(Intent.createChooser(intent, "Share Via"));
                     }
                     break;
-                    case 6: {
+                    case 7: {
                         songDetails(mposition);
                     }
                     break;
@@ -149,7 +147,7 @@ public class LongClickItems {
 
     private void showNowPlayingDialog(final int mposition) {
         String[] items = context.getResources().getStringArray(R.array.longPressNowPlaying);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(context, R.layout.adapter_alert_list, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(context, R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(context).inflate(R.layout.alert_list, null);
 
@@ -214,7 +212,7 @@ public class LongClickItems {
     }
 
     private void showDeleteSongDialog(final Song song) {
-        AlertDialog.Builder b = new AlertDialog.Builder(context);
+        AlertDialog.Builder b = new AlertDialog.Builder(context, R.style.AlertDialogCustom);
         b.setTitle(context.getString(R.string.deleteMessage));
         b.setMessage(song.getTitle());
         b.setPositiveButton(context.getString(R.string.yes), new DialogInterface.OnClickListener() {

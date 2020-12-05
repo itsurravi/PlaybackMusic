@@ -14,7 +14,7 @@ public class PrefManager {
 
     SharedPreferences sp;
     SharedPreferences.Editor ed;
-    private String Playlist;
+    private final String Playlist;
 
     public PrefManager(Context c) {
         sp = c.getSharedPreferences(c.getString(R.string.playback_info), Context.MODE_PRIVATE);

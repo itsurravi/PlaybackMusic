@@ -159,7 +159,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
         }
 
         String[] items = getResources().getStringArray(R.array.longPressItemsPlaylist);
-        ArrayAdapter<String> ad = new ArrayAdapter<String>(getContext(), R.layout.adapter_alert_list, items);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(getContext(), R.layout.adapter_alert_list, items);
 
         View v = LayoutInflater.from(getContext()).inflate(R.layout.alert_playlist, null);
 

@@ -18,8 +18,8 @@ android {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 26
-        versionName "2.6.1"
+        versionCode 28
+        versionName "2.6.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

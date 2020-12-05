@@ -38,13 +38,13 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadata;
 import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.media.audiofx.PresetReverb;
 import android.media.audiofx.Virtualizer;
 import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
 import android.media.session.PlaybackState;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -53,6 +53,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -69,8 +70,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Intent playIntent;
     private PendingIntent pi;
 
-    private int checkedItem = 0;
+    private final int checkedItem = 0;
     private AlarmManager am;
 
     private PrefManager manage;
@@ -163,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Song playingSong;
 
-    private MediaSessionManager mediaSessionManager;
     protected MediaSession mediaSession;
 
     public static MainActivity getInstance() {
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         TAG = getString(R.string.app_name);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
         toolbar.setTitleTextColor(getResources().getColor(R.color.titleColor));
         setSupportActionBar(toolbar);
@@ -194,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         }
 
-        player_controller = (RelativeLayout) findViewById(R.id.player_cotroller);
+        player_controller = findViewById(R.id.player_cotroller);
         player_controller.setVisibility(View.INVISIBLE);
         musicSrv = new MusicService();
 
@@ -204,14 +206,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(sectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        songList = new ArrayList<Song>();
-        normalList = new ArrayList<Song>();
+        songList = new ArrayList<>();
+        normalList = new ArrayList<>();
 
         control_back_image = findViewById(R.id.control_back);
-        slidingLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        slidingLayout = findViewById(R.id.sliding_layout);
         seekBar = findViewById(R.id.seekBar);
         title = findViewById(R.id.txtSongName);
         artist = findViewById(R.id.txtSongArtist);
@@ -226,9 +228,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentPosition = findViewById(R.id.currentPosition);
         totalDuration = findViewById(R.id.totalDuration);
         slidePanelTop = findViewById(R.id.slidePanelTop);
-        equalizer = (ImageView) findViewById(R.id.imgEq);
-        playlist = (ImageView) findViewById(R.id.imgPlaylist);
-        favorite = (ImageView) findViewById(R.id.imgFav);
+        equalizer = findViewById(R.id.imgEq);
+        playlist = findViewById(R.id.imgPlaylist);
+        favorite = findViewById(R.id.imgFav);
 
         manage = new PrefManager(getApplicationContext());
 
@@ -337,10 +339,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (lastSongId != null) {
             songPosn = Integer.parseInt(lastSongId);
             if (songList.size() != 0) {
-                if(songList.size()<=songPosn){
+                if (songList.size() <= songPosn) {
                     UtilsKt.setPlayingSong(songList.get(0));
-                }
-                else{
+                } else {
                     UtilsKt.setPlayingSong(songList.get(songPosn));
                 }
             }
@@ -851,58 +852,188 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void showTimer() {
-        final CharSequence[] items = getResources().getStringArray(R.array.timer);
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
-        dialog.setTitle(getString(R.string.choose_Timer));
-        dialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        checkedItem = 0;
-                        setTimer(0);
+    int alert_seek_max = 5;
+    int alert_seek_step = 1;
+    int alert_current_value = 0;
+    private int trackCount = 0;
+    private CharSequence[] seekValue;
+    boolean timerSelectedValue = true;
 
-                        break;
-                    case 1:
-                        checkedItem = 1;
-                        setTimer(30 * 60 * 1000);
-                        showSnackBar(getString(R.string.mins30));
-                        break;
-                    case 2:
-                        checkedItem = 2;
-                        setTimer(60 * 60 * 1000);
-                        showSnackBar(getString(R.string.mins60));
-                        break;
-                    case 3:
-                        checkedItem = 3;
-                        setTimer(90 * 60 * 1000);
-                        showSnackBar(getString(R.string.mins90));
-                        break;
-                    case 4:
-                        checkedItem = 4;
-                        setTimer(120 * 60 * 1000);
-                        showSnackBar(getString(R.string.mins120));
-                        break;
-                }
-                dialog.dismiss();
+    private void showTimer() {
+        final CharSequence[] timerArray = getResources().getStringArray(R.array.timer);
+        final CharSequence[] trackArray = getResources().getStringArray(R.array.tracks);
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+        View v = LayoutInflater.from(this).inflate(R.layout.alert_timer, null);
+        dialog.setView(v);
+
+        final TextView txt_timer = v.findViewById(R.id.txt_timer);
+        final TextView txt_tracks = v.findViewById(R.id.txt_tracks);
+        final TextView txt_seekValue = v.findViewById(R.id.txt_seekValue);
+        final TextView txt_save = v.findViewById(R.id.txt_save);
+        final TextView txt_on_off = v.findViewById(R.id.txt_on_off);
+        final SeekBar alert_seekBar = v.findViewById(R.id.alert_seekBar);
+        final SwitchCompat timer_switch = v.findViewById(R.id.timer_switch);
+        final FrameLayout timerBlocker = v.findViewById(R.id.timerBlocker);
+
+        alert_seekBar.setMax(alert_seek_max / alert_seek_step);
+
+        final AlertDialog alertDialog = dialog.create();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        if (!TIMER) {
+            alertDialog.setCancelable(true);
+            timerBlocker.setVisibility(View.VISIBLE);
+            seekValue = timerArray;
+            switchTimerAlertView(true, txt_timer, txt_tracks);
+            alert_seekBar.setProgress(0);
+            alert_current_value = 0;
+        } else {
+            alertDialog.setCancelable(false);
+            timerBlocker.setVisibility(View.GONE);
+            if (timerSelectedValue) {
+                seekValue = timerArray;
+            } else {
+                seekValue = trackArray;
+            }
+            switchTimerAlertView(timerSelectedValue, txt_timer, txt_tracks);
+            alert_seekBar.setProgress(alert_current_value);
+            txt_on_off.setText("On");
+        }
+
+        timer_switch.setChecked(TIMER);
+
+        txt_seekValue.setText(seekValue[alert_current_value].toString());
+
+        alertDialog.show();
+
+        alert_seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                alert_current_value = progress * alert_seek_step;
+                txt_seekValue.setText(seekValue[progress].toString());
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
-        dialog.create();
-        dialog.show();
+
+        txt_timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                seekValue = timerArray;
+                switchTimerAlertView(true, txt_timer, txt_tracks);
+                alert_seekBar.setProgress(0);
+                txt_seekValue.setText(seekValue[0].toString());
+            }
+        });
+
+        txt_tracks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                seekValue = trackArray;
+                switchTimerAlertView(false, txt_timer, txt_tracks);
+                alert_seekBar.setProgress(0);
+                txt_seekValue.setText(seekValue[0].toString());
+            }
+        });
+
+        timer_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    TIMER = false;
+                    txt_on_off.setText("Off");
+                    timerBlocker.setVisibility(View.VISIBLE);
+                    alertDialog.setCancelable(true);
+                    if (am != null && pi != null) {
+                        am.cancel(pi);
+                        am = null;
+                        pi = null;
+                        showSnackBar(getString(R.string.timeOff));
+                    }
+                } else {
+                    TIMER = true;
+                    txt_on_off.setText("On");
+                    timerBlocker.setVisibility(View.GONE);
+                    alertDialog.setCancelable(false);
+                }
+            }
+        });
+
+        txt_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (timerSelectedValue) {
+                    switch (alert_current_value) {
+                        case 0:
+                            setTimer(15 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins15));
+                            break;
+                        case 1:
+                            setTimer(30 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins30));
+                            break;
+                        case 2:
+                            setTimer(45 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins45));
+                            break;
+                        case 3:
+                            setTimer(60 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins60));
+                            break;
+                        case 4:
+                            setTimer(90 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins90));
+                            break;
+                        case 5:
+                            setTimer(120 * 60 * 1000);
+                            showSnackBar(getString(R.string.mins120));
+                            break;
+                    }
+                }
+                alertDialog.dismiss();
+            }
+        });
+    }
+
+    public void trackCounterCheck() {
+        if (TIMER && !timerSelectedValue) {
+            if (trackCount == alert_current_value) {
+                trackCount = 0;
+                stopApp();
+            } else {
+                trackCount++;
+            }
+        }
+    }
+
+    private void switchTimerAlertView(boolean timerSelected, TextView timer, TextView tracks) {
+        timerSelectedValue = timerSelected;
+        if (timerSelected) {
+            timer.setTextColor(getResources().getColor(R.color.popupItemBackground));
+            tracks.setTextColor(getResources().getColor(R.color.white));
+            timer.setBackground(getResources().getDrawable(R.drawable.timer_alert_tab_selected_left));
+            tracks.setBackground(getResources().getDrawable(R.drawable.timer_alert_tab_unselected_right));
+        } else {
+            tracks.setTextColor(getResources().getColor(R.color.popupItemBackground));
+            timer.setTextColor(getResources().getColor(R.color.white));
+            tracks.setBackground(getResources().getDrawable(R.drawable.timer_alert_tab_selected_right));
+            timer.setBackground(getResources().getDrawable(R.drawable.timer_alert_tab_unselected_left));
+        }
     }
 
     private void setTimer(int time) {
         Intent i = new Intent(this, Timer.class);
         pi = PendingIntent.getBroadcast(this, 1234, i, 0);
         am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        if (time == 0) {
-            am.cancel(pi);
-            TIMER = false;
-        } else {
-            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time, pi);
-            TIMER = true;
-        }
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time, pi);
     }
 
     //play next
@@ -957,13 +1088,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 moveTaskToBack(true);
             } else {
                 if (doubleBackToExitPressedOnce) {
-                    killApp();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.exit(0);
-                        }
-                    }, 800);
+                    stopApp();
                     return;
                 }
                 this.doubleBackToExitPressedOnce = true;
@@ -987,7 +1112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             manage.storeInfo(getString(R.string.Songs), true);
             manage.storeInfo("position", String.valueOf(songPosn));
         }
-        if (TIMER) {
+        if (TIMER && timerSelectedValue) {
             am.cancel(pi);
         }
         if (musicSrv != null) {
@@ -1008,6 +1133,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             adView.destroy();
         }
         finish();
+    }
+
+    public void stopApp() {
+        killApp();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                System.exit(0);
+            }
+        }, 800);
     }
 
     @Override
@@ -1088,7 +1223,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * This will work when activity is in background
      * */
     private void initMediaSessions() {
-        mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
         mediaSession = new MediaSession(getApplicationContext(), TAG);
         mediaSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
@@ -1178,7 +1312,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection() {
+    private final ServiceConnection musicConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
@@ -1507,13 +1641,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         } else {
             started = false;
-            killApp();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    System.exit(0);
-                }
-            }, 800);
+            stopApp();
         }
     }
 

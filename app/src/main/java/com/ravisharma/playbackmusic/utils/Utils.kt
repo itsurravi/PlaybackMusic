@@ -1,8 +1,6 @@
 package com.ravisharma.playbackmusic.utils
 
 import android.net.Uri
-import android.os.AsyncTask
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.model.Song
 
@@ -15,14 +13,14 @@ fun setPlayingSong(song: Song) {
 
 
 //playing song position
-var songPosition: MutableLiveData<Int> = MutableLiveData();
+var songPosition: MutableLiveData<Int> = MutableLiveData()
 
 fun setSongPosition(i: Int) {
     songPosition.value = i
 }
 
 //current playing list
-private var playingList: MutableLiveData<ArrayList<Song>> = MutableLiveData();
+private var playingList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
 
 fun setPlayingList(songList: ArrayList<Song>) {
     playingList.value = songList.clone() as ArrayList<Song>

@@ -16,7 +16,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.model.Song
 import java.util.concurrent.TimeUnit
 
-class SongAdapter(private var songs: ArrayList<Song>, var c: Context) : RecyclerView.Adapter<SongAdapter.ViewHolder>() {
+class SongAdapter(private var songs: ArrayList<Song>, private var c: Context) : RecyclerView.Adapter<SongAdapter.ViewHolder>() {
 
     //declare interface
     private lateinit var onClick: OnItemClicked

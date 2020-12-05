@@ -47,7 +47,7 @@ public class ArtistSongsActivity extends AppCompatActivity implements SongAdapte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_artist_songs);
 
-        songList = new ArrayList<Song>();
+        songList = new ArrayList<>();
 
         imgBack = findViewById(R.id.imgBack);
         artistName = findViewById(R.id.artistName);

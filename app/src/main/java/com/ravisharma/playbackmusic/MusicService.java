@@ -1,7 +1,6 @@
 package com.ravisharma.playbackmusic;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import android.app.Service;
@@ -23,7 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
+
 import java.util.concurrent.TimeUnit;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -35,8 +34,6 @@ import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
-
-import static com.ravisharma.playbackmusic.utils.UtilsKt.setPlayingSong;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
@@ -232,7 +229,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this);
     }
 
-    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (isPng()) {
@@ -256,6 +253,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //play a adap_song
         player.reset();
         //get adap_song
+        MainActivity.getInstance().trackCounterCheck();
 
         Song playSong = songs.get(songPosn);
         songTitle = playSong.getTitle();
@@ -271,10 +269,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         playingSong = playSong;
         try {
             player.setDataSource(getApplicationContext(), trackUri);
-        } catch (Exception ignored) {
 
-        }
-        try {
             player.prepare();
             UtilsKt.setPlayingSong(playSong);
 
@@ -282,11 +277,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             mostPlayedRepository.addSongToMostPlayed(playSong);
             lastPlayedRepository.addSongToLastPlayed(playSong);
+        } catch (Exception ignored) {
 
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
     }
 
     @Override
@@ -406,6 +399,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         NotificationCompat.Action next = new NotificationCompat.Action
                 .Builder(R.drawable.ic_next_24, "Next", retrievePlaybackIntent(4))
                 .build();
+        NotificationCompat.Action close = new NotificationCompat.Action
+                .Builder(R.drawable.ic_close_24, "Close", retrievePlaybackIntent(5))
+                .build();
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -422,6 +418,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .addAction(previous)
                 .addAction(playPause)
                 .addAction(next)
+                .addAction(close)
                 .setContentIntent(pendingIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 2, 3)
@@ -465,6 +462,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 // next track
                 intent.putExtra(getString(R.string.doit), getString(R.string.next));
                 pendingIntent = PendingIntent.getBroadcast(this, 4, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                return pendingIntent;
+
+            case 5:
+                // close app
+                intent.putExtra(getString(R.string.doit), getString(R.string.close));
+                pendingIntent = PendingIntent.getBroadcast(this, 5, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                 return pendingIntent;
             default:
                 break;

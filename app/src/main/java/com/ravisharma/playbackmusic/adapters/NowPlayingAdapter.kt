@@ -18,7 +18,7 @@ import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.utils.StartDragListener
 import java.util.concurrent.TimeUnit
 
-class NowPlayingAdapter(private var songs: ArrayList<Song>, var c: Context, var dragListener: StartDragListener) : RecyclerView.Adapter<NowPlayingAdapter.ViewHolder>() {
+class NowPlayingAdapter(private var songs: ArrayList<Song>, private var c: Context, private var dragListener: StartDragListener) : RecyclerView.Adapter<NowPlayingAdapter.ViewHolder>() {
 
     //declare interface
     private lateinit var onClick: OnItemClicked
