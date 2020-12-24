@@ -4,9 +4,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ravisharma.playbackmusic.activities.AboutActivity;
@@ -106,8 +108,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String PREF_KEY = "equalizer";
 
-    private AdView adView2;
-    private FrameLayout adContainerView2;
     private FrameLayout adContainerView;
     private AdView adView;
 
@@ -406,18 +406,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         favorite.setOnClickListener(this);
 
         adContainerView = findViewById(R.id.banner_container_player);
-        adContainerView2 = findViewById(R.id.banner_container_name);
 
         adView = new AdView(this);
         adView.setAdUnitId(getString(R.string.mainActId));
         adContainerView.addView(adView);
         loadBanner1();
-
-        adView2 = new AdView(this);
-        adView2.setAdUnitId(getString(R.string.playlistFragId));
-        adContainerView2.addView(adView2);
-        loadBanner2();
-
     }
 
     private void loadBanner1() {
@@ -428,26 +421,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adView.loadAd(adRequest);
     }
 
-    private void loadBanner2() {
-        AdRequest adRequest =
-                new AdRequest.Builder().build();
-        AdSize adSize = AdSize.BANNER;
-        adView2.setAdSize(adSize);
-        adView2.loadAd(adRequest);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         new checkUpdate().execute();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (adView2 != null) {
-            adView2.destroy();
-        }
     }
 
     @Override
@@ -1232,7 +1209,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         PlaybackState.ACTION_PAUSE |
                         PlaybackState.ACTION_SKIP_TO_NEXT |
                         PlaybackState.ACTION_SKIP_TO_PREVIOUS)
-                .setState(musicSrv.player.isPlaying() ? PlaybackState.STATE_PAUSED : PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+                .setState(musicSrv.player.isPlaying() ?
+                        PlaybackState.STATE_PAUSED :
+                        PlaybackState.STATE_PLAYING,
+                        PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
                 .build();
         mediaSession.setPlaybackState(state);
 

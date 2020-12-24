@@ -66,8 +66,8 @@ public class LastAndMostPlayed extends AppCompatActivity implements SongAdapter.
 
         setContentView(R.layout.activity_last_and_most_played);
 
-        txtTitle1 = findViewById(R.id.txtTitle_1);
-        txtTitle2 = findViewById(R.id.txtTitle_2);
+        txtTitle1 = findViewById(R.id.txtPlaylistName1);
+        txtTitle2 = findViewById(R.id.txtPlaylistName2);
         albumArt = findViewById(R.id.albumArt);
         recyclerView = findViewById(R.id.song_list);
         noDataLayout = findViewById(R.id.noDataLayout);

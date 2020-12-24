@@ -9,17 +9,23 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -38,6 +44,7 @@ import com.ravisharma.playbackmusic.R;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -47,12 +54,15 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     private AdView adView;
     private FrameLayout adContainerView;
 
-    private TextView txtPlaylistName;
     private ArrayList<Song> songList;
     private FastScrollRecyclerView recyclerView;
     private SongAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
+
+    private ImageView albumArt;
     private ConstraintLayout noDataLayout;
+    private RelativeLayout firstLayout;
+    private LinearLayout secondLayout;
 
     private String playlistName;
 
@@ -61,14 +71,26 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // In Activity's onCreate() for instance
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        setWindowFlag(this, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, false);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+
         setContentView(R.layout.activity_favorite_playlist);
         songList = new ArrayList<>();
         repository = new PlaylistRepository(this);
+
         noDataLayout = findViewById(R.id.noDataLayout);
+        albumArt = findViewById(R.id.albumArt);
+        firstLayout = findViewById(R.id.firstLayout);
+        secondLayout = findViewById(R.id.secondLayout);
 
         playlistName = getIntent().getStringExtra("playlistName");
-        txtPlaylistName = findViewById(R.id.txtPlaylistName);
-        txtPlaylistName.setText(playlistName);
+        TextView txtPlaylistName1 = findViewById(R.id.txtPlaylistName1);
+        TextView txtPlaylistName2 = findViewById(R.id.txtPlaylistName2);
+        txtPlaylistName1.setText(playlistName);
+        txtPlaylistName2.setText(playlistName);
+
 
         initRecyclerView();
 
@@ -76,18 +98,18 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
             @Override
             public void onChanged(List<Playlist> playlists) {
                 songList.clear();
-                for(Playlist p : playlists){
+                for (Playlist p : playlists) {
                     Song song = p.getSong();
                     songList.add(song);
                 }
 
+                if (playlistName.equals(getString(R.string.favTracks)) && songList.size() > 0) {
+                    Collections.reverse(songList);
+                }
+
                 adapter.notifyDataSetChanged();
 
-                if (songList.size() == 0) {
-                    noDataLayout.setVisibility(View.VISIBLE);
-                } else {
-                    noDataLayout.setVisibility(View.GONE);
-                }
+                setUpLayout();
             }
         });
 
@@ -129,6 +151,39 @@ public class PlaylistActivity extends AppCompatActivity implements SongAdapter.O
 
     public void finishPage(View view) {
         finish();
+    }
+
+    public void setWindowFlag(Activity activity, final int bits, boolean on) {
+        Window win = activity.getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
+    }
+
+    private void setUpLayout() {
+        if (songList.size() == 0) {
+            noDataLayout.setVisibility(View.VISIBLE);
+            secondLayout.setVisibility(View.VISIBLE);
+            firstLayout.setVisibility(View.GONE);
+        } else {
+            noDataLayout.setVisibility(View.GONE);
+            secondLayout.setVisibility(View.GONE);
+            firstLayout.setVisibility(View.VISIBLE);
+
+            RequestOptions requestOptions = new RequestOptions();
+            requestOptions.placeholder(R.drawable.logo);
+            requestOptions.error(R.drawable.logo);
+
+            Glide.with(this)
+                    .setDefaultRequestOptions(requestOptions)
+                    .load(Uri.parse(songList.get(0).getArt()))
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .into(albumArt);
+        }
     }
 
     @Override

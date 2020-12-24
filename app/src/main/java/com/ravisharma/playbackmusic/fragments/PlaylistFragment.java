@@ -16,16 +16,23 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
 import com.ravisharma.playbackmusic.activities.LastAndMostPlayed;
 import com.ravisharma.playbackmusic.activities.PlaylistActivity;
 import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
@@ -58,6 +65,9 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
     private PlaylistFragmentViewModel viewModel;
 
+    private AdView adView;
+    private FrameLayout adContainerView;
+
     public PlaylistFragment() {
         // Required empty public constructor
     }
@@ -85,15 +95,38 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
         initRecyclerView();
 
+        adContainerView = v.findViewById(R.id.banner_container_playlist);
+
+        adView = new AdView(getContext());
+        adView.setAdUnitId(getString(R.string.playlistFragId));
+        adContainerView.addView(adView);
+        loadBanner2();
+
         cardRecentAdded.setOnClickListener(this);
         cardLastPlayed.setOnClickListener(this);
         cardMostPlayed.setOnClickListener(this);
+    }
+
+    private void loadBanner2() {
+        AdRequest adRequest =
+                new AdRequest.Builder().build();
+        AdSize adSize = AdSize.BANNER;
+        adView.setAdSize(adSize);
+        adView.loadAd(adRequest);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         setUpArrayList();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
     private void initRecyclerView() {

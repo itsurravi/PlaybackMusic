@@ -26,6 +26,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import java.util.concurrent.TimeUnit;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;

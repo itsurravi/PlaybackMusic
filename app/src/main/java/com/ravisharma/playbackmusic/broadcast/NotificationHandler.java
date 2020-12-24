@@ -14,7 +14,7 @@ public class NotificationHandler extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent != null && intent.getExtras() != null) {
+        if (intent != null && intent.getExtras() != null && MainActivity.getInstance() != null) {
             String as = intent.getExtras().getString(context.getString(R.string.doit));
 
             if (as.equals(context.getString(R.string.prev))) {
