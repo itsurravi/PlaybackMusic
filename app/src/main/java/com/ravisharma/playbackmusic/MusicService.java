@@ -26,7 +26,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import java.util.concurrent.TimeUnit;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
@@ -54,6 +53,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     boolean repeat_one = false;
     boolean notification = false;
     boolean fromButton = true;
+
+    private boolean isStarted = false;
+    private int playingSongPosition = 0;
 
     protected SeekBar seekBar;
     private TextView mCurrentPosition;
@@ -152,12 +154,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setList(ArrayList<Song> theSongs) {
         songs = theSongs;
-        UtilsKt.setPlayingList(songs);
-    }
-
-    public void updateList(ArrayList<Song> songList) {
-        songs = songList;
-        UtilsKt.setPlayingList(songs);
     }
 
     public void setSong(int songIndex) {
@@ -244,6 +240,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         registerReceiver(becomingNoisyReceiver, intentFilter);
     }
 
+    public void setPlayingPosition(String playingDuration) {
+        playingSongPosition = Integer.parseInt(playingDuration);
+    }
+
     public class MusicBinder extends Binder {
         MusicService getService() {
             return MusicService.this;
@@ -315,6 +315,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onPrepared(MediaPlayer mp) {
         requestAudioFocus();
+        if(!isStarted){
+            mp.seekTo(playingSongPosition);
+            isStarted = true;
+        }
+
         mp.start();
 
         if (repeat_one) {

@@ -8,8 +8,8 @@ import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.prefrences.TinyDB
-import com.ravisharma.playbackmusic.utils.playingSong
-import com.ravisharma.playbackmusic.utils.songPosition
+import com.ravisharma.playbackmusic.utils.curPlayingSong
+import com.ravisharma.playbackmusic.utils.curPlayingSongPosition
 
 class MainActivityViewModel : ViewModel() {
 
@@ -17,13 +17,13 @@ class MainActivityViewModel : ViewModel() {
     private var pSong: MutableLiveData<Song> = MutableLiveData()
     private var sPosition: MutableLiveData<Int> = MutableLiveData()
 
-    fun getPlayingSong(): MutableLiveData<Song> {
-        pSong = playingSong
+    fun getPlayingSong(): LiveData<Song> {
+        pSong = curPlayingSong
         return pSong
     }
 
-    fun getSongPosition(): MutableLiveData<Int> {
-        sPosition = songPosition
+    fun getSongPosition(): LiveData<Int> {
+        sPosition = curPlayingSongPosition
         return sPosition
     }
 

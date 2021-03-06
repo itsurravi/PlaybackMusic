@@ -5,49 +5,49 @@ import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.model.Song
 
 //current playing song
-var playingSong: MutableLiveData<Song> = MutableLiveData()
+var curPlayingSong: MutableLiveData<Song> = MutableLiveData()
 
 fun setPlayingSong(song: Song) {
-    playingSong.value = song
+    curPlayingSong.value = song
 }
 
 
 //playing song position
-var songPosition: MutableLiveData<Int> = MutableLiveData()
+var curPlayingSongPosition: MutableLiveData<Int> = MutableLiveData()
 
 fun setSongPosition(i: Int) {
-    songPosition.value = i
+    curPlayingSongPosition.value = i
 }
 
 //current playing list
-private var playingList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
+private var curPlayingList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
 
 fun setPlayingList(songList: ArrayList<Song>) {
-    playingList.value = songList.clone() as ArrayList<Song>
+    curPlayingList.value = songList.clone() as ArrayList<Song>
 }
 
 fun getPlayingListData(): MutableLiveData<ArrayList<Song>> {
-    return playingList
+    return curPlayingList
 }
 
 fun removeFromPlayingList(song: Song) {
-    val list = playingList.value
+    val list = curPlayingList.value
     list?.remove(song)
-    playingList.value = list
+    curPlayingList.value = list
 }
 
 fun addNextSongToPlayingList(song: Song) {
-    songPosition.value?.toInt()?.let {
-        val list = playingList.value
+    curPlayingSongPosition.value?.toInt()?.let {
+        val list = curPlayingList.value
         list?.add(it + 1, song)
-        playingList.value = list
+        curPlayingList.value = list
     }
 }
 
 fun addSongToPlayingList(song: Song) {
-    val list = playingList.value
+    val list = curPlayingList.value
     list?.add(song)
-    playingList.value = list
+    curPlayingList.value = list
 }
 
 //audio file Uri for delete

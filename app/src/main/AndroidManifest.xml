@@ -28,7 +28,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="q">
-        <activity android:name=".activities.LastAndMostPlayed" />
         <activity
             android:name=".activities.SingleSongPlayActivity"
             android:excludeFromRecents="true"
@@ -59,9 +58,6 @@
             android:name=".activities.AddToPlaylistActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.RecentAddedActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.PlaylistActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -71,8 +67,9 @@
             android:name=".activities.NowPlayingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.ArtistSongsActivity"
-            android:screenOrientation="portrait" />
+            android:name=".activities.CategorySongActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".SplashScreen"
             android:screenOrientation="portrait">
@@ -84,10 +81,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.AlbumSongsActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/TransparentBar" />
-        <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -98,7 +91,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" /> <!-- Receivers -->
+        <service android:name=".MusicService" />
+
+        <!-- Receivers -->
         <receiver android:name=".broadcast.NotificationHandler">
             <intent-filter>
                 <action android:name="prev" />

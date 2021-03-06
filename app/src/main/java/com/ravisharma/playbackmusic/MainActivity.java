@@ -2,13 +2,13 @@ package com.ravisharma.playbackmusic;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.ravisharma.playbackmusic.activities.AboutActivity;
@@ -56,6 +56,7 @@ import androidx.annotation.Nullable;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -78,7 +79,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +96,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -126,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static MainActivity activity;
     private String lastSongId;
+    private String playingDuration;
     private boolean lastShuffle = false;
     private boolean lastRepeat = false;
     private boolean lastRepeatOne = false;
@@ -139,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView playPause, prev, next, shuffle, repeat, playPauseSlide, equalizer, playlist, favorite;
     private ViewPager viewPager;
     private SlidingUpPanelLayout slidingLayout;
-    private LinearLayout slidePanelTop;
-    private RelativeLayout player_controller;
+    private ConstraintLayout slidePanelTop;
+    private ConstraintLayout player_controller;
 
     public boolean musicBound = false, fromList = false, started = false, deletionProcess = false,
             fromButton = false, played = false, playbackPaused = false, TIMER = false;
@@ -196,13 +196,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
         }
 
-        player_controller = findViewById(R.id.player_cotroller);
+        player_controller = findViewById(R.id.player_controller);
         player_controller.setVisibility(View.INVISIBLE);
         musicSrv = new MusicService();
 
         SectionsPagerAdapter sectionsPagerAdapter;
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        viewPager = findViewById(R.id.vpager);
+        viewPager = findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(sectionsPagerAdapter);
 
@@ -245,22 +245,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         UtilsKt.getPlayingListData().observe(this, new Observer<ArrayList<Song>>() {
             @Override
             public void onChanged(ArrayList<Song> songs) {
-                if (songs.size() > songList.size()) {
-                    songList = songs;
-                    musicSrv.updateList(songList);
-                } else {
-                    songList = songs;
-                }
+                songList = songs;
                 if (songList.size() > 0) {
                     Log.d("Playing", "List Changed " + songList.size());
-
+                    musicSrv.setList(songList);
+                    if(playingDuration != null) {
+                        musicSrv.setPlayingPosition(playingDuration);
+                    }
                     viewModel.saveQueueSongs(MainActivity.this, normalList);
                     viewModel.saveShuffleSongs(MainActivity.this, songList);
 
                     Log.d("Playing", "" + deletionProcess);
 
                     if (deletionProcess) {
-                        musicSrv.updateList(songList);
+                        musicSrv.setList(songList);
                         if (!songList.contains(playingSong)) {
                             UtilsKt.setSongPosition(songPosn);
                             UtilsKt.setPlayingSong(songList.get(songPosn));
@@ -283,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 checkInFav(playingSong);
 
                 PrefManager manage = new PrefManager(MainActivity.this);
-                manage.storeInfo("position", String.valueOf(songPosn));
+                manage.storeInfo(getString(R.string.position), String.valueOf(songPosn));
                 manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
 
                 totalDuration.setText(String.format("%d:%02d",
@@ -308,8 +306,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastShuffle = manage.get_b_Info(getString(R.string.Shuffle));
         lastRepeat = manage.get_b_Info(getString(R.string.Repeat));
         lastRepeatOne = manage.get_b_Info(getString(R.string.RepeatOne));
+        playingDuration = manage.get_s_Info(getString(R.string.currentPlayingDuration));
         boolean start = manage.get_b_Info(getString(R.string.Started));
-        String position = manage.get_s_Info("position");
+        String position = manage.get_s_Info(getString(R.string.position));
 
         if (manage.get_b_Info(getString(R.string.Songs))) {
             songList.clear();
@@ -411,6 +410,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adView.setAdUnitId(getString(R.string.mainActId));
         adContainerView.addView(adView);
         loadBanner1();
+
+        new checkUpdate().execute();
     }
 
     private void loadBanner1() {
@@ -419,12 +420,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        new checkUpdate().execute();
     }
 
     @Override
@@ -477,7 +472,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             manage.storeInfo(getString(R.string.Shuffle), false);
         }
         musicSrv.setList(songList);
+        UtilsKt.setPlayingList(songList);
         musicSrv.setSong(songPosn);
+        playingDuration = "0";
+        musicSrv.setPlayingPosition(playingDuration);
         musicSrv.playSong();
         control_back_image.resume();
         if (playbackPaused) {
@@ -580,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 songPosn = songList.indexOf(playingSong);
 
-                musicSrv.setList(songList);
+                UtilsKt.setPlayingList(songList);
                 musicSrv.setSong(songPosn);
                 UtilsKt.setPlayingSong(songList.get(songPosn));
             }
@@ -691,6 +689,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (songList.size() > 0) {
                             Glide.with(getApplicationContext()).setDefaultRequestOptions(requestOptions)
                                     .load(Uri.parse(songList.get(songPosn).getArt()))
+                                    .transform(new CenterCrop(), new RoundedCorners(10))
                                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                                     .into(slideImage);
                         } else {
@@ -727,6 +726,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Glide.with(getApplicationContext())
                 .setDefaultRequestOptions(requestOptions)
                 .load(Uri.parse(playingSong.getArt()))
+                .transform(new CenterCrop(), new RoundedCorners(50))
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(cardImage);
@@ -734,6 +734,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Glide.with(getApplicationContext())
                     .setDefaultRequestOptions(requestOptions)
                     .load(Uri.parse(playingSong.getArt()))
+                    .transform(new CenterCrop(), new RoundedCorners(10))
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(slideImage);
         } else {
@@ -1087,7 +1088,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             manage.storeInfo(getString(R.string.ID), String.valueOf(songPosn));
             manage.storeInfo(getString(R.string.Started), started);
             manage.storeInfo(getString(R.string.Songs), true);
-            manage.storeInfo("position", String.valueOf(songPosn));
+            manage.storeInfo(getString(R.string.position), String.valueOf(songPosn));
+            if (musicSrv != null) {
+                manage.storeInfo(getString(R.string.currentPlayingDuration), String.valueOf(musicSrv.player.getCurrentPosition()));
+            }
         }
         if (TIMER && timerSelectedValue) {
             am.cancel(pi);
@@ -1210,8 +1214,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         PlaybackState.ACTION_SKIP_TO_NEXT |
                         PlaybackState.ACTION_SKIP_TO_PREVIOUS)
                 .setState(musicSrv.player.isPlaying() ?
-                        PlaybackState.STATE_PAUSED :
-                        PlaybackState.STATE_PLAYING,
+                                PlaybackState.STATE_PAUSED :
+                                PlaybackState.STATE_PLAYING,
                         PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
                 .build();
         mediaSession.setPlaybackState(state);
@@ -1300,7 +1304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             musicSrv = binder.getService();
             //pass alert_list
             if (lastSongId != null) {
-                musicSrv.setList(songList);
+                UtilsKt.setPlayingList(songList);
                 musicSrv.setShuffle(lastShuffle);
                 musicSrv.checkRepeat(lastRepeat, lastRepeatOne);
                 musicSrv.setSong(Integer.parseInt(lastSongId));

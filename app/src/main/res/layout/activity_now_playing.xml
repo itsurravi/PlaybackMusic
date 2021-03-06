@@ -46,7 +46,8 @@
                 android:background="?android:selectableItemBackground"
                 android:onClick="showCreateListAlert"
                 android:padding="15dp"
-                android:src="@drawable/ic_save_24" />
+                android:src="@drawable/ic_save_24"
+                android:contentDescription="@string/save_as_playlist" />
 
 
         </LinearLayout>

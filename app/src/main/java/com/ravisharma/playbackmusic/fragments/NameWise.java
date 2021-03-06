@@ -39,6 +39,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
+import com.ravisharma.playbackmusic.utils.ExtensionKt;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.model.Song;
@@ -47,7 +48,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 
 public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
@@ -96,12 +96,12 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                     songList.clear();
                     songList.addAll(songs);
 
-                    adapter.notifyDataSetChanged();
+                    adapter.setList(songList);
                 }
             }
         });
 
-        adapter = new SongAdapter(songList, getContext());
+        adapter = new SongAdapter(getContext());
         recyclerView.setAdapter(adapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
@@ -255,7 +255,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
                     }
                     break;
                     case 7: {
-                        songDetails(mPosition);
+                        ExtensionKt.showSongInfo(getContext(), songList.get(mPosition));
                     }
                     break;
                 }
@@ -264,48 +264,13 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         });
     }
 
-    private void songDetails(int pos) {
-        LayoutInflater li = LayoutInflater.from(getActivity());
-
-        View v = li.inflate(R.layout.info, null);
-        TextView title, artist, album, composer, duration, location;
-        title = v.findViewById(R.id.info_title);
-        artist = v.findViewById(R.id.info_artist);
-        album = v.findViewById(R.id.info_album);
-        composer = v.findViewById(R.id.info_composer);
-        duration = v.findViewById(R.id.info_duration);
-        location = v.findViewById(R.id.info_location);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(v);
-
-        title.setText(songList.get(pos).getTitle());
-        artist.setText(songList.get(pos).getArtist());
-        album.setText(songList.get(pos).getAlbum());
-        composer.setText(songList.get(pos).getComposer());
-        duration.setText((String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(songList.get(pos).getDuration()),
-                TimeUnit.MILLISECONDS.toSeconds(songList.get(pos).getDuration()) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(songList.get(pos).getDuration())))));
-        location.setText(songList.get(pos).getData());
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
-        dialog.show();
-    }
-
     public interface OnFragmentItemClicked {
         void OnFragmentItemClick(int position, ArrayList<Song> songsArrayList, boolean nowPlaying);
     }
 
-    public interface OnFragmentItemLongClicked {
-        void OnFragmentItemLongClick(int position, ArrayList<Song> songsArrayList);
-    }
-
     private void updateList(int mposition) {
         Song song = songList.get(mposition);
-        if (song.equals(UtilsKt.getPlayingSong().getValue())) {
+        if (song.equals(UtilsKt.getCurPlayingSong().getValue())) {
             MainActivity.getInstance().playNext();
         }
         UtilsKt.removeFromPlayingList(song);

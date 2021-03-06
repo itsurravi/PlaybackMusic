@@ -1,105 +1,67 @@
-package com.ravisharma.playbackmusic.fragments;
+package com.ravisharma.playbackmusic.fragments
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.ravisharma.playbackmusic.activities.ArtistSongsActivity;
-import com.ravisharma.playbackmusic.adapters.ArtistAdapter;
-import com.ravisharma.playbackmusic.provider.SongsProvider;
-import com.ravisharma.playbackmusic.model.Artist;
-import com.ravisharma.playbackmusic.R;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
-import static com.ravisharma.playbackmusic.MainActivity.ARTIST_SONGS;
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ravisharma.playbackmusic.MainActivity
+import com.ravisharma.playbackmusic.activities.CategorySongActivity
+import com.ravisharma.playbackmusic.adapters.ArtistAdapter
+import com.ravisharma.playbackmusic.adapters.ArtistAdapter.OnArtistClicked
+import com.ravisharma.playbackmusic.databinding.FragmentArtistBinding
+import com.ravisharma.playbackmusic.model.Artist
+import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.artistList
+import java.util.*
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple [Fragment] subclass.
  */
-public class ArtistFragment extends Fragment implements ArtistAdapter.OnArtistClicked {
+class ArtistFragment : Fragment(), OnArtistClicked {
 
-    FastScrollRecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<Artist> artistList;
+    private var artistsList: ArrayList<Artist> = ArrayList()
 
-    ArtistAdapter adapter;
+    private lateinit var binding: FragmentArtistBinding
 
-    public ArtistFragment() {
-        // Required empty public constructor
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View {
+
+        binding = FragmentArtistBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_artist, container, false);
-        return v;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(v, savedInstanceState);
-        artistList = new ArrayList<>();
-
-        recyclerView = v.findViewById(R.id.artist_list);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,
-                false);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        SongsProvider.Companion.getArtistList().observe(this, new Observer<ArrayList<Artist>>() {
-            @Override
-            public void onChanged(ArrayList<Artist> artists) {
-                if (artists.size() > 0) {
-                    artistList.clear();
-                    artistList.addAll(artists);
-
-                    Collections.sort(artistList, new Comparator<Artist>() {
-                        public int compare(Artist a, Artist b) {
-                            return a.getArtistName().compareTo(b.getArtistName());
-                        }
-                    });
-
-                    adapter.notifyDataSetChanged();
-                }
+    override fun onViewCreated(v: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(v, savedInstanceState)
+        binding.artistList.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            itemAnimator = DefaultItemAnimator()
+            adapter = ArtistAdapter(artistsList).apply {
+                setOnClick(this@ArtistFragment)
             }
-        });
+            addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
+        }
+        artistList.observe(this, { artists ->
+            if (artists.size > 0) {
+                artistsList.clear()
+                artistsList.addAll(artists)
+                artistsList.sortWith { (_, artistName1), (_, artistName2) -> artistName1.compareTo(artistName2) }
 
-
-        adapter = new ArtistAdapter(getContext(), artistList);
-        recyclerView.setAdapter(adapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
-        adapter.setOnClick(this);
+                binding.artistList.adapter?.notifyDataSetChanged()
+            }
+        })
     }
 
-    @Override
-    public void onArtistClick(int position) {
-        Intent i = new Intent(getContext(), ArtistSongsActivity.class);
-        i.putExtra("artistId", String.valueOf(artistList.get(position).getArtistId()));
-        getActivity().startActivityForResult(i, ARTIST_SONGS);
+    override fun onArtistClick(position: Int) {
+        val i = Intent(context, CategorySongActivity::class.java).apply {
+            putExtra("artistId", artistsList[position].artistId.toString())
+            putExtra("actName", artistsList[position].artistName)
+        }
+        activity!!.startActivityForResult(i, MainActivity.ARTIST_SONGS)
     }
 }

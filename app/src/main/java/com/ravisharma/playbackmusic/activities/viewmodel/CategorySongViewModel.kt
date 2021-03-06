@@ -2,34 +2,52 @@ package com.ravisharma.playbackmusic.activities.viewmodel
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ravisharma.playbackmusic.database.model.LastPlayed
+import com.ravisharma.playbackmusic.database.model.MostPlayed
+import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository
+import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository
 import com.ravisharma.playbackmusic.model.Song
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class ArtistSongViewModel : ViewModel() {
-    private var artistSong: MutableLiveData<ArrayList<Song>> = MutableLiveData()
+class CategorySongViewModel : ViewModel() {
 
-    fun getArtistSongs(artistId: String, contentResolver: ContentResolver): MutableLiveData<ArrayList<Song>> {
+    private var songsList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
+
+    private var lastPlayedList: MutableLiveData<List<LastPlayed>> = MutableLiveData()
+    private var mostPlayedList: MutableLiveData<List<MostPlayed>> = MutableLiveData()
+
+    fun getCategorySongs(queryType: String, albumId: String, contentResolver: ContentResolver): MutableLiveData<ArrayList<Song>> {
         viewModelScope.launch(Dispatchers.Main) {
-            artistSong.value = withContext(Dispatchers.IO) {
-                getArtistSongsList(artistId, contentResolver)
+            songsList.value = withContext(Dispatchers.IO) {
+                getSongs(queryType, albumId, contentResolver)
             }
         }
-        return artistSong
+        return songsList
     }
 
-    private fun getArtistSongsList(artistId: String, contentResolver: ContentResolver): ArrayList<Song> {
+    private fun getSongs(queryType: String, id: String, contentResolver: ContentResolver): ArrayList<Song> {
         val songList = ArrayList<Song>()
         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val musicCursor = contentResolver.query(musicUri, null,
-                MediaStore.Audio.Media.ARTIST_ID + "=" + artistId + " AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%"), MediaStore.Audio.Media.TITLE + " ASC")
+        var musicCursor : Cursor? = null
+
+        if(queryType == "Album"){
+            musicCursor = contentResolver.query(musicUri, null,
+                    MediaStore.Audio.Media.ALBUM_ID + "=" + id/* + " AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%")*/, null, MediaStore.Audio.Media.TITLE + " ASC")
+        }
+        else if(queryType == "Artist") {
+            musicCursor = contentResolver.query(musicUri, null,
+                    MediaStore.Audio.Media.ARTIST_ID + "=" + id + " AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%"), MediaStore.Audio.Media.TITLE + " ASC")
+        }
 
         musicCursor?.let { cursor ->
             if (cursor.count > 0) {
@@ -67,35 +85,27 @@ class ArtistSongViewModel : ViewModel() {
             musicCursor.close()
         }
         return songList
+    }
 
-        /*if (musicCursor != null && musicCursor.moveToFirst()) {
-            //get columns
-            val idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID)
-            val albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)
-            val titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE)
-            val artistColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
-            val albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
-            val composerColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER)
-            val pathColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA)
-            val durationColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DURATION)
-            val dateModifyColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
+    fun getLastPlayedSongsList(context: Context): MutableLiveData<List<LastPlayed>> {
+        val lastPlayedRepository = LastPlayedRepository(context)
 
-            //add songs to list
-            do {
-                val thisId = musicCursor.getLong(idColumn)
-                val thisTitle = musicCursor.getString(titleColumn)
-                val thisArtist = musicCursor.getString(artistColumn)
-                val thisAlbum = musicCursor.getString(albumColumn)
-                val thisComposer = musicCursor.getString(composerColumn)
-                val thisPath = musicCursor.getString(pathColumn)
-                val thisDateModify = musicCursor.getString(dateModifyColumn)
-                val thisDuration = musicCursor.getLong(durationColumn)
-                val thisAlbumAid = musicCursor.getLong(albumIdColumn)
-                val ART_CONTENT = Uri.parse("content://media/external/audio/albumart")
-                val albumArt = ContentUris.withAppendedId(ART_CONTENT, thisAlbumAid)
-                songList.add(Song(thisId, thisTitle, thisArtist, thisPath, thisDateModify, albumArt.toString(), thisDuration, thisAlbum, thisComposer))
-            } while (musicCursor.moveToNext())
+        viewModelScope.launch {
+            lastPlayedList.value = withContext(Dispatchers.IO) {
+                lastPlayedRepository.getLastPlayedSongsList()
+            }
         }
-        return songList*/
+        return lastPlayedList
+    }
+
+    fun getMostPlayedSongsList(context: Context): MutableLiveData<List<MostPlayed>> {
+        val mostPlayedRepository = MostPlayedRepository(context)
+
+        viewModelScope.launch {
+            mostPlayedList.value = withContext(Dispatchers.IO) {
+                mostPlayedRepository.getMostPlayedSongs()
+            }
+        }
+        return mostPlayedList
     }
 }

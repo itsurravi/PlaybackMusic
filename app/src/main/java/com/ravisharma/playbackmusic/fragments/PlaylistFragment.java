@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +27,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.ravisharma.playbackmusic.activities.LastAndMostPlayed;
+import com.ravisharma.playbackmusic.activities.CategorySongActivity;
 import com.ravisharma.playbackmusic.activities.PlaylistActivity;
-import com.ravisharma.playbackmusic.activities.RecentAddedActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel;
@@ -170,14 +166,15 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
     @Override
     public void onClick(View view) {
         if (cardRecentAdded.equals(view)) {
-            Intent i = new Intent(getContext(), RecentAddedActivity.class);
+            Intent i = new Intent(getContext(), CategorySongActivity.class);
+            i.putExtra("actName","Recent Added");
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (cardLastPlayed.equals(view)) {
-            Intent i = new Intent(getContext(), LastAndMostPlayed.class);
+            Intent i = new Intent(getContext(), CategorySongActivity.class);
             i.putExtra("actName", "Last Played");
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (cardMostPlayed.equals(view)) {
-            Intent i = new Intent(getContext(), LastAndMostPlayed.class);
+            Intent i = new Intent(getContext(), CategorySongActivity.class);
             i.putExtra("actName", "Most Played");
             getActivity().startActivityForResult(i, RECENT_ADDED);
         } else if (btnAddNewPlaylist.equals(view)) {

@@ -19,20 +19,6 @@
     <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
     <string name="mainActId">ca-app-pub-8188016146639430/7494562314</string>
 
-    <string name="adSize">FULL_BANNER</string>
-
-    <string name="recentAdded">Recent Added</string>
-    <string name="lastPlayed">Last Played</string>
-    <string name="mostPlayed">Most Played</string>
-    <string name="favTracks">My Favorites</string>
-    <string name="appVersion">v1.0</string>
-    <string name="support">Thanks for your Support.\nMade in India.</string>
-
-    <string name="deleteMessage">Do you want to delete?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
-    <string name="notValid">Not Valid Search</string>
-
     <string name="doit">do</string>
     <string name="prev">prev</string>
     <string name="playPause">playPause</string>
@@ -44,12 +30,25 @@
     <string name="playback_info">playback_info</string>
     <string name="DB">DB</string>
 
+    <string name="recentAdded">Recent Added</string>
+    <string name="lastPlayed">Last Played</string>
+    <string name="appVersion">v1.0</string>
+    <string name="support">Thanks for your Support. Made in India.</string>
+
+    <string name="deleteMessage">Do you want to delete?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="notValid">Not Valid Search</string>
+    <string name="notValidLength">"Search Length Not Valid"</string>
+
     <string name="ID">ID</string>
     <string name="Shuffle">Shuffle</string>
     <string name="Repeat">Repeat</string>
     <string name="RepeatOne">RepeatOne</string>
     <string name="Started">Started</string>
     <string name="Songs">Songs</string>
+    <string name="position">position</string>
+    <string name="currentPlayingDuration">currentPlayingDuration</string>
     <string name="NormalSongs">NormalSongs</string>
     <string name="Shuffle_On">Shuffle On</string>
     <string name="Shuffle_Off">Shuffle Off</string>
@@ -104,6 +103,14 @@
     <string name="artist">Artist:</string>
     <string name="savePlaylist">Save as Playlist</string>
     <string name="noSong">No Song for This Category</string>
+    <string name="save_as_playlist">Save as Playlist</string>
+    <string name="timer">Timer</string>
+    <string name="tracks">Tracks</string>
+    <string name="sleep_after">Sleep After:</string>
+    <string name="sleep_timer_title">Sleep Timer</string>
+    <string name="time_text_off">Off</string>
+    <string name="reverb_effect">Reverb Effect</string>
+    <string name="preset">Preset</string>
 
     <plurals name="numberOfSongs">
         <item quantity="one">%d Song</item>
@@ -170,6 +177,8 @@
         <item>5 Tracks</item>
         <item>6 Tracks</item>
     </string-array>
+    <string name="mostPlayed">Most Played</string>
+    <string name="favTracks">My Favorites</string>
 
 
 </resources>

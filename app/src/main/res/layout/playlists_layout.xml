@@ -11,8 +11,9 @@
     <RelativeLayout
         android:id="@+id/firstLayout"
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:visibility="gone">
+        android:layout_height="200dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -39,7 +40,20 @@
 
         <TextView
             android:id="@+id/txtPlaylistName1"
-            style="@style/TextAppearance.AppCompat.Headline"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:layout_above="@id/noOfSongs"
+            android:maxLines="1"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="@string/favTracks"
+            android:textColor="@color/listitemTitle" />
+
+        <TextView
+            android:id="@+id/noOfSongs"
+            style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -48,7 +62,7 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="20dp"
-            android:text="@string/favTracks"
+            android:text="@string/album_SongNumbers"
             android:textColor="@color/listitemTitle" />
 
         <View
@@ -66,7 +80,8 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:paddingTop="24dp">
+        android:paddingTop="24dp"
+        tools:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -90,7 +105,10 @@
 
     </LinearLayout>
 
-    <include layout="@layout/no_data_found" />
+    <include
+        android:id="@+id/no_data_found"
+        layout="@layout/no_data_found"
+        android:visibility="invisible"/>
 
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"

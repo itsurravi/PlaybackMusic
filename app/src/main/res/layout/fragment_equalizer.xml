@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Reverb Effect"
+                android:text="@string/reverb_effect"
                 android:textColor="@color/white" />
 
             <TextView
@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Preset"
+                android:text="@string/preset"
                 android:textColor="@color/white" />
 
         </LinearLayout>

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.PlaylistHolder
+import com.ravisharma.playbackmusic.databinding.AdapterPlaylistBinding
 
 class PlaylistAdapter(private val context: Context, private val playlistArrayList: List<String>) : RecyclerView.Adapter<PlaylistHolder>() {
 
@@ -18,28 +19,31 @@ class PlaylistAdapter(private val context: Context, private val playlistArrayLis
     private lateinit var onLongClicked: OnPlaylistLongClicked
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaylistHolder {
-        val v = LayoutInflater.from(context).inflate(R.layout.adapter_playlist, parent, false)
-        return PlaylistHolder(v)
+        val binding = AdapterPlaylistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PlaylistHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PlaylistHolder, position: Int) {
         val playList = playlistArrayList[position]
-        holder.playlistName.text = playList
-        if (context is MainActivity) {
-            when (position) {
-                0 -> {
-                    holder.playlistIcon.setImageResource(R.drawable.ic_favtrack_playlist)
-                }
-                else -> {
-                    holder.playlistIcon.setImageResource(R.drawable.ic_created_playlist)
+        holder.binding.apply {
+            playlistTitle.text = playList
+            if (context is MainActivity) {
+                when (position) {
+                    0 -> {
+                        playlistIcon.setImageResource(R.drawable.ic_favtrack_playlist)
+                    }
+                    else -> {
+                        playlistIcon.setImageResource(R.drawable.ic_created_playlist)
+                    }
                 }
             }
-        }
-        holder.playlistBox.setOnClickListener { onClicked.onPlaylistClick(position) }
-
-        holder.playlistBox.setOnLongClickListener {
-            onLongClicked.onPlaylistLongClick(position)
-            return@setOnLongClickListener true
+            playlistBox.apply {
+                setOnClickListener { onClicked.onPlaylistClick(position) }
+                setOnLongClickListener {
+                    onLongClicked.onPlaylistLongClick(position)
+                    return@setOnLongClickListener true
+                }
+            }
         }
     }
 
@@ -47,11 +51,7 @@ class PlaylistAdapter(private val context: Context, private val playlistArrayLis
         return playlistArrayList.size
     }
 
-    inner class PlaylistHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var playlistIcon: ImageView = itemView.findViewById(R.id.playlistIcon)
-        var playlistName: TextView = itemView.findViewById(R.id.playlistTitle)
-        var playlistBox: LinearLayout = itemView.findViewById(R.id.playlistBox)
-    }
+    inner class PlaylistHolder(val binding: AdapterPlaylistBinding) : RecyclerView.ViewHolder(binding.root)
 
     //make interface like this
     interface OnPlaylistClicked {

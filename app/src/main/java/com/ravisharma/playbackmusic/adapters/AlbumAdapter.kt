@@ -10,9 +10,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.AlbumViewHolder
+import com.ravisharma.playbackmusic.databinding.AdapterAlbumsBinding
 import com.ravisharma.playbackmusic.model.Album
 
 class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Album>) : RecyclerView.Adapter<AlbumViewHolder>() {
@@ -20,37 +23,35 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
     private lateinit var onClick: OnAlbumClicked
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
-        val v = LayoutInflater.from(c).inflate(R.layout.adapter_albums, parent, false)
-        return AlbumViewHolder(v)
+        val binding = AdapterAlbumsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AlbumViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
         val currAlbum = albumsList[position]
-        holder.albumTitle.text = currAlbum.albumName
-        holder.artistTitle.text = currAlbum.albumArtist
-        /*Song art code here*/
-        val requestOptions = RequestOptions()
-        requestOptions.placeholder(R.drawable.logo)
-        requestOptions.error(R.drawable.logo)
-        Glide.with(c)
-                .setDefaultRequestOptions(requestOptions)
-                .load(currAlbum.albumArt)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .into(holder.albumArt)
-        holder.albumBox.setOnClickListener { onClick.onAlbumClick(position) }
+        holder.binding.apply {
+            albumTitle.text = currAlbum.albumName
+            artistTitle.text = currAlbum.albumArtist
+            val requestOptions = RequestOptions().apply {
+                placeholder(R.drawable.logo)
+                error(R.drawable.logo)
+            }
+            Glide.with(c)
+                    .setDefaultRequestOptions(requestOptions)
+                    .load(currAlbum.albumArt)
+                    .transform(CenterCrop(), RoundedCorners(20))
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
+                    .into(albumArt)
+
+            albumBox.setOnClickListener { onClick.onAlbumClick(position) }
+        }
     }
 
     override fun getItemCount(): Int {
         return albumsList.size
     }
 
-    inner class AlbumViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var albumTitle: TextView = itemView.findViewById(R.id.albumTitle)
-        var artistTitle: TextView = itemView.findViewById(R.id.artistTitle)
-        var albumArt: ImageView = itemView.findViewById(R.id.albumArt)
-        var albumBox: LinearLayout = itemView.findViewById(R.id.albumBox)
-
-    }
+    inner class AlbumViewHolder(val binding: AdapterAlbumsBinding) : RecyclerView.ViewHolder(binding.root)
 
     //make interface like this
     interface OnAlbumClicked {

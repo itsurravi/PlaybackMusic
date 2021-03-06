@@ -51,7 +51,7 @@
             </com.google.android.material.appbar.AppBarLayout>
 
             <androidx.viewpager.widget.ViewPager
-                android:id="@+id/vpager"
+                android:id="@+id/view_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -71,7 +71,9 @@
             android:focusable="false"
             android:orientation="vertical">
 
-            <include layout="@layout/playing_panel" />
+            <include
+                android:id="@+id/playing_panel"
+                layout="@layout/playing_panel" />
 
         </LinearLayout>
 

@@ -86,47 +86,44 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
         initRecyclerView();
 
-        UtilsKt.getPlayingListData().observe(this, new Observer<ArrayList<Song>>() {
-            @Override
-            public void onChanged(ArrayList<Song> songs) {
-                Log.d("Playing", "NowPlaying Playlist");
-                playingList = songs;
-                adapter.setList(playingList);
-                if (UtilsKt.getSwiped() || UtilsKt.getFileDelete()) {
-                    Log.d("Playing", "Swiped");
-                    if (playingList.size() > 0) {
-                        MainActivity.getInstance().musicSrv.updateList(playingList);
-                        int position = playingList.indexOf(playingSong);
-                        MainActivity.getInstance().musicSrv.setSong(position);
-                    } else {
-                        if (SongsProvider.Companion.getSongListByName().getValue().size() == 0) {
-                            Toast.makeText(NowPlayingActivity.this, "No Song Left in Storage", Toast.LENGTH_SHORT).show();
-                            PrefManager manage = new PrefManager(NowPlayingActivity.this);
-                            manage.storeInfo(getString(R.string.Songs), false);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    System.exit(0);
-                                }
-                            }, 1000);
-                        }
-                        MainActivity.getInstance().musicSrv.updateList(SongsProvider.Companion.getSongListByName().getValue());
-                        MainActivity.getInstance().musicSrv.setSong(0);
-                        MainActivity.getInstance().musicSrv.playSong();
-                    }
-                    UtilsKt.setSwiped(false);
-                    UtilsKt.setFileDelete(false);
-                }
-                if (UtilsKt.getMoved()) {
-                    MainActivity.getInstance().musicSrv.updateList(playingList);
+        UtilsKt.getPlayingListData().observe(this, songs -> {
+            Log.d("Playing", "NowPlaying Playlist");
+            playingList = songs;
+            adapter.setList(playingList);
+            if (UtilsKt.getSwiped() || UtilsKt.getFileDelete()) {
+                Log.d("Playing", "Swiped");
+                if (playingList.size() > 0) {
+                    UtilsKt.setPlayingList(playingList);
                     int position = playingList.indexOf(playingSong);
                     MainActivity.getInstance().musicSrv.setSong(position);
-                    UtilsKt.setMoved(false);
+                } else {
+                    if (SongsProvider.Companion.getSongListByName().getValue().size() == 0) {
+                        Toast.makeText(NowPlayingActivity.this, "No Song Left in Storage", Toast.LENGTH_SHORT).show();
+                        PrefManager manage = new PrefManager(NowPlayingActivity.this);
+                        manage.storeInfo(getString(R.string.Songs), false);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                System.exit(0);
+                            }
+                        }, 1000);
+                    }
+                    UtilsKt.setPlayingList(playingList);
+                    MainActivity.getInstance().musicSrv.setSong(0);
+                    MainActivity.getInstance().musicSrv.playSong();
                 }
+                UtilsKt.setSwiped(false);
+                UtilsKt.setFileDelete(false);
+            }
+            if (UtilsKt.getMoved()) {
+                UtilsKt.setPlayingList(playingList);
+                int position = playingList.indexOf(playingSong);
+                MainActivity.getInstance().musicSrv.setSong(position);
+                UtilsKt.setMoved(false);
             }
         });
 
-        UtilsKt.getPlayingSong().observe(this, new Observer<Song>() {
+        UtilsKt.getCurPlayingSong().observe(this, new Observer<Song>() {
             @Override
             public void onChanged(Song song) {
                 Log.d("Playing", "Chnaged");
@@ -171,7 +168,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         recyclerView = findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
 
-        adapter = new NowPlayingAdapter(playingList, this, this);
+        adapter = new NowPlayingAdapter(this, this);
         recyclerView.setAdapter(adapter);
 
         layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
@@ -251,7 +248,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
             Collections.swap(playingList, fromPosition, toPosition);
             UtilsKt.setMoved(true);
-            recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+            adapter.setList(playingList);
 
             return false;
         }
@@ -265,7 +262,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
                 }
             }
             playingList.remove(position);
-            recyclerView.getAdapter().notifyDataSetChanged();
+            adapter.setList(playingList);
             UtilsKt.setSwiped(true);
             updatePlayingList();
         }

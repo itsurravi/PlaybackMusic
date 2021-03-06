@@ -13,22 +13,13 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/song_art_card"
+        <ImageView
+            android:id="@+id/albumArt"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="@dimen/cardCorner">
-
-            <ImageView
-                android:id="@+id/albumArt"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/logo" />
-
-        </androidx.cardview.widget.CardView>
+            android:src="@drawable/logo" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -50,11 +41,11 @@
 
             <TextView
                 android:id="@+id/artistTitle"
-                android:textSize="12sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="@color/listitemArtist" />
+                android:textColor="@color/listitemArtist"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <ImageView
