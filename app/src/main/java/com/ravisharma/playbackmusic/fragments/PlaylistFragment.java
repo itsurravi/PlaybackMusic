@@ -30,8 +30,6 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.ravisharma.playbackmusic.activities.CategorySongActivity;
-import com.ravisharma.playbackmusic.activities.PlaylistActivity;
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter;
 import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel;
@@ -45,9 +43,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.ravisharma.playbackmusic.MainActivity.PLAYLIST;
-import static com.ravisharma.playbackmusic.MainActivity.RECENT_ADDED;
 
 public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlaylistClicked
         , PlaylistAdapter.OnPlaylistLongClicked, View.OnClickListener {
@@ -158,28 +153,47 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
 
     @Override
     public void onPlaylistClick(int position) {
-        Intent i = new Intent(getContext(), PlaylistActivity.class);
-        i.putExtra("playlistName", playListArrayList.get(position));
-        getActivity().startActivityForResult(i, PLAYLIST);
+        Bundle bundle = new Bundle();
+        bundle.putString("argType", CategorySongFragmentKt.PLAYLIST);
+        bundle.putString("actName", playListArrayList.get(position));
+
+        openFragment(bundle);
+    }
+
+    private void openFragment(Bundle bundle) {
+        CategorySongFragment fragment = new CategorySongFragment();
+        fragment.setArguments(bundle);
+
+        MainActivity.getInstance().hideHomePanel();
+
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
     public void onClick(View view) {
-        if (cardRecentAdded.equals(view)) {
-            Intent i = new Intent(getContext(), CategorySongActivity.class);
-            i.putExtra("actName","Recent Added");
-            getActivity().startActivityForResult(i, RECENT_ADDED);
-        } else if (cardLastPlayed.equals(view)) {
-            Intent i = new Intent(getContext(), CategorySongActivity.class);
-            i.putExtra("actName", "Last Played");
-            getActivity().startActivityForResult(i, RECENT_ADDED);
-        } else if (cardMostPlayed.equals(view)) {
-            Intent i = new Intent(getContext(), CategorySongActivity.class);
-            i.putExtra("actName", "Most Played");
-            getActivity().startActivityForResult(i, RECENT_ADDED);
-        } else if (btnAddNewPlaylist.equals(view)) {
+        if (btnAddNewPlaylist.equals(view)) {
             showCreateUpdatePlaylistDialog(true, null);
+            return;
         }
+
+        Bundle bundle = new Bundle();
+
+        if (cardRecentAdded.equals(view)) {
+            bundle.putString("argType", "Recent Added");
+            bundle.putString("actName", "Recent Added");
+        } else if (cardLastPlayed.equals(view)) {
+            bundle.putString("argType", "Last Played");
+            bundle.putString("actName", "Last Played");
+        } else if (cardMostPlayed.equals(view)) {
+            bundle.putString("argType", "Most Played");
+            bundle.putString("actName", "Most Played");
+        }
+
+        openFragment(bundle);
     }
 
     @Override

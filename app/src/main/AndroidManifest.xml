@@ -58,18 +58,12 @@
             android:name=".activities.AddToPlaylistActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.PlaylistActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.SearchActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.NowPlayingActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.CategorySongActivity"
-            android:screenOrientation="portrait"
-            />
+
         <activity
             android:name=".SplashScreen"
             android:screenOrientation="portrait">

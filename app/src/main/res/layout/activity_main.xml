@@ -25,38 +25,51 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/appBar"
+            <FrameLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                android:layout_marginBottom="64dp"
+                android:visibility="gone" />
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:popupTheme="@style/AppTheme"
-                    android:background="@color/colorPrimary" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/colorPrimary"
-                    app:tabIndicatorColor="@color/tabIndicatorColor"
-                    app:tabSelectedTextColor="@color/tabSelectedTextColor"
-                    app:tabTextAppearance="@style/MineCustomTabText"
-                    app:tabTextColor="@color/tabTextColor">
-
-                </com.google.android.material.tabs.TabLayout>
-            </com.google.android.material.appbar.AppBarLayout>
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/view_pager"
+            <LinearLayout
+                android:id="@+id/mainLayout"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginBottom="64dp"/>
+                android:layout_height="match_parent"
+                android:layout_marginBottom="64dp"
+                android:orientation="vertical">
 
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/appBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        app:popupTheme="@style/AppTheme" />
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@color/colorPrimary"
+                        app:tabIndicatorColor="@color/tabIndicatorColor"
+                        app:tabSelectedTextColor="@color/tabSelectedTextColor"
+                        app:tabTextAppearance="@style/MineCustomTabText"
+                        app:tabTextColor="@color/tabTextColor">
+
+                    </com.google.android.material.tabs.TabLayout>
+                </com.google.android.material.appbar.AppBarLayout>
+
+                <androidx.viewpager.widget.ViewPager
+                    android:id="@+id/view_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- SLIDING LAYOUT -->

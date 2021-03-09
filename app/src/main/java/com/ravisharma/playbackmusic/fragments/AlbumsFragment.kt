@@ -12,14 +12,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.MainActivity
-import com.ravisharma.playbackmusic.R
-import com.ravisharma.playbackmusic.activities.CategorySongActivity
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.OnAlbumClicked
 import com.ravisharma.playbackmusic.databinding.FragmentAlbumsBinding
 import com.ravisharma.playbackmusic.model.Album
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.albumList
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import com.ravisharma.playbackmusic.utils.openFragment
 import java.util.*
 
 class AlbumsFragment : Fragment(), OnAlbumClicked {
@@ -59,9 +57,21 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
     }
 
     override fun onAlbumClick(position: Int) {
-        val i = Intent(context, CategorySongActivity::class.java)
+        /*val i = Intent(context, CategorySongActivity::class.java)
         i.putExtra("albumId", albumsList[position].albumId.toString())
         i.putExtra("actName", albumsList[position].albumName)
-        activity!!.startActivityForResult(i, MainActivity.ALBUM_SONGS)
+        activity!!.startActivityForResult(i, MainActivity.ALBUM_SONGS)*/
+
+        val bundle = Bundle().apply {
+            putString("argType", QUERY_ALBUM)
+            putString("albumId", albumsList[position].albumId.toString())
+            putString("actName", albumsList[position].albumName)
+        }
+
+
+        val fragment = CategorySongFragment()
+        fragment.arguments = bundle
+
+        (activity as MainActivity).openFragment(fragment)
     }
 }

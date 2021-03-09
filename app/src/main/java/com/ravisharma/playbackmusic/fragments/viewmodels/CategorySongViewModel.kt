@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.activities.viewmodel
+package com.ravisharma.playbackmusic.fragments.viewmodels
 
 import android.content.ContentResolver
 import android.content.ContentUris

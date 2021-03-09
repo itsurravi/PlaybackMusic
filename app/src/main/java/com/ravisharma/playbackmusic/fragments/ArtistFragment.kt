@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.MainActivity
-import com.ravisharma.playbackmusic.activities.CategorySongActivity
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter.OnArtistClicked
 import com.ravisharma.playbackmusic.databinding.FragmentArtistBinding
 import com.ravisharma.playbackmusic.model.Artist
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.artistList
+import com.ravisharma.playbackmusic.utils.openFragment
 import java.util.*
 
 /**
@@ -58,10 +58,15 @@ class ArtistFragment : Fragment(), OnArtistClicked {
     }
 
     override fun onArtistClick(position: Int) {
-        val i = Intent(context, CategorySongActivity::class.java).apply {
-            putExtra("artistId", artistsList[position].artistId.toString())
-            putExtra("actName", artistsList[position].artistName)
+        val bundle = Bundle().apply {
+            putString("argType", QUERY_ARTIST)
+            putString("artistId", artistsList[position].artistId.toString())
+            putString("actName", artistsList[position].artistName)
         }
-        activity!!.startActivityForResult(i, MainActivity.ARTIST_SONGS)
+
+        val fragment = CategorySongFragment()
+        fragment.arguments = bundle
+
+        (activity as MainActivity).openFragment(fragment)
     }
 }

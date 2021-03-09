@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -52,6 +53,14 @@ public class PlaylistAlert {
             public void onClick(View v) {
                 String playlistName = edPlayListName.getText().toString().trim();
                 if (playlistName.length() > 0) {
+                    if (playlistName.equalsIgnoreCase("My Favorites") ||
+                            playlistName.equalsIgnoreCase("Recent Added") ||
+                            playlistName.equalsIgnoreCase("Last Played") ||
+                            playlistName.equalsIgnoreCase("Most Played")){
+
+                        Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String[] words = playlistName.split("\\s+");
                     StringBuilder capitalizeWord = new StringBuilder();
                     for (String w : words) {
@@ -105,6 +114,14 @@ public class PlaylistAlert {
             public void onClick(View v) {
                 String playlistName = edPlayListName.getText().toString().trim();
                 if (playlistName.length() > 0) {
+                    if (playlistName.equalsIgnoreCase("My Favorites") ||
+                            playlistName.equalsIgnoreCase("Recent Added") ||
+                            playlistName.equalsIgnoreCase("Last Played") ||
+                            playlistName.equalsIgnoreCase("Most Played")){
+
+                        Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String[] words = playlistName.split("\\s+");
                     StringBuilder capitalizeWord = new StringBuilder();
                     for (String w : words) {

@@ -6,6 +6,9 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.InfoBinding
 import com.ravisharma.playbackmusic.model.Song
@@ -33,4 +36,14 @@ fun Context.showSongInfo(song: Song) {
 
 fun Context.showToast(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+}
+
+fun AppCompatActivity.openFragment(fragment: Fragment) {
+    (this as MainActivity).hideHomePanel()
+    val fragmentTransaction = supportFragmentManager.beginTransaction()
+    fragmentTransaction.apply {
+        replace(R.id.container, fragment)
+        addToBackStack(null)
+        commit()
+    }
 }

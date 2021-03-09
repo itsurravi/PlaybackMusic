@@ -17,6 +17,7 @@ import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
+import com.ravisharma.playbackmusic.fragments.CategorySongFragment;
 import com.ravisharma.playbackmusic.model.Playlist;
 import com.ravisharma.playbackmusic.prefrences.TinyDB;
 import com.ravisharma.playbackmusic.provider.SongsProvider;
@@ -34,12 +35,14 @@ import com.ravisharma.playbackmusic.equalizer.model.EqualizerSettings;
 import com.ravisharma.playbackmusic.equalizer.model.Settings;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaMetadata;
 import android.media.audiofx.BassBoost;
@@ -49,6 +52,7 @@ import android.media.audiofx.Virtualizer;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 
 import androidx.annotation.Nullable;
@@ -75,6 +79,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
@@ -96,14 +102,17 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 
+import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
-        NameWise.OnFragmentItemClicked {
+        NameWise.OnFragmentItemClicked, CategorySongFragment.OnFragmentItemClicked {
 
     private static final String PREF_KEY = "equalizer";
 
@@ -141,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SlidingUpPanelLayout slidingLayout;
     private ConstraintLayout slidePanelTop;
     private ConstraintLayout player_controller;
+
+    private FrameLayout container;
+    private LinearLayout mainLayout;
 
     public boolean musicBound = false, fromList = false, started = false, deletionProcess = false,
             fromButton = false, played = false, playbackPaused = false, TIMER = false;
@@ -212,6 +224,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         songList = new ArrayList<>();
         normalList = new ArrayList<>();
 
+        container = findViewById(R.id.container);
+        mainLayout = findViewById(R.id.mainLayout);
         control_back_image = findViewById(R.id.control_back);
         slidingLayout = findViewById(R.id.sliding_layout);
         seekBar = findViewById(R.id.seekBar);
@@ -420,6 +434,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AdSize adSize = AdSize.BANNER;
         adView.setAdSize(adSize);
         adView.loadAd(adRequest);
+    }
+
+    public void setWindowFlag(Activity activity, final int bits, boolean on) {
+        Window win = activity.getWindow();
+        WindowManager.LayoutParams winParams = win.getAttributes();
+        if (on) {
+            winParams.flags |= bits;
+        } else {
+            winParams.flags &= ~bits;
+        }
+        win.setAttributes(winParams);
     }
 
     @Override
@@ -1060,6 +1085,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
+            if(container.getVisibility() == View.VISIBLE) {
+                showHomePanel();
+                return;
+            }
             if (viewPager.getCurrentItem() > 0) {
                 viewPager.setCurrentItem(0, true);
             } else if (musicSrv != null && musicSrv.isPng()) {
@@ -1250,6 +1279,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+    }
+
+    public void hideHomePanel() {
+        container.setVisibility(View.VISIBLE);
+        mainLayout.setVisibility(View.GONE);
+    }
+
+    public void showHomePanel() {
+        getSupportFragmentManager().popBackStack();
+        container.setVisibility(View.GONE);
+        mainLayout.setVisibility(View.VISIBLE);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

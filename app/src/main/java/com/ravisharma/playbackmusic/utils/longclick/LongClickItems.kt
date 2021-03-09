@@ -211,9 +211,6 @@ class LongClickItems {
 
     private fun itemClick(position: Int) {
         when (context) {
-            is CategorySongActivity -> {
-                context.onItemClick(position)
-            }
             is NowPlayingActivity -> {
                 context.onItemClick(position)
             }
@@ -226,9 +223,6 @@ class LongClickItems {
     private fun playSingleOnly(song: Song) {
         val list = arrayListOf(song)
         when (context) {
-            is CategorySongActivity -> {
-                context.longPressOnItemClick(list)
-            }
             is SearchActivity -> {
                 context.onItemClick(list)
             }
@@ -236,9 +230,7 @@ class LongClickItems {
     }
 
     private fun updateList(mposition: Int) {
-        if (context is CategorySongActivity) {
-            context.updateList(mposition)
-        } else if (context is NowPlayingActivity) {
+        if (context is NowPlayingActivity) {
             context.updateList(mposition)
         } else if (context is SearchActivity) {
 //            ((SearchActivity) context).updateList(mposition);
