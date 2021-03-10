@@ -16,11 +16,11 @@ class ArtistAdapter(private var artistList: ArrayList<Artist>) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: ArtistViewHolder, position: Int) {
-        val currArtist = artistList[position]
+        val currArtist = artistList[holder.adapterPosition]
         holder.binding.apply {
             artistTitle.text = currArtist.artistName
             numberOfSongs.text = currArtist.numberOfTracks
-            artistbox.setOnClickListener { onClick.onArtistClick(position) }
+            artistbox.setOnClickListener { onClick.onArtistClick(holder.adapterPosition) }
         }
     }
 

@@ -52,7 +52,7 @@ class NowPlayingAdapter(private var c: Context, private var dragListener: StartD
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val currSong = songs[position]
+        val currSong = songs[holder.adapterPosition]
         holder.binding.apply {
             songTitle.text = currSong.title
             songArtist.text = currSong.artist
@@ -71,8 +71,8 @@ class NowPlayingAdapter(private var c: Context, private var dragListener: StartD
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(songArt)
 
-            songBox.setOnClickListener { onClick.onItemClick(position) }
-            imgOptions.setOnClickListener { onClick.onOptionsClick(position) }
+            songBox.setOnClickListener { onClick.onItemClick(holder.adapterPosition) }
+            imgOptions.setOnClickListener { onClick.onOptionsClick(holder.adapterPosition) }
             ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     dragListener.requestDrag(holder)

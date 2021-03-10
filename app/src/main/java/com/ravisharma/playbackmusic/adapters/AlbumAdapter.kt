@@ -28,7 +28,7 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
     }
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
-        val currAlbum = albumsList[position]
+        val currAlbum = albumsList[holder.adapterPosition]
         holder.binding.apply {
             albumTitle.text = currAlbum.albumName
             artistTitle.text = currAlbum.albumArtist
@@ -43,7 +43,7 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(albumArt)
 
-            albumBox.setOnClickListener { onClick.onAlbumClick(position) }
+            albumBox.setOnClickListener { onClick.onAlbumClick(holder.adapterPosition) }
         }
     }
 

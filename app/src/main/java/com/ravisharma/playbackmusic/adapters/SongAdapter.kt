@@ -41,9 +41,9 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
     fun setList(songList: ArrayList<Song>) {
         val diffCallback = DiffCallback(songs, songList)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
+        diffResult.dispatchUpdatesTo(this)
         songs.clear()
         songs.addAll(songList)
-        diffResult.dispatchUpdatesTo(this)
     }
 
     class ViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(binding.root)
@@ -54,7 +54,7 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val currSong = songs[position]
+        val currSong = songs[holder.adapterPosition]
         holder.binding.apply {
             songTitle.text = currSong.title
             songArtist.text = currSong.artist
@@ -74,9 +74,9 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
                     .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(songArt)
             songBox.apply {
-                setOnClickListener { onClick.onItemClick(position) }
+                setOnClickListener { onClick.onItemClick(holder.adapterPosition) }
                 setOnLongClickListener {
-                    onLongClick.onItemLongClick(position)
+                    onLongClick.onItemLongClick(holder.adapterPosition)
                     return@setOnLongClickListener true
                 }
             }
@@ -105,12 +105,7 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].id == newList[newItemPosition].id
-        }
-
-        @Nullable
-        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-            return super.getChangePayload(oldItemPosition, newItemPosition)
+            return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }
 }
