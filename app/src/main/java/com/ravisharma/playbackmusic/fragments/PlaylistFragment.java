@@ -163,7 +163,6 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
     private void openFragment(Bundle bundle) {
         CategorySongFragment fragment = new CategorySongFragment();
         fragment.setArguments(bundle);
-
         MainActivity.getInstance().hideHomePanel();
 
         getActivity().getSupportFragmentManager()

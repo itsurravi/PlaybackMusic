@@ -1,5 +1,6 @@
 package com.ravisharma.playbackmusic.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -21,5 +22,8 @@ interface MostPlayedDao {
     fun updatePlayCount(playedId: Long)
 
     @Query("SELECT * FROM mostPlayed ORDER BY playedCount DESC, playedId DESC LIMIT 30")
-    fun getMostPlayedSongs(): List<MostPlayed>
+    fun getMostPlayedSongs(): LiveData<List<MostPlayed>>
+
+    @Query("DELETE FROM mostPlayed WHERE id=:songId")
+    fun deleteMostPlayedSong(songId: Long)
 }

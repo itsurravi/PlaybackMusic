@@ -1,10 +1,14 @@
 package com.ravisharma.playbackmusic.fragments
 
-import android.content.Intent
+import android.app.RecoverableSecurityException
+import android.content.*
+import android.content.IntentSender.SendIntentException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,19 +27,22 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
-import com.ravisharma.playbackmusic.fragments.viewmodels.CategorySongViewModel
+import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity
 import com.ravisharma.playbackmusic.adapters.SongAdapter
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.databinding.ActivityCategorySongBinding
+import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.databinding.PlaylistsLayoutBinding
+import com.ravisharma.playbackmusic.fragments.viewmodels.CategorySongViewModel
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider
-import com.ravisharma.playbackmusic.utils.addNextSongToPlayingList
-import com.ravisharma.playbackmusic.utils.addSongToPlayingList
-import com.ravisharma.playbackmusic.utils.longclick.LongClickItems
-import com.ravisharma.playbackmusic.utils.showSongInfo
+import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
+import com.ravisharma.playbackmusic.utils.*
+import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val QUERY_ALBUM = "Album"
 const val QUERY_ARTIST = "Artist"
@@ -142,12 +149,7 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
             }
         }
         category?.let {
-            viewModel.getCategorySongs(it, id!!, activity!!.contentResolver).observe(this, { songs ->
-                songList.clear()
-                songList.addAll(songs!!)
-                setUpLayout()
-            })
-
+            fetchCategorySongs(it)
             return
         }
 
@@ -192,6 +194,14 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
             }
 
         }
+    }
+
+    private fun fetchCategorySongs(it: String) {
+        viewModel.getCategorySongs(it, id!!, activity!!.contentResolver).observe(this, { songs ->
+            songList.clear()
+            songList.addAll(songs!!)
+            setUpLayout()
+        })
     }
 
     private fun setUpLayout() {
@@ -245,7 +255,7 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
         ) {
             playlistLongClick(position)
         } else {
-            context?.let { LongClickItems(it, position, songList) }
+            context?.let { longClickItem(it, position, songList) }
         }
     }
 
@@ -292,6 +302,155 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
             }
             alertDialog.dismiss()
         }
+    }
+
+    private fun longClickItem(context: Context, mPosition: Int, songList: ArrayList<Song>) {
+        val items = context.resources.getStringArray(R.array.longPressItems)
+        val ad = ArrayAdapter(context, R.layout.adapter_alert_list, items)
+        val binding = AlertListBinding.inflate(LayoutInflater.from(context))
+
+        val requestOptions = RequestOptions().apply {
+            placeholder(R.drawable.logo)
+            error(R.drawable.logo)
+        }
+        Glide.with(binding.root)
+                .setDefaultRequestOptions(requestOptions)
+                .load(songList[mPosition].art)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.songArt)
+        binding.title.text = songList[mPosition].title
+        binding.list.adapter = ad
+
+        val dialog = AlertDialog.Builder(context)
+        dialog.setView(binding.root)
+        val alertDialog = dialog.create()
+
+        alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation_2
+        alertDialog.show()
+
+        binding.list.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            when (position) {
+                0 -> {
+                    onItemClick(mPosition)
+                }
+                1 -> {
+                    val list = arrayListOf(songList[mPosition])
+                    val onFragmentItemClicked = activity as OnFragmentItemClicked?
+                    onFragmentItemClicked!!.OnFragmentItemClick(0, list, false)
+                }
+                2 -> {
+                    addNextSongToPlayingList(songList[mPosition])
+                }
+                3 -> {
+                    addSongToPlayingList(songList[mPosition])
+                }
+                4 -> {
+                    Intent(context, AddToPlaylistActivity::class.java).apply {
+                        putExtra("Song", songList[mPosition])
+                        context.startActivity(this)
+                    }
+                }
+                5 -> {
+                    showDeleteSongDialog(mPosition)
+                }
+                6 -> {
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "audio/*"
+                    val uri = Uri.parse(songList[mPosition].data)
+                    intent.putExtra(Intent.EXTRA_STREAM, uri)
+                    context.startActivity(Intent.createChooser(intent, "Share Via"))
+                }
+                7 -> {
+                    context.showSongInfo(songList[mPosition])
+                }
+            }
+            alertDialog.dismiss()
+        }
+    }
+
+    private val listener = object : DeleteListener {
+        override fun onOkClicked() {
+            category?.let { fetchCategorySongs(it) }
+        }
+    }
+
+    private fun showDeleteSongDialog(mPosition: Int) {
+        val song: Song = songList[mPosition]
+
+        val b = AlertDialog.Builder(context!!, R.style.AlertDialogCustom)
+        b.setTitle(getString(R.string.deleteMessage))
+        b.setMessage(song.title)
+        b.setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
+            if (songListByName.value!!.size == 1) {
+                Toast.makeText(context, "Can't Delete Last Song", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
+            }
+            val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            val projection = arrayOf(MediaStore.Audio.Media._ID)
+            val selection = MediaStore.Audio.Media.DATA + " = ?"
+            val selectionArgs = arrayOf(song.data)
+            val musicCursor = activity!!.contentResolver.query(musicUri, projection,
+                    selection, selectionArgs, null)
+
+            musicCursor?.let {
+                if (it.moveToFirst()) {
+                    val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+                    val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                    try {
+                        val fdelete = File(selectionArgs[0])
+                        if (fdelete.exists()) {
+                            activity!!.contentResolver.delete(uri, null, null)
+                            updateList(mPosition)
+                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                            listener.onOkClicked()
+                        }
+                    } catch (e: Exception) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            val recoverableSecurityException: RecoverableSecurityException
+                            if (e is RecoverableSecurityException) {
+                                recoverableSecurityException = e as RecoverableSecurityException
+                                val intentSender = recoverableSecurityException.userAction
+                                        .actionIntent.intentSender
+                                try {
+                                    deleteUri = uri
+                                    startIntentSenderForResult(intentSender, 20123,
+                                            null, 0, 0, 0, null)
+                                } catch (ex: SendIntentException) {
+                                    ex.printStackTrace()
+                                }
+                            } else {
+                                Toast.makeText(context, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show()
+                }
+                it.close()
+            }
+            dialog.dismiss()
+        }).setNegativeButton(getString(R.string.no)) { dialog, which -> dialog.dismiss() }
+        val d = b.create()
+        d.show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        listener.onOkClicked()
+    }
+
+    private fun updateList(mPosition: Int) {
+        val song = songList[mPosition]
+        if (song == curPlayingSong.value) {
+            MainActivity.getInstance().playNext()
+        }
+        removeFromPlayingList(song)
+    }
+
+    interface DeleteListener {
+        fun onOkClicked()
     }
 
     interface OnFragmentItemClicked {

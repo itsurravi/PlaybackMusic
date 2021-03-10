@@ -6,6 +6,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,8 +24,8 @@ class CategorySongViewModel : ViewModel() {
 
     private var songsList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
 
-    private var lastPlayedList: MutableLiveData<List<LastPlayed>> = MutableLiveData()
-    private var mostPlayedList: MutableLiveData<List<MostPlayed>> = MutableLiveData()
+    private var lastPlayedList: LiveData<List<LastPlayed>> = MutableLiveData()
+    private var mostPlayedList: LiveData<List<MostPlayed>> = MutableLiveData()
 
     fun getCategorySongs(queryType: String, albumId: String, contentResolver: ContentResolver): MutableLiveData<ArrayList<Song>> {
         viewModelScope.launch(Dispatchers.Main) {
@@ -87,24 +88,27 @@ class CategorySongViewModel : ViewModel() {
         return songList
     }
 
-    fun getLastPlayedSongsList(context: Context): MutableLiveData<List<LastPlayed>> {
+    fun getLastPlayedSongsList(context: Context): LiveData<List<LastPlayed>> {
         val lastPlayedRepository = LastPlayedRepository(context)
 
         viewModelScope.launch {
-            lastPlayedList.value = withContext(Dispatchers.IO) {
+            /*lastPlayedList.value = withContext(Dispatchers.IO) {
                 lastPlayedRepository.getLastPlayedSongsList()
-            }
+            }*/
+            lastPlayedList = lastPlayedRepository.getLastPlayedSongsList()
         }
         return lastPlayedList
     }
 
-    fun getMostPlayedSongsList(context: Context): MutableLiveData<List<MostPlayed>> {
+    fun getMostPlayedSongsList(context: Context): LiveData<List<MostPlayed>> {
         val mostPlayedRepository = MostPlayedRepository(context)
 
         viewModelScope.launch {
-            mostPlayedList.value = withContext(Dispatchers.IO) {
+            /*mostPlayedList.value = withContext(Dispatchers.IO) {
                 mostPlayedRepository.getMostPlayedSongs()
-            }
+            }*/
+
+            mostPlayedList = mostPlayedRepository.getMostPlayedSongs()
         }
         return mostPlayedList
     }

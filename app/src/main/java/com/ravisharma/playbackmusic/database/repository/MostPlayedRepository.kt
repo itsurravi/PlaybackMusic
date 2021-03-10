@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic.database.repository
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.MostPlayedDao
 import com.ravisharma.playbackmusic.database.model.MostPlayed
@@ -48,7 +50,11 @@ class MostPlayedRepository(context: Context) {
         mostPlayedDao.updatePlayCount(playedId)
     }
 
-    fun getMostPlayedSongs(): List<MostPlayed> {
+    fun deleteMostPlayedSong(songId: Long) {
+        mostPlayedDao.deleteMostPlayedSong(songId)
+    }
+
+    fun getMostPlayedSongs(): LiveData<List<MostPlayed>> {
         return mostPlayedDao.getMostPlayedSongs()
     }
 }

@@ -1,5 +1,6 @@
 package com.ravisharma.playbackmusic.database.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -18,5 +19,5 @@ interface LastPlayedDao {
     fun checkSongIfExist(songId: Long): Long
 
     @Query("SELECT * FROM lastPlayed ORDER BY playedId DESC LIMIT 30")
-    fun getAllLastPlayedSongs(): List<LastPlayed>
+    fun getAllLastPlayedSongs(): LiveData<List<LastPlayed>>
 }

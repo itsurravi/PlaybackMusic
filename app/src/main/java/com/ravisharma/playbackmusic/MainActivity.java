@@ -16,6 +16,10 @@ import com.ravisharma.playbackmusic.activities.EqualizerActivity;
 import com.ravisharma.playbackmusic.activities.NowPlayingActivity;
 import com.ravisharma.playbackmusic.activities.SearchActivity;
 import com.ravisharma.playbackmusic.broadcast.Timer;
+import com.ravisharma.playbackmusic.database.model.LastPlayed;
+import com.ravisharma.playbackmusic.database.model.MostPlayed;
+import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository;
+import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.fragments.CategorySongFragment;
 import com.ravisharma.playbackmusic.model.Playlist;
@@ -478,6 +482,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                     getContentResolver().delete(UtilsKt.getDeleteUri(), null, null);
+                    UtilsKt.setDeleteUri(null);
+                    for(Fragment fragment : getSupportFragmentManager().getFragments()) {
+                        fragment.onActivityResult(requestCode, resultCode, data);
+                    }
                 }
             }
         }
@@ -1663,6 +1671,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     UtilsKt.removeFromPlayingList(s);
                 }
             }
+
+            LastPlayedRepository lastPlayedRepository = new LastPlayedRepository(this);
+            lastPlayedRepository.getLastPlayedSongsList().observe(this, lastPlayed -> {
+                if (lastPlayed != null) {
+                    for (LastPlayed played : lastPlayed) {
+                        Song s = played.getSong();
+                        if (!songListByName.contains(s)) {
+                            lastPlayedRepository.deleteSongFromLastPlayed(s.getId());
+                        }
+                    }
+                }
+            });
+
+            MostPlayedRepository mostPlayedRepository = new MostPlayedRepository(this);
+            mostPlayedRepository.getMostPlayedSongs().observe(this, mostPlayed -> {
+                if (mostPlayed != null) {
+                    for (MostPlayed played : mostPlayed) {
+                        Song s = played.getSong();
+                        if (!songListByName.contains(s)) {
+                            mostPlayedRepository.deleteMostPlayedSong(s.getId());
+                        }
+                    }
+                }
+            });
         } else {
             started = false;
             stopApp();

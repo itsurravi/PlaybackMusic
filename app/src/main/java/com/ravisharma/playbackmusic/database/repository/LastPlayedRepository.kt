@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic.database.repository
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.LastPlayedDao
 import com.ravisharma.playbackmusic.database.model.LastPlayed
@@ -34,7 +36,7 @@ class LastPlayedRepository(context: Context) {
         lastPlayedDao.addToLastPlayedList(lastPlayed)
     }
 
-    private fun deleteSongFromLastPlayed(songId: Long) {
+    fun deleteSongFromLastPlayed(songId: Long) {
         lastPlayedDao.deleteLastPlayedSong(songId)
     }
 
@@ -42,7 +44,7 @@ class LastPlayedRepository(context: Context) {
         return lastPlayedDao.checkSongIfExist(songId)
     }
 
-    fun getLastPlayedSongsList(): List<LastPlayed> {
+    fun getLastPlayedSongsList(): LiveData<List<LastPlayed>> {
         return lastPlayedDao.getAllLastPlayedSongs()
     }
 }

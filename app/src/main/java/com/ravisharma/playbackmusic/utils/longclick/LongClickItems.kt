@@ -23,10 +23,7 @@ import com.ravisharma.playbackmusic.activities.*
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
-import com.ravisharma.playbackmusic.utils.addNextSongToPlayingList
-import com.ravisharma.playbackmusic.utils.addSongToPlayingList
-import com.ravisharma.playbackmusic.utils.showSongInfo
-import com.ravisharma.playbackmusic.utils.showToast
+import com.ravisharma.playbackmusic.utils.*
 import java.io.File
 import java.util.*
 
@@ -167,12 +164,12 @@ class LongClickItems {
                     selection, selectionArgs, null)
             if (musicCursor!!.moveToFirst()) {
                 val id = musicCursor.getLong(musicCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                var deleteUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+                val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
                 try {
                     val fdelete = File(selectionArgs[0])
-                    Log.d("ERRORDELETION", "" + deleteUri)
+                    Log.d("ERRORDELETION", "" + uri)
                     if (fdelete.exists()) {
-                        context.contentResolver.delete(deleteUri, null, null)
+                        context.contentResolver.delete(uri, null, null)
                         if (position != 1) {
                             updateList(position)
                             position = -1
@@ -187,6 +184,7 @@ class LongClickItems {
                             val intentSender = recoverableSecurityException.userAction
                                     .actionIntent.intentSender
                             try {
+                                deleteUri = uri
                                 (context as Activity).startIntentSenderForResult(intentSender, 20123,
                                         null, 0, 0, 0, null)
                             } catch (ex: SendIntentException) {
