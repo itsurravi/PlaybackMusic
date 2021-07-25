@@ -29,8 +29,8 @@ class SearchViewModel : ViewModel() {
                     MediaStore.Audio.Media.TITLE + " LIKE ? OR " +
                             MediaStore.Audio.Media.DISPLAY_NAME + " LIKE ? OR " +
                             MediaStore.Audio.Media.ALBUM + " LIKE ? OR " +
-                            MediaStore.Audio.Media.ARTIST + " LIKE ? ",
-                    arrayOf("%$searchName%"),
+                            MediaStore.Audio.Media.ARTIST + " LIKE ?",
+                    arrayOf("%$searchName%","%$searchName%","%$searchName%","%$searchName%"),
                     MediaStore.Audio.Media.TITLE + " ASC")
 
             if (musicCursor != null && musicCursor.moveToFirst()) {
