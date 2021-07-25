@@ -18,7 +18,7 @@ android {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 35
+        versionCode 36
         versionName "2.7.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,6 +28,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug{
@@ -59,7 +60,7 @@ dependencies {
     implementation 'com.flaviofaria:kenburnsview:1.0.7'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.17'
+    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
     implementation 'com.google.android.material:material:1.4.0'
 
     implementation 'com.sothree.slidinguppanel:library:3.4.0'

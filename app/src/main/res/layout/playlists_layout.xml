@@ -112,6 +112,11 @@
         android:id="@+id/song_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fastScrollThumbColor="@color/scrollThumb" />
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1000"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="@color/scrollThumb"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="@color/scrollThumb"  />
 
 </LinearLayout>

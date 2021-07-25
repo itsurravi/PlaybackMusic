@@ -30,7 +30,7 @@ import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity
-import com.ravisharma.playbackmusic.adapters.SongAdapter
+import com.ravisharma.playbackmusic.adapters.CategoryAdapter
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.databinding.ActivityCategorySongBinding
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
@@ -48,7 +48,7 @@ const val QUERY_ALBUM = "Album"
 const val QUERY_ARTIST = "Artist"
 const val PLAYLIST = "Playlist"
 
-class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
+class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, CategoryAdapter.OnItemLongClicked {
 
     private var adView: AdView? = null
     private var id: String? = null
@@ -143,7 +143,7 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            adapter = SongAdapter(context).apply {
+            adapter = CategoryAdapter(context).apply {
                 setOnClick(this@CategorySongFragment)
                 setOnLongClick(this@CategorySongFragment)
             }
@@ -208,7 +208,7 @@ class CategorySongFragment : Fragment(), SongAdapter.OnItemClicked, SongAdapter.
         playlistBinding.txtPlaylistName1.text = actName
         playlistBinding.txtPlaylistName2.text = actName
 
-        (playlistBinding.songList.adapter as SongAdapter).setList(songList)
+        (playlistBinding.songList.adapter as CategoryAdapter).setList(songList)
 
         if (songList.size == 0) {
             playlistBinding.noDataFound.noDataLayout.visibility = View.VISIBLE

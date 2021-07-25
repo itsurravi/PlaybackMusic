@@ -17,10 +17,16 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.AlbumViewHolder
 import com.ravisharma.playbackmusic.databinding.AdapterAlbumsBinding
 import com.ravisharma.playbackmusic.model.Album
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
-class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Album>) : RecyclerView.Adapter<AlbumViewHolder>() {
+class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Album>) :
+    RecyclerView.Adapter<AlbumViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private lateinit var onClick: OnAlbumClicked
+
+    override fun getSectionName(position: Int): String {
+        return albumsList[position].albumName[0].toString()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
         val binding = AdapterAlbumsBinding.inflate(LayoutInflater.from(parent.context), parent, false)

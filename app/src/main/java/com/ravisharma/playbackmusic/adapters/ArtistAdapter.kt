@@ -6,9 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter.ArtistViewHolder
 import com.ravisharma.playbackmusic.databinding.AdapterArtistBinding
 import com.ravisharma.playbackmusic.model.Artist
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
-class ArtistAdapter(private var artistList: ArrayList<Artist>) : RecyclerView.Adapter<ArtistViewHolder>() {
+class ArtistAdapter(private var artistList: ArrayList<Artist>) :
+    RecyclerView.Adapter<ArtistViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+
     private lateinit var onClick: OnArtistClicked
+
+    override fun getSectionName(position: Int): String {
+        return artistList[position].artistName[0].toString()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {
         val binding = AdapterArtistBinding.inflate(LayoutInflater.from(parent.context), parent, false)

@@ -12,6 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:fastScrollThumbColor="@color/scrollThumb" />
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1000"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollPopupBackgroundSize="40dp"
+        app:fastScrollPopupBgColor="@color/scrollThumb"
+        app:fastScrollPopupPosition="adjacent"
+        app:fastScrollPopupTextColor="@color/white"
+        app:fastScrollPopupTextSize="22dp"
+        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
+        app:fastScrollThumbColor="@color/scrollThumb"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="@color/scrollThumb" />
 
 </LinearLayout>

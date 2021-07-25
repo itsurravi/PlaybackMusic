@@ -22,7 +22,7 @@ import com.ravisharma.playbackmusic.model.Song
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.concurrent.TimeUnit
 
-class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+class CategoryAdapter(private var c: Context) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     private var songs: ArrayList<Song> = ArrayList()
 
@@ -49,10 +49,6 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
 
     class ViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun getSectionName(position: Int): String {
-        return songs[position].title[0].toString()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = AdapSongBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
@@ -64,20 +60,20 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
             songTitle.text = currSong.title
             songArtist.text = currSong.artist
             duration.text = String.format("%d:%02d",
-                    TimeUnit.MILLISECONDS.toMinutes(currSong.duration),
-                    TimeUnit.MILLISECONDS.toSeconds(currSong.duration) -
-                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currSong.duration)))
+                TimeUnit.MILLISECONDS.toMinutes(currSong.duration),
+                TimeUnit.MILLISECONDS.toSeconds(currSong.duration) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currSong.duration)))
 
             val requestOptions = RequestOptions().apply {
                 placeholder(R.drawable.logo)
                 error(R.drawable.logo)
             }
             Glide.with(c)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(Uri.parse(currSong.art))
-                    .transform(CenterCrop(), RoundedCorners(20))
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .into(songArt)
+                .setDefaultRequestOptions(requestOptions)
+                .load(Uri.parse(currSong.art))
+                .transform(CenterCrop(), RoundedCorners(20))
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .into(songArt)
             songBox.apply {
                 setOnClickListener { onClick.onItemClick(holder.adapterPosition) }
                 setOnLongClickListener {

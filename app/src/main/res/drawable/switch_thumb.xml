@@ -6,7 +6,7 @@
 
             <size android:width="24dp" android:height="24dp" />
             <solid android:color="@color/scrollThumb" />
-            <stroke android:width="5dp" android:color="@color/colorWhite" />
+            <stroke android:width="5dp" android:color="@color/white" />
 
         </shape>
     </item>
@@ -15,7 +15,7 @@
         <shape android:shape="oval">
 
             <size android:width="24dp" android:height="24dp" />
-            <solid android:color="@color/colorWhite" />
+            <solid android:color="@color/white" />
             <stroke android:width="5dp" android:color="@color/scrollThumb" />
 
         </shape>

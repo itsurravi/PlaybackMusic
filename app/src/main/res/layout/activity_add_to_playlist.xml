@@ -53,7 +53,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:fastScrollThumbColor="@color/scrollThumb" />
+        app:fastScrollAutoHide="true"
+        app:fastScrollAutoHideDelay="1000"
+        app:fastScrollEnableThumbInactiveColor="true"
+        app:fastScrollThumbColor="@color/scrollThumb"
+        app:fastScrollThumbEnabled="true"
+        app:fastScrollThumbInactiveColor="@color/scrollThumb" />
 
     <FrameLayout
         android:id="@+id/banner_container_addToPlaylist"
