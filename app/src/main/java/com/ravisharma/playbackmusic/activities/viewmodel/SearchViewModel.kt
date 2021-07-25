@@ -26,11 +26,11 @@ class SearchViewModel : ViewModel() {
         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         try {
             val musicCursor = musicResolver.query(musicUri, null,
-                    MediaStore.Audio.Media.TITLE + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.DISPLAY_NAME + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.ALBUM + " LIKE \"%" + searchName + "%\" OR " +
-                            MediaStore.Audio.Media.ARTIST + " LIKE \"%" + searchName + "%\"",
-                    null,
+                    MediaStore.Audio.Media.TITLE + " LIKE ? OR " +
+                            MediaStore.Audio.Media.DISPLAY_NAME + " LIKE ? OR " +
+                            MediaStore.Audio.Media.ALBUM + " LIKE ? OR " +
+                            MediaStore.Audio.Media.ARTIST + " LIKE ? ",
+                    arrayOf("%$searchName%"),
                     MediaStore.Audio.Media.TITLE + " ASC")
 
             if (musicCursor != null && musicCursor.moveToFirst()) {
