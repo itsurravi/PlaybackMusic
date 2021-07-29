@@ -39,32 +39,24 @@
                 android:layout_marginBottom="64dp"
                 android:orientation="vertical">
 
-                <com.google.android.material.appbar.AppBarLayout
-                    android:id="@+id/appBar"
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorPrimary"
+                    app:popupTheme="@style/AppTheme" />
 
-                    <androidx.appcompat.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/colorPrimary"
-                        app:popupTheme="@style/AppTheme" />
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@color/colorPrimary"
+                    app:tabIndicatorColor="@color/tabIndicatorColor"
+                    app:tabSelectedTextColor="@color/tabSelectedTextColor"
+                    app:tabTextAppearance="@style/MineCustomTabText"
+                    app:tabTextColor="@color/tabTextColor"/>
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/tabs"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@color/colorPrimary"
-                        app:tabIndicatorColor="@color/tabIndicatorColor"
-                        app:tabSelectedTextColor="@color/tabSelectedTextColor"
-                        app:tabTextAppearance="@style/MineCustomTabText"
-                        app:tabTextColor="@color/tabTextColor">
-
-                    </com.google.android.material.tabs.TabLayout>
-                </com.google.android.material.appbar.AppBarLayout>
-
-                <androidx.viewpager.widget.ViewPager
+                <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"

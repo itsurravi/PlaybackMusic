@@ -1,15 +1,75 @@
 package com.ravisharma.playbackmusic;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.graphics.drawable.ColorDrawable;
+import android.media.MediaMetadata;
+import android.media.audiofx.BassBoost;
+import android.media.audiofx.Equalizer;
+import android.media.audiofx.PresetReverb;
+import android.media.audiofx.Virtualizer;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.flaviofaria.kenburnsview.KenBurnsView;
+import com.flaviofaria.kenburnsview.RandomTransitionGenerator;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.ravisharma.playbackmusic.activities.AboutActivity;
 import com.ravisharma.playbackmusic.activities.EqualizerActivity;
@@ -21,74 +81,24 @@ import com.ravisharma.playbackmusic.database.model.MostPlayed;
 import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository;
 import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
-import com.ravisharma.playbackmusic.fragments.CategorySongFragment;
-import com.ravisharma.playbackmusic.model.Playlist;
-import com.ravisharma.playbackmusic.prefrences.TinyDB;
-import com.ravisharma.playbackmusic.provider.SongsProvider;
-import com.ravisharma.playbackmusic.utils.UtilsKt;
-import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
-import com.ravisharma.playbackmusic.fragments.ArtistFragment;
-import com.ravisharma.playbackmusic.fragments.NameWise;
-import com.ravisharma.playbackmusic.fragments.PlaylistFragment;
-import com.ravisharma.playbackmusic.model.Song;
-import com.ravisharma.playbackmusic.prefrences.PrefManager;
-import com.flaviofaria.kenburnsview.KenBurnsView;
-import com.flaviofaria.kenburnsview.RandomTransitionGenerator;
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerModel;
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerSettings;
 import com.ravisharma.playbackmusic.equalizer.model.Settings;
+import com.ravisharma.playbackmusic.fragments.AlbumsFragment;
+import com.ravisharma.playbackmusic.fragments.ArtistFragment;
+import com.ravisharma.playbackmusic.fragments.CategorySongFragment;
+import com.ravisharma.playbackmusic.fragments.NameWise;
+import com.ravisharma.playbackmusic.fragments.PlaylistFragment;
+import com.ravisharma.playbackmusic.model.Playlist;
+import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.prefrences.PrefManager;
+import com.ravisharma.playbackmusic.prefrences.TinyDB;
+import com.ravisharma.playbackmusic.provider.SongsProvider;
+import com.ravisharma.playbackmusic.utils.MainViewModelFactory;
+import com.ravisharma.playbackmusic.utils.UtilsKt;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.database.ContentObserver;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.media.MediaMetadata;
-import android.media.audiofx.BassBoost;
-import android.media.audiofx.Equalizer;
-import android.media.audiofx.PresetReverb;
-import android.media.audiofx.Virtualizer;
-import android.media.session.MediaSession;
-import android.media.session.PlaybackState;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-
-import androidx.annotation.Nullable;
-
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.os.Bundle;
-
-import androidx.appcompat.widget.Toolbar;
-
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,23 +107,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import android.net.Uri;
-import android.os.IBinder;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import org.jsoup.Jsoup;
-
-import static android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         NameWise.OnFragmentItemClicked, CategorySongFragment.OnFragmentItemClicked {
@@ -150,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private KenBurnsView control_back_image;
     private ImageView slideImage, cardImage;
     private ImageView playPause, prev, next, shuffle, repeat, playPauseSlide, equalizer, playlist, favorite;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private SlidingUpPanelLayout slidingLayout;
     private ConstraintLayout slidePanelTop;
     private ConstraintLayout player_controller;
@@ -174,6 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private PrefManager manage;
 
     private MainActivityViewModel viewModel;
+    private MainViewModelFactory viewModelFactory;
 
     public Equalizer mEqualizer;
     public BassBoost bassBoost;
@@ -183,6 +177,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Song playingSong;
 
     protected MediaSession mediaSession;
+
+    private TinyDB tinydb;
+    private PlaylistRepository repository;
 
     public static MainActivity getInstance() {
         return activity;
@@ -217,13 +214,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         musicSrv = new MusicService();
 
         SectionsPagerAdapter sectionsPagerAdapter;
-        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter = new SectionsPagerAdapter(this);
         viewPager = findViewById(R.id.view_pager);
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(sectionsPagerAdapter);
 
         TabLayout tabLayout = findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText(getString(R.string.playlist));
+                    break;
+                case 1:
+                    tab.setText(getString(R.string.Tracks));
+                    break;
+                case 2:
+                    tab.setText(getString(R.string.Albums));
+                    break;
+                case 3:
+                    tab.setText(getString(R.string.Artists));
+                    break;
+            }
+        }).attach();
 
         songList = new ArrayList<>();
         normalList = new ArrayList<>();
@@ -252,7 +265,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         manage = new PrefManager(getApplicationContext());
 
-        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        tinydb = new TinyDB(this);
+        repository = new PlaylistRepository(this);
+
+        viewModelFactory = new MainViewModelFactory(repository, tinydb);
+
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel.class);
 
         control_back_image.pause();
 
@@ -267,11 +285,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (songList.size() > 0) {
                     Log.d("Playing", "List Changed " + songList.size());
                     musicSrv.setList(songList);
-                    if(playingDuration != null) {
+                    if (playingDuration != null) {
                         musicSrv.setPlayingPosition(playingDuration);
                     }
-                    viewModel.saveQueueSongs(MainActivity.this, normalList);
-                    viewModel.saveShuffleSongs(MainActivity.this, songList);
+                    viewModel.saveTinyDbSongs(getString(R.string.NormalSongs), normalList);
+                    viewModel.saveTinyDbSongs(getString(R.string.Songs), songList);
 
                     Log.d("Playing", "" + deletionProcess);
 
@@ -332,8 +350,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             songList.clear();
             normalList.clear();
 
-            songList.addAll(viewModel.getShuffleSongs(this));
-            normalList.addAll(viewModel.getQueueSongs(this));
+            songList.addAll(viewModel.getTinyDbSongs(getString(R.string.Songs)));
+            normalList.addAll(viewModel.getTinyDbSongs(getString(R.string.NormalSongs)));
             Log.d("Playing", songList.size() + "");
             UtilsKt.setPlayingList(songList);
 
@@ -379,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             repeat.setImageResource(R.drawable.ic_repeat_off);
         }
 
-        viewModel.getPlaylistSong(this, getString(R.string.favTracks)).observe(this, new Observer<List<Playlist>>() {
+        viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(this, new Observer<List<Playlist>>() {
             @Override
             public void onChanged(List<Playlist> playlists) {
                 boolean check = false;
@@ -440,17 +458,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adView.loadAd(adRequest);
     }
 
-    public void setWindowFlag(Activity activity, final int bits, boolean on) {
-        Window win = activity.getWindow();
-        WindowManager.LayoutParams winParams = win.getAttributes();
-        if (on) {
-            winParams.flags |= bits;
-        } else {
-            winParams.flags &= ~bits;
-        }
-        win.setAttributes(winParams);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -483,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     getContentResolver().delete(UtilsKt.getDeleteUri(), null, null);
                     UtilsKt.setDeleteUri(null);
-                    for(Fragment fragment : getSupportFragmentManager().getFragments()) {
+                    for (Fragment fragment : getSupportFragmentManager().getFragments()) {
                         fragment.onActivityResult(requestCode, resultCode, data);
                     }
                 }
@@ -673,14 +680,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void addToFavPlaylist() {
         try {
             Song song = songList.get(songPosn);
-            long exist = viewModel.isSongExist(MainActivity.this, getString(R.string.favTracks), song.getId());
+            long exist = viewModel.isSongExist(getString(R.string.favTracks), song.getId());
             if (exist > 0) {
                 musicSrv.updateFavNotification(false);
                 favorite.setImageResource(R.drawable.ic_fav_not);
-                viewModel.removeSong(MainActivity.this, getString(R.string.favTracks), song.getId());
+                viewModel.removeSong(getString(R.string.favTracks), song.getId());
             } else {
                 Playlist playlist = new Playlist(0, getString(R.string.favTracks), song);
-                viewModel.addSong(MainActivity.this, playlist);
+                viewModel.addSong(playlist);
                 musicSrv.updateFavNotification(true);
                 favorite.setImageResource(R.drawable.ic_fav);
                 Toast.makeText(MainActivity.this, getString(R.string.added_To_Favorite), Toast.LENGTH_SHORT).show();
@@ -691,7 +698,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void checkInFav(Song song) {
-        long exist = viewModel.isSongExist(MainActivity.this, getString(R.string.favTracks), song.getId());
+        long exist = viewModel.isSongExist(getString(R.string.favTracks), song.getId());
         if (exist > 0) {
             favorite.setImageResource(R.drawable.ic_fav);
             musicSrv.updateFavNotification(true);
@@ -1093,7 +1100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else {
-            if(container.getVisibility() == View.VISIBLE) {
+            if (container.getVisibility() == View.VISIBLE) {
                 showHomePanel();
                 return;
             }
@@ -1300,15 +1307,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainLayout.setVisibility(View.VISIBLE);
     }
 
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStateAdapter {
 
-        SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentActivity fm) {
             super(fm);
         }
 
-        @Override
-        public Fragment getItem(int position) {
+//        @Override
+//        public Fragment getItem(int position) {
+//
+//            switch (position) {
+//                case 0:
+//                    return new PlaylistFragment();
+//                case 1:
+//                    return new NameWise();
+//                case 2:
+//                    return new AlbumsFragment();
+//                case 3:
+//                    return new ArtistFragment();
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return 4;
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position) {
+//                case 0:
+//                    return getString(R.string.playlist);
+//                case 1:
+//                    return getString(R.string.Tracks);
+//                case 2:
+//                    return getString(R.string.Albums);
+//                case 3:
+//                    return getString(R.string.Artists);
+//            }
+//            return null;
+//        }
 
+        @NonNull
+        @Override
+        public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
                     return new PlaylistFragment();
@@ -1323,23 +1366,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return 4;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getString(R.string.playlist);
-                case 1:
-                    return getString(R.string.Tracks);
-                case 2:
-                    return getString(R.string.Albums);
-                case 3:
-                    return getString(R.string.Artists);
-            }
-            return null;
         }
     }
 
@@ -1627,9 +1655,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void checkInPlaylists() {
         ArrayList<Song> songListByName = SongsProvider.Companion.getSongListByName().getValue();
         if (songListByName.size() > 0) {
-            TinyDB tinydb = new TinyDB(this);
-
-            PlaylistRepository repository = new PlaylistRepository(this);
 
             List<String> playListArrayList = new ArrayList<>();
             playListArrayList.add("NormalSongs");

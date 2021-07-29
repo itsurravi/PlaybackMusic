@@ -164,7 +164,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="1000"
+        app:fastScrollAutoHideDelay="2000"
         app:fastScrollEnableThumbInactiveColor="true"
         app:fastScrollThumbColor="@color/scrollThumb"
         app:fastScrollThumbEnabled="true"

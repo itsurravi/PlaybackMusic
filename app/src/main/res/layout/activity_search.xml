@@ -71,17 +71,17 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="1000"
+        app:fastScrollAutoHideDelay="2000"
         app:fastScrollEnableThumbInactiveColor="true"
-        app:fastScrollPopupBackgroundSize="40dp"
+        app:fastScrollPopupBackgroundSize="@dimen/scrollPopupBackgroundSize"
         app:fastScrollPopupBgColor="@color/scrollThumb"
         app:fastScrollPopupPosition="adjacent"
         app:fastScrollPopupTextColor="@color/white"
-        app:fastScrollPopupTextSize="22dp"
+        app:fastScrollPopupTextSize="@dimen/scrollPopupTextSize"
         app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
         app:fastScrollThumbColor="@color/scrollThumb"
         app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="@color/scrollThumb" />
+        app:fastScrollThumbInactiveColor="@color/scrollThumb"/>
 
     <FrameLayout
         android:id="@+id/banner_container_search"
