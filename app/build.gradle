@@ -18,7 +18,7 @@ android {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 38
+        versionCode 39
         versionName "2.7.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -56,7 +56,6 @@ dependencies {
 
     //Added Dependencies
     implementation "androidx.media:media:1.4.0"
-    implementation 'com.flaviofaria:kenburnsview:1.0.7'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'

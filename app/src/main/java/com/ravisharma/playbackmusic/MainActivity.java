@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
@@ -31,8 +30,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
@@ -62,8 +59,6 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
-import com.flaviofaria.kenburnsview.KenBurnsView;
-import com.flaviofaria.kenburnsview.RandomTransitionGenerator;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -140,8 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SeekBar seekBar;
     private TextView title, artist, currentPosition, totalDuration;
     private Toolbar toolbar;
-    private KenBurnsView control_back_image;
-    private ImageView slideImage, cardImage;
+    private ImageView slideImage, cardImage, control_back_image;
     private ImageView playPause, prev, next, shuffle, repeat, playPauseSlide, equalizer, playlist, favorite;
     private ViewPager2 viewPager;
     private SlidingUpPanelLayout slidingLayout;
@@ -271,12 +265,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         viewModelFactory = new MainViewModelFactory(repository, tinydb);
 
         viewModel = new ViewModelProvider(this, viewModelFactory).get(MainActivityViewModel.class);
-
-        control_back_image.pause();
-
-        AccelerateDecelerateInterpolator a = new AccelerateDecelerateInterpolator();
-        RandomTransitionGenerator r = new RandomTransitionGenerator(20000, a);
-        control_back_image.setTransitionGenerator(r);
 
         UtilsKt.getPlayingListData().observe(this, new Observer<ArrayList<Song>>() {
             @Override
@@ -517,7 +505,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         playingDuration = "0";
         musicSrv.setPlayingPosition(playingDuration);
         musicSrv.playSong();
-        control_back_image.resume();
         if (playbackPaused) {
             playbackPaused = false;
         }
@@ -1178,7 +1165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void start() {
         musicSrv.go();
-        control_back_image.resume();
         if (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
             title.setSelected(true);
             artist.setSelected(true);
@@ -1192,7 +1178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void pause() {
         playbackPaused = true;
-        control_back_image.pause();
         title.setSelected(false);
         artist.setSelected(false);
         musicSrv.pausePlayer();
@@ -1312,42 +1297,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SectionsPagerAdapter(FragmentActivity fm) {
             super(fm);
         }
-
-//        @Override
-//        public Fragment getItem(int position) {
-//
-//            switch (position) {
-//                case 0:
-//                    return new PlaylistFragment();
-//                case 1:
-//                    return new NameWise();
-//                case 2:
-//                    return new AlbumsFragment();
-//                case 3:
-//                    return new ArtistFragment();
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return 4;
-//        }
-//
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            switch (position) {
-//                case 0:
-//                    return getString(R.string.playlist);
-//                case 1:
-//                    return getString(R.string.Tracks);
-//                case 2:
-//                    return getString(R.string.Albums);
-//                case 3:
-//                    return getString(R.string.Artists);
-//            }
-//            return null;
-//        }
 
         @NonNull
         @Override
