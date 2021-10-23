@@ -14,8 +14,8 @@ public class Timer extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (MainActivity.getInstance() != null) {
-            MainActivity.getInstance().onDestroy();
+        if (MainActivity.Companion.getInstance() != null) {
+            MainActivity.Companion.getInstance().onDestroy();
         }
         System.exit(0);
     }

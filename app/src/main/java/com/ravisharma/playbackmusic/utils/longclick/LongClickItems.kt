@@ -14,10 +14,7 @@ import android.view.LayoutInflater
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import androidx.appcompat.app.AlertDialog
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
+import coil.load
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.*
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
@@ -59,16 +56,12 @@ class LongClickItems {
         val ad = ArrayAdapter(context, R.layout.adapter_alert_list, items)
         binding = AlertListBinding.inflate(LayoutInflater.from(context))
 
-        val requestOptions = RequestOptions().apply {
+        binding.songArt.load(Uri.parse(songList[position].art)) {
             placeholder(R.drawable.logo)
             error(R.drawable.logo)
+            crossfade(true)
         }
-        Glide.with(binding.root)
-                .setDefaultRequestOptions(requestOptions)
-                .load(songList[position].art)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.songArt)
+
         binding.title.text = songList[position].title
         binding.list.adapter = ad
     }

@@ -95,7 +95,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
                 if (playingList.size() > 0) {
                     UtilsKt.setPlayingList(playingList);
                     int position = playingList.indexOf(playingSong);
-                    MainActivity.getInstance().musicSrv.setSong(position);
+                    MainActivity.Companion.getInstance().getMusicSrv().setSong(position);
                 } else {
                     if (SongsProvider.Companion.getSongListByName().getValue().size() == 0) {
                         Toast.makeText(NowPlayingActivity.this, "No Song Left in Storage", Toast.LENGTH_SHORT).show();
@@ -109,8 +109,8 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
                         }, 1000);
                     }
                     UtilsKt.setPlayingList(playingList);
-                    MainActivity.getInstance().musicSrv.setSong(0);
-                    MainActivity.getInstance().musicSrv.playSong();
+                    MainActivity.Companion.getInstance().getMusicSrv().setSong(0);
+                    MainActivity.Companion.getInstance().getMusicSrv().playSong();
                 }
                 UtilsKt.setSwiped(false);
                 UtilsKt.setFileDelete(false);
@@ -118,7 +118,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
             if (UtilsKt.getMoved()) {
                 UtilsKt.setPlayingList(playingList);
                 int position = playingList.indexOf(playingSong);
-                MainActivity.getInstance().musicSrv.setSong(position);
+                MainActivity.Companion.getInstance().getMusicSrv().setSong(position);
                 UtilsKt.setMoved(false);
             }
         });
@@ -258,7 +258,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
             int position = viewHolder.getAdapterPosition();
             if (playingList.get(position).equals(playingSong)) {
                 if (playingList.size() > 0) {
-                    MainActivity.getInstance().playNext();
+                    MainActivity.Companion.getInstance().playNext();
                 }
             }
             playingList.remove(position);
@@ -269,7 +269,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
         @Override
         public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-            if (!MainActivity.getInstance().played) {
+            if (!MainActivity.Companion.getInstance().played) {
                 return 0;
             }
             return super.getSwipeDirs(recyclerView, viewHolder);
@@ -304,7 +304,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         playingList.remove(mposition);
 
         if (song.equals(playingSong) && playingList.size() > 1) {
-            MainActivity.getInstance().playNext();
+            MainActivity.Companion.getInstance().playNext();
         }
 
         UtilsKt.setFileDelete(true);

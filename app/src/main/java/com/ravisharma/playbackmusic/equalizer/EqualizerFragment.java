@@ -111,10 +111,10 @@ public class EqualizerFragment extends Fragment {
                 Settings.equalizerModel.setEqualizerEnabled(isChecked);
                 Settings.equalizerModel.setEqualizerReloaded(isChecked);
 
-                MainActivity.getInstance().mEqualizer.setEnabled(isChecked);
-                MainActivity.getInstance().bassBoost.setEnabled(isChecked);
-                MainActivity.getInstance().virtualizer.setEnabled(isChecked);
-                MainActivity.getInstance().presetReverb.setEnabled(isChecked);
+                MainActivity.Companion.getInstance().mEqualizer.setEnabled(isChecked);
+                MainActivity.Companion.getInstance().bassBoost.setEnabled(isChecked);
+                MainActivity.Companion.getInstance().virtualizer.setEnabled(isChecked);
+                MainActivity.Companion.getInstance().presetReverb.setEnabled(isChecked);
 
                 if (isChecked) {
                     equalizerBlocker.setVisibility(View.INVISIBLE);
@@ -158,17 +158,17 @@ public class EqualizerFragment extends Fragment {
         int x;
         if (!Settings.isEqualizerReloaded) {
             x = 0;
-            if (MainActivity.getInstance().bassBoost != null) {
+            if (MainActivity.Companion.getInstance().bassBoost != null) {
                 try {
-                    x = ((MainActivity.getInstance().bassBoost.getRoundedStrength() * 19) / 1000);
+                    x = ((MainActivity.Companion.getInstance().bassBoost.getRoundedStrength() * 19) / 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            if (MainActivity.getInstance().virtualizer != null) {
+            if (MainActivity.Companion.getInstance().virtualizer != null) {
                 try {
-                    y = ((MainActivity.getInstance().virtualizer.getRoundedStrength() * 19) / 1000);
+                    y = ((MainActivity.Companion.getInstance().virtualizer.getRoundedStrength() * 19) / 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -199,7 +199,7 @@ public class EqualizerFragment extends Fragment {
                 }
                 try {
                     Settings.equalizerModel.setBassStrength(Settings.bassStrength);
-                    MainActivity.getInstance().bassBoost.setStrength(Settings.bassStrength);
+                    MainActivity.Companion.getInstance().bassBoost.setStrength(Settings.bassStrength);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -215,7 +215,7 @@ public class EqualizerFragment extends Fragment {
                 }
                 try {
                     Settings.equalizerModel.setVirtualizerStrength(Settings.virtualizerStrength);
-                    MainActivity.getInstance().virtualizer.setStrength(Settings.virtualizerStrength);
+                    MainActivity.Companion.getInstance().virtualizer.setStrength(Settings.virtualizerStrength);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -230,8 +230,8 @@ public class EqualizerFragment extends Fragment {
 
         numberOfFrequencyBands = 5;
 
-        final short lowerEqualizerBandLevel = MainActivity.getInstance().mEqualizer.getBandLevelRange()[0];
-        final short upperEqualizerBandLevel = MainActivity.getInstance().mEqualizer.getBandLevelRange()[1];
+        final short lowerEqualizerBandLevel = MainActivity.Companion.getInstance().mEqualizer.getBandLevelRange()[0];
+        final short upperEqualizerBandLevel = MainActivity.Companion.getInstance().mEqualizer.getBandLevelRange()[1];
 
         for (short i = 0; i < numberOfFrequencyBands; i++) {
 
@@ -243,7 +243,7 @@ public class EqualizerFragment extends Fragment {
             ));
             frequencyHeaderTextView.setGravity(Gravity.CENTER_HORIZONTAL);
             frequencyHeaderTextView.setTextColor(Color.parseColor("#FFFFFF"));
-            frequencyHeaderTextView.setText((MainActivity.getInstance().mEqualizer.getCenterFreq(equalizerBandIndex) / 1000) + "Hz");
+            frequencyHeaderTextView.setText((MainActivity.Companion.getInstance().mEqualizer.getCenterFreq(equalizerBandIndex) / 1000) + "Hz");
 
             LinearLayout seekBarRowLayout = new LinearLayout(getContext());
             seekBarRowLayout.setOrientation(LinearLayout.VERTICAL);
@@ -301,15 +301,15 @@ public class EqualizerFragment extends Fragment {
             if (Settings.isEqualizerReloaded) {
                 seekBar.setProgress(Settings.seekbarpos[i] - lowerEqualizerBandLevel);
             } else {
-                seekBar.setProgress(MainActivity.getInstance().mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel);
-                Settings.seekbarpos[i] = MainActivity.getInstance().mEqualizer.getBandLevel(equalizerBandIndex);
+                seekBar.setProgress(MainActivity.Companion.getInstance().mEqualizer.getBandLevel(equalizerBandIndex) - lowerEqualizerBandLevel);
+                Settings.seekbarpos[i] = MainActivity.Companion.getInstance().mEqualizer.getBandLevel(equalizerBandIndex);
                 Settings.isEqualizerReloaded = true;
             }
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    MainActivity.getInstance().mEqualizer.setBandLevel(equalizerBandIndex, (short) (progress + lowerEqualizerBandLevel));
+                    MainActivity.Companion.getInstance().mEqualizer.setBandLevel(equalizerBandIndex, (short) (progress + lowerEqualizerBandLevel));
                     Settings.seekbarpos[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
                     Settings.equalizerModel.getSeekbarpos()[seekBar.getId()] = (progress + lowerEqualizerBandLevel);
                 }
@@ -340,8 +340,8 @@ public class EqualizerFragment extends Fragment {
         equalizerPresetSpinnerAdapter.setDropDownViewResource(R.layout.spinner_drop_down_item);
         equalizerPresetNames.add("Custom");
 
-        for (short i = 0; i < MainActivity.getInstance().mEqualizer.getNumberOfPresets(); i++) {
-            equalizerPresetNames.add(MainActivity.getInstance().mEqualizer.getPresetName(i));
+        for (short i = 0; i < MainActivity.Companion.getInstance().mEqualizer.getNumberOfPresets(); i++) {
+            equalizerPresetNames.add(MainActivity.Companion.getInstance().mEqualizer.getPresetName(i));
         }
 
         presetSpinner.setAdapter(equalizerPresetSpinnerAdapter);
@@ -356,16 +356,16 @@ public class EqualizerFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 try {
                     if (position != 0) {
-                        MainActivity.getInstance().mEqualizer.usePreset((short) (position - 1));
+                        MainActivity.Companion.getInstance().mEqualizer.usePreset((short) (position - 1));
                         Settings.presetPos = position;
                         short numberOfFreqBands = 5;
 
-                        final short lowerEqualizerBandLevel = MainActivity.getInstance().mEqualizer.getBandLevelRange()[0];
+                        final short lowerEqualizerBandLevel = MainActivity.Companion.getInstance().mEqualizer.getBandLevelRange()[0];
 
                         for (short i = 0; i < numberOfFreqBands; i++) {
-                            seekBarFinal[i].setProgress(MainActivity.getInstance().mEqualizer.getBandLevel(i) - lowerEqualizerBandLevel);
-                            Settings.seekbarpos[i] = MainActivity.getInstance().mEqualizer.getBandLevel(i);
-                            Settings.equalizerModel.getSeekbarpos()[i] = MainActivity.getInstance().mEqualizer.getBandLevel(i);
+                            seekBarFinal[i].setProgress(MainActivity.Companion.getInstance().mEqualizer.getBandLevel(i) - lowerEqualizerBandLevel);
+                            Settings.seekbarpos[i] = MainActivity.Companion.getInstance().mEqualizer.getBandLevel(i);
+                            Settings.equalizerModel.getSeekbarpos()[i] = MainActivity.Companion.getInstance().mEqualizer.getBandLevel(i);
                         }
                     }
                 } catch (Exception e) {
@@ -409,7 +409,7 @@ public class EqualizerFragment extends Fragment {
                     Settings.reverbPreset = (short) position;
                     try {
                         Settings.equalizerModel.setReverbPreset(Settings.reverbPreset);
-                        MainActivity.getInstance().presetReverb.setPreset(Settings.reverbPreset);
+                        MainActivity.Companion.getInstance().presetReverb.setPreset(Settings.reverbPreset);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

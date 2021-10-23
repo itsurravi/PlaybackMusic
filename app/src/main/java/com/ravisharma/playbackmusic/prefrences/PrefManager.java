@@ -30,7 +30,7 @@ public class PrefManager {
         ed.remove("Songs");
         ed.remove("position");
         ed.remove("Started");
-        ed.commit();
+        ed.apply();
     }
 
     public void storeInfo(String key, String data) {
@@ -39,17 +39,17 @@ public class PrefManager {
         } else {
             ed.putString(key, data);
         }
-        ed.commit();
+        ed.apply();
     }
 
     public void storeInfo(String key, boolean data) {
         ed.putBoolean(key, data);
-        ed.commit();
+        ed.apply();
     }
 
     public void storeAppVersion(int data) {
         ed.putInt("appVersion", data);
-        ed.commit();
+        ed.apply();
     }
 
     public int getAppVersion() {
@@ -57,7 +57,7 @@ public class PrefManager {
     }
 
     public String get_s_Info(String key) {
-        return sp.getString(key, null);
+        return sp.getString(key, "");
     }
 
     public boolean get_b_Info(String key) {
@@ -75,7 +75,7 @@ public class PrefManager {
         l.add(playlistName);
         Set<String> list2 = new LinkedHashSet<>(l);
         ed.putStringSet(Playlist, list2);
-        ed.commit();
+        ed.apply();
     }
 
     public void renamePlaylist(String oldName, String newName){
@@ -86,7 +86,7 @@ public class PrefManager {
             l.set(l.indexOf(oldName), newName);
             Set<String> list2 = new LinkedHashSet<>(l);
             ed.putStringSet(Playlist, list2);
-            ed.commit();
+            ed.apply();
         }
     }
 
@@ -105,6 +105,6 @@ public class PrefManager {
 
         Set<String> list2 = new LinkedHashSet<>(l);
         ed.putStringSet(Playlist, list2);
-        ed.commit();
+        ed.apply();
     }
 }

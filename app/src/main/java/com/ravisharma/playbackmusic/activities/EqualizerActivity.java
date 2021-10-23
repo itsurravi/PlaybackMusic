@@ -15,7 +15,7 @@ public class EqualizerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equalizer);
 
-        final int sessionId = MainActivity.getInstance().sessionId;
+        final int sessionId = MainActivity.Companion.getInstance().sessionId;
         EqualizerFragment equalizerFragment = EqualizerFragment.newBuilder()
                 .setAccentColor(getResources().getColor(R.color.scrollThumb))
                 .setAudioSessionId(sessionId)

@@ -3,19 +3,11 @@ package com.ravisharma.playbackmusic.adapters
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.AdapSongBinding
 import com.ravisharma.playbackmusic.model.Song
@@ -68,16 +60,12 @@ class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.Vie
                     TimeUnit.MILLISECONDS.toSeconds(currSong.duration) -
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(currSong.duration)))
 
-            val requestOptions = RequestOptions().apply {
+            songArt.load(Uri.parse(currSong.art)) {
                 placeholder(R.drawable.logo)
                 error(R.drawable.logo)
+                transformations(RoundedCornersTransformation(20f))
             }
-            Glide.with(c)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(Uri.parse(currSong.art))
-                    .transform(CenterCrop(), RoundedCorners(20))
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .into(songArt)
+
             songBox.apply {
                 setOnClickListener { onClick.onItemClick(holder.adapterPosition) }
                 setOnLongClickListener {

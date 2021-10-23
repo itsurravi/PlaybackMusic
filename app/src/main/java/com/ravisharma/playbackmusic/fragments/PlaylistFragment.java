@@ -163,7 +163,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
     private void openFragment(Bundle bundle) {
         CategorySongFragment fragment = new CategorySongFragment();
         fragment.setArguments(bundle);
-        MainActivity.getInstance().hideHomePanel();
+        MainActivity.Companion.getInstance().hideHomePanel();
 
         getActivity().getSupportFragmentManager()
                 .beginTransaction()
@@ -231,7 +231,7 @@ public class PlaylistFragment extends Fragment implements PlaylistAdapter.OnPlay
                                 songList.add(p.getSong());
                             }
                             if (songList.size() > 0) {
-                                MainActivity.getInstance().OnFragmentItemClick(0, songList, false);
+                                MainActivity.Companion.getInstance().OnFragmentItemClick(0, songList, false);
                             }
                         } else {
                             Toast.makeText(getContext(), "Playlist is Empty", Toast.LENGTH_SHORT).show();

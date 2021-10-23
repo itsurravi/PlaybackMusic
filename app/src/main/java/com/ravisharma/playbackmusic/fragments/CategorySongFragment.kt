@@ -20,10 +20,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.bumptech.glide.request.RequestOptions
+import coil.load
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -118,11 +115,11 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         loadBanner()
 
         playlistBinding.imageBack1.setOnClickListener {
-            activity!!.onBackPressed()
+            requireActivity().onBackPressed()
         }
 
         playlistBinding.imageBack2.setOnClickListener {
-            activity!!.onBackPressed()
+            requireActivity().onBackPressed()
         }
     }
 
@@ -155,14 +152,14 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
 
         when (actName) {
             "Recent Added" -> {
-                SongsProvider.songListByDate.observe(this, { songs ->
+                SongsProvider.songListByDate.observe(viewLifecycleOwner, { songs ->
                     songList.clear()
                     songList.addAll(songs!!)
                     setUpLayout()
                 })
             }
             "Last Played" -> {
-                viewModel.getLastPlayedSongsList(context!!).observe(this, { lastPlayedList ->
+                viewModel.getLastPlayedSongsList(requireContext()).observe(viewLifecycleOwner, { lastPlayedList ->
                     songList.clear()
                     for ((song) in lastPlayedList) {
                         songList.add(song)
@@ -171,7 +168,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 })
             }
             "Most Played" -> {
-                viewModel.getMostPlayedSongsList(context!!).observe(this, { mostPlayedList ->
+                viewModel.getMostPlayedSongsList(requireContext()).observe(viewLifecycleOwner, { mostPlayedList ->
                     songList.clear()
                     for ((song) in mostPlayedList) {
                         songList.add(song)
@@ -181,7 +178,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
             }
             else -> {
                 repository = PlaylistRepository(context)
-                repository.getPlaylistSong(actName!!).observe(this, { playlists ->
+                repository.getPlaylistSong(actName!!).observe(viewLifecycleOwner, { playlists ->
                     songList.clear()
                     for ((_, _, song) in playlists) {
                         songList.add(song)
@@ -197,7 +194,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     }
 
     private fun fetchCategorySongs(it: String) {
-        viewModel.getCategorySongs(it, id!!, activity!!.contentResolver).observe(this, { songs ->
+        viewModel.getCategorySongs(it, id!!, requireActivity().contentResolver).observe(viewLifecycleOwner, { songs ->
             songList.clear()
             songList.addAll(songs!!)
             setUpLayout()
@@ -223,15 +220,10 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
             val noOfSongs = resources.getQuantityString(R.plurals.numberOfSongs, size, size)
             playlistBinding.noOfSongs.text = noOfSongs
 
-            val requestOptions = RequestOptions().apply {
+            playlistBinding.albumArt.load(Uri.parse(songList[0].art)) {
                 error(R.drawable.logo)
+                crossfade(true)
             }
-            Glide.with(context!!)
-                    .setDefaultRequestOptions(requestOptions)
-                    .load(Uri.parse(songList[0].art))
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(playlistBinding.albumArt)
         }
     }
 
@@ -261,24 +253,21 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
 
     private fun playlistLongClick(mposition: Int) {
         val items = resources.getStringArray(R.array.longPressItemsRemove)
-        val ad = ArrayAdapter(context!!, R.layout.adapter_alert_list, items)
-        val v = LayoutInflater.from(context!!).inflate(R.layout.alert_list, null)
+        val ad = ArrayAdapter(requireContext(), R.layout.adapter_alert_list, items)
+        val v = LayoutInflater.from(requireContext()).inflate(R.layout.alert_list, null)
         val lv = v.findViewById<ListView>(R.id.list)
         val tv = v.findViewById<TextView>(R.id.title)
         val songArt = v.findViewById<ImageView>(R.id.songArt)
-        val requestOptions = RequestOptions().apply {
+
+        songArt.load(Uri.parse(songList[mposition].art)) {
             placeholder(R.drawable.logo)
             error(R.drawable.logo)
+            crossfade(true)
         }
-        Glide.with(v)
-                .setDefaultRequestOptions(requestOptions)
-                .load(songList[mposition].art)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(songArt)
+
         tv.text = songList[mposition].title
         lv.adapter = ad
-        val dialog = AlertDialog.Builder(context!!)
+        val dialog = AlertDialog.Builder(requireContext())
         dialog.setView(v)
         val alertDialog = dialog.create()
         alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -298,7 +287,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     }
                     startActivity(Intent.createChooser(intent, "Share Via"))
                 }
-                5 -> context!!.showSongInfo(songList[mposition])
+                5 -> requireContext().showSongInfo(songList[mposition])
             }
             alertDialog.dismiss()
         }
@@ -309,16 +298,12 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         val ad = ArrayAdapter(context, R.layout.adapter_alert_list, items)
         val binding = AlertListBinding.inflate(LayoutInflater.from(context))
 
-        val requestOptions = RequestOptions().apply {
+        binding.songArt.load(Uri.parse(songList[mPosition].art)) {
             placeholder(R.drawable.logo)
             error(R.drawable.logo)
+            crossfade(true)
         }
-        Glide.with(binding.root)
-                .setDefaultRequestOptions(requestOptions)
-                .load(songList[mPosition].art)
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.songArt)
+
         binding.title.text = songList[mPosition].title
         binding.list.adapter = ad
 
@@ -379,7 +364,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     private fun showDeleteSongDialog(mPosition: Int) {
         val song: Song = songList[mPosition]
 
-        val b = AlertDialog.Builder(context!!, R.style.AlertDialogCustom)
+        val b = AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
         b.setTitle(getString(R.string.deleteMessage))
         b.setMessage(song.title)
         b.setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
@@ -391,7 +376,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
             val projection = arrayOf(MediaStore.Audio.Media._ID)
             val selection = MediaStore.Audio.Media.DATA + " = ?"
             val selectionArgs = arrayOf(song.data)
-            val musicCursor = activity!!.contentResolver.query(musicUri, projection,
+            val musicCursor = requireActivity().contentResolver.query(musicUri, projection,
                     selection, selectionArgs, null)
 
             musicCursor?.let {
@@ -401,7 +386,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     try {
                         val fdelete = File(selectionArgs[0])
                         if (fdelete.exists()) {
-                            activity!!.contentResolver.delete(uri, null, null)
+                            requireActivity().contentResolver.delete(uri, null, null)
                             updateList(mPosition)
                             Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
                             listener.onOkClicked()
@@ -444,7 +429,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     private fun updateList(mPosition: Int) {
         val song = songList[mPosition]
         if (song == curPlayingSong.value) {
-            MainActivity.getInstance().playNext()
+            MainActivity.instance?.playNext()
         }
         removeFromPlayingList(song)
     }

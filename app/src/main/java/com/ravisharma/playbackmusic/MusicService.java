@@ -145,7 +145,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-        MainActivity.getInstance().sessionId = player.getAudioSessionId();
+        MainActivity.Companion.getInstance().sessionId = player.getAudioSessionId();
 
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
@@ -165,13 +165,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.start();
         mProgressRunner.run();
         togglePlayPauseNotification(true);
-        MainActivity.getInstance().setPauseIcons();
+        MainActivity.Companion.getInstance().setPauseIcons();
     }
 
     private void pause() {
         player.pause();
         togglePlayPauseNotification(false);
-        MainActivity.getInstance().setPlayIcons();
+        MainActivity.Companion.getInstance().setPlayIcons();
     }
 
     @Override
@@ -254,7 +254,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //play a adap_song
         player.reset();
         //get adap_song
-        MainActivity.getInstance().trackCounterCheck();
+        MainActivity.Companion.getInstance().trackCounterCheck();
 
         Song playSong = songs.get(songPosn);
         songTitle = playSong.getTitle();
@@ -274,7 +274,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             player.prepare();
             UtilsKt.setPlayingSong(playSong);
 
-            MainActivity.getInstance().songPosn = songPosn;
+            MainActivity.Companion.getInstance().songPosn = songPosn;
 
             mostPlayedRepository.addSongToMostPlayed(playSong);
             lastPlayedRepository.addSongToLastPlayed(playSong);
@@ -428,7 +428,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .setContentIntent(pendingIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setShowActionsInCompactView(0, 2, 3)
-                        .setMediaSession(MediaSessionCompat.Token.fromToken(MainActivity.getInstance().mediaSession.getSessionToken())))
+                        .setMediaSession(MediaSessionCompat.Token.fromToken(MainActivity.Companion.getInstance().mediaSession.getSessionToken())))
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build();
 

@@ -89,7 +89,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        SongsProvider.Companion.getSongListByName().observe(this, new Observer<ArrayList<Song>>() {
+        SongsProvider.Companion.getSongListByName().observe(getViewLifecycleOwner(), new Observer<ArrayList<Song>>() {
             @Override
             public void onChanged(ArrayList<Song> songs) {
                 if (songs.size() > 0) {
@@ -271,7 +271,7 @@ public class NameWise extends Fragment implements SongAdapter.OnItemClicked,
     private void updateList(int mposition) {
         Song song = songList.get(mposition);
         if (song.equals(UtilsKt.getCurPlayingSong().getValue())) {
-            MainActivity.getInstance().playNext();
+            MainActivity.Companion.getInstance().playNext();
         }
         UtilsKt.removeFromPlayingList(song);
     }
