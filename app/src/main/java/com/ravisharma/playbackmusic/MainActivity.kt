@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     var serviceInitialized = false
     var fromList = false
     var started = false
-    var deletionProcess = false
+
     var fromButton = false
 
     @JvmField
@@ -119,8 +119,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     var songList: ArrayList<Song> = ArrayList()
     var normalList: ArrayList<Song> = ArrayList()
 
-    @JvmField
-    var songPosn = 0
+    private var songPosn = 0
     private var playIntent: Intent? = null
     private var pi: PendingIntent? = null
 
@@ -200,14 +199,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         }.attach()
 
-//        repository = PlaylistRepository(this)
-
         getPlayingListData().observe(this, { songs ->
             songList = songs
             if (songList.size > 0) {
                 Log.d("Playing", "List Changed " + songList.size)
                 musicSrv!!.setList(songList)
-                if (playingDuration != null) {
+                if (playingDuration!!.isNotEmpty() || playingDuration!!.isNotBlank()) {
                     musicSrv!!.setPlayingPosition(playingDuration)
                 }
                 viewModel.saveTinyDbSongs(getString(R.string.NormalSongs), normalList)
@@ -218,9 +215,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     if (!songList.contains(playingSong)) {
                         setSongPosition(songPosn)
                         setPlayingSong(songList[songPosn])
+                    } else {
+                        val songIndex = songList.indexOf(playingSong)
+                        setSongPosition(songIndex)
+                        setPlayingSong(songList[songIndex])
                     }
                     deletionProcess = false
                 }
+
             }
         })
 
@@ -245,7 +247,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
             checkInFav(playingSong)
 
-            val manage = PrefManager(this@MainActivity)
             manage.storeInfo(getString(R.string.position), songPosn.toString())
             manage.storeInfo(getString(R.string.ID), songPosn.toString())
         })
@@ -255,6 +256,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (songPosn >= songList.size) {
                 songPosn = 0
             }
+            musicSrv!!.setSong(songPosn)
             Log.d("Playing", "Position Changed $songPosn")
         })
 
@@ -279,10 +281,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     start = false
                 } else if (songList.size <= position.toInt()) {
                     songPosn = 0
-                    setSongPosition(0)
+                    setSongPosition(songPosn)
                 } else {
                     songPosn = position.toInt()
-                    setSongPosition(position.toInt())
+                    setSongPosition(songPosn)
                 }
             }
         }
@@ -293,8 +295,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             songPosn = lastSongId.toInt()
             if (songList.size != 0) {
                 if (songList.size <= songPosn) {
+                    setSongPosition(0)
                     setPlayingSong(songList[0])
                 } else {
+                    setSongPosition(songPosn)
                     setPlayingSong(songList[songPosn])
                 }
             }
@@ -427,9 +431,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             setRepeatOff()
             manage.storeInfo(getString(R.string.Shuffle), false)
         }
-        musicSrv!!.setList(songList)
+        setPlayingSong(songList[songPosn])
         setPlayingList(songList)
-        musicSrv!!.setSong(songPosn)
+        setSongPosition(songPosn)
         playingDuration = "0"
         musicSrv!!.setPlayingPosition(playingDuration)
         musicSrv!!.playSong()
@@ -522,7 +526,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 Log.d(TAG, playingSong!!.title)
                 songPosn = songList.indexOf(playingSong)
                 setPlayingList(songList)
-                musicSrv!!.setSong(songPosn)
+                setSongPosition(songPosn)
                 setPlayingSong(songList[songPosn])
             }
             if (v == binding.playingPanel.btnRepeat) {
@@ -931,7 +935,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (playbackPaused) {
                 playbackPaused = false
             }
-            songPosn = musicSrv!!.songPosn
             musicBound = fromList
             fromButton = true
             binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
@@ -949,7 +952,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (playbackPaused) {
                 playbackPaused = false
             }
-            songPosn = musicSrv!!.songPosn
             musicBound = fromList
             fromButton = true
             binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
@@ -1179,7 +1181,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 setPlayingList(songList)
                 musicSrv!!.setShuffle(lastShuffle)
                 musicSrv!!.checkRepeat(lastRepeat, lastRepeatOne)
-                musicSrv!!.setSong(lastSongId.toInt())
+                setSongPosition(lastSongId.toInt())
             }
             musicSrv!!.setUIControls(
                 binding.playingPanel.seekBar,
@@ -1429,24 +1431,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInPlaylists() {
         val songListByName = songListByName.value!!
         if (songListByName.size > 0) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val playListArrayList: MutableList<String> = ArrayList()
-                playListArrayList.add("NormalSongs")
-                playListArrayList.add("Songs")
-                for (playListName in playListArrayList) {
-                    val songList = tinydb.getListObject(playListName, Song::class.java)
-                    val iterator = songList.iterator()
-                    while (iterator.hasNext()) {
-                        val value = iterator.next()
-                        if (!songListByName.contains(value)) {
-                            iterator.remove()
-                        }
+            val playListArrayList: MutableList<String> = ArrayList()
+            playListArrayList.add("NormalSongs")
+            playListArrayList.add("Songs")
+            for (playListName in playListArrayList) {
+                val songList = tinydb.getListObject(playListName, Song::class.java)
+                val iterator = songList.iterator()
+                while (iterator.hasNext()) {
+                    val value = iterator.next()
+                    if (!songListByName.contains(value)) {
+                        iterator.remove()
                     }
-                    if (playListName == "Songs" && songList.size == 0) {
-                        manage.storeInfo(getString(R.string.Songs), false)
-                    }
-                    tinydb.putListObject(playListName, songList)
                 }
+                if (playListName == "Songs" && songList.size == 0) {
+                    manage.storeInfo(getString(R.string.Songs), false)
+                }
+                tinydb.putListObject(playListName, songList)
             }
 
             viewModel.removeSongFromPlaylist()
@@ -1458,7 +1458,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         songsToRemove.add(s)
                     }
                 }
-                deletionProcess = true
                 for (s in songsToRemove) {
                     removeFromPlayingList(s)
                 }

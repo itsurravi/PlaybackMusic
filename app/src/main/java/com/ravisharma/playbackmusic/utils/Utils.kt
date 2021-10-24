@@ -6,6 +6,7 @@ import com.ravisharma.playbackmusic.model.Song
 
 //current playing song
 var curPlayingSong: MutableLiveData<Song> = MutableLiveData()
+    private set
 
 fun setPlayingSong(song: Song) {
     curPlayingSong.value = song
@@ -14,6 +15,7 @@ fun setPlayingSong(song: Song) {
 
 //playing song position
 var curPlayingSongPosition: MutableLiveData<Int> = MutableLiveData()
+    private set
 
 fun setSongPosition(i: Int) {
     curPlayingSongPosition.value = i
@@ -31,6 +33,7 @@ fun getPlayingListData(): MutableLiveData<ArrayList<Song>> {
 }
 
 fun removeFromPlayingList(song: Song) {
+    deletionProcess = true
     val list = curPlayingList.value
     list?.remove(song)
     curPlayingList.value = list
@@ -49,7 +52,7 @@ fun addSongToPlayingList(song: Song) {
     list?.add(song)
     curPlayingList.value = list
 }
-
+var deletionProcess = false
 //audio file Uri for delete
 var DELETE_URI : Uri? = null
 var swiped : Boolean = false

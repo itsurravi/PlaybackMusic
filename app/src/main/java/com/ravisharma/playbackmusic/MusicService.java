@@ -164,7 +164,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void setSong(int songIndex) {
         songPosn = songIndex;
-        UtilsKt.setSongPosition(songPosn);
     }
 
     private void start() {
@@ -280,7 +279,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             player.prepare();
             UtilsKt.setPlayingSong(playSong);
 
-            MainActivity.Companion.getInstance().songPosn = songPosn;
+            UtilsKt.setSongPosition(songPosn);
 
             mostPlayedRepository.addSongToMostPlayed(playSong);
             lastPlayedRepository.addSongToLastPlayed(playSong);
