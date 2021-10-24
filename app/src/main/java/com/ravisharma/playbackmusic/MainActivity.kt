@@ -30,8 +30,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -52,7 +50,6 @@ import com.ravisharma.playbackmusic.database.model.LastPlayed
 import com.ravisharma.playbackmusic.database.model.MostPlayed
 import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository
 import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.databinding.ActivityMainBinding
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerModel
@@ -89,42 +86,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private val viewModel: MainActivityViewModel by viewModels()
 
-    private var adView: AdView? = null
-    private var latestVersion: String? = null
-    private var currentVersion: String? = null
-
-    @JvmField
-    var sessionId = 0
-    private lateinit var lastSongId: String
-    private var playingDuration: String? = null
-    private var lastShuffle = false
-    private var lastRepeat = false
-    private var lastRepeatOne = false
-    
-    var musicSrv: MusicService? = null
-
-    var musicBound = false
-    var serviceInitialized = false
-    var fromList = false
-    var started = false
-
-    var fromButton = false
-
-    @JvmField
-    var played = false
-    var playbackPaused = false
-    var TIMER = false
-    private var doubleBackToExitPressedOnce = false
-
-    var songList: ArrayList<Song> = ArrayList()
-    var normalList: ArrayList<Song> = ArrayList()
-
-    private var songPosn = 0
-    private var playIntent: Intent? = null
-    private var pi: PendingIntent? = null
-
-    private var am: AlarmManager? = null
-
     @Inject
     lateinit var manage: PrefManager
 
@@ -136,6 +97,41 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     @Inject
     lateinit var mostPlayedRepository: MostPlayedRepository
+
+    private var adView: AdView? = null
+    private var latestVersion: String? = null
+    private var currentVersion: String? = null
+
+    private var alert_seek_max = 5
+    private var alert_seek_step = 1
+    private var alert_current_value = 0
+    private var trackCount = 0
+
+    private lateinit var seekValue: Array<String>
+
+    var timerSelectedValue = true
+
+    private lateinit var lastSongId: String
+    private var playingDuration: String? = null
+    private var lastShuffle = false
+    private var lastRepeat = false
+    private var lastRepeatOne = false
+    
+    var musicSrv: MusicService? = null
+
+    var started = false
+
+    private var TIMER = false
+    private var doubleBackToExitPressedOnce = false
+
+    var songList: ArrayList<Song> = ArrayList()
+    var normalList: ArrayList<Song> = ArrayList()
+
+    private var songPosn = 0
+    private var playIntent: Intent? = null
+    private var pi: PendingIntent? = null
+
+    private var am: AlarmManager? = null
 
     @JvmField
     var mEqualizer: Equalizer? = null
@@ -154,6 +150,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     @JvmField
     var mediaSession: MediaSession? = null
 
+    @JvmField
+    var sessionId = 0
+
+    @JvmField
+    var played = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -277,14 +278,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             Log.d("Playing", songList.size.toString() + "")
             setPlayingList(songList)
             if (position != null) {
-                if (songList.size == 0) {
-                    start = false
-                } else if (songList.size <= position.toInt()) {
-                    songPosn = 0
-                    setSongPosition(songPosn)
-                } else {
-                    songPosn = position.toInt()
-                    setSongPosition(songPosn)
+                when {
+                    songList.size == 0 ->{
+                        start = false
+                    }
+                    songList.size <= position.toInt() ->{
+                        songPosn = 0
+                        setSongPosition(songPosn)
+                    }
+                    else -> {
+                        songPosn = position.toInt()
+                        setSongPosition(songPosn)
+                    }
                 }
             }
         }
@@ -423,7 +428,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     ) {
         songList = songsArrayList.clone() as ArrayList<Song>
         songPosn = position
-        fromList = true
         if (!nowPlaying) {
             normalList.clear()
             binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
@@ -438,11 +442,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         musicSrv!!.setPlayingPosition(playingDuration)
         musicSrv!!.playSong()
 
-        if (playbackPaused) {
-            playbackPaused = false
-        }
-
-        musicBound = true
         played = true
         started = true
         binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
@@ -450,28 +449,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     fun btnPlayPause() {
-        if (fromList) {
-            if (musicBound) {
-                pause()
-            } else {
-                start()
-                played = true
-            }
+        if(musicSrv!!.isSongPlaying){
+            pause()
         } else {
-            if (musicBound) {
-                try {
-                    if (!fromButton) {
-                        musicSrv!!.playSong()
-                        fromButton = true
-                    }
-                    start()
-                    played = true
-                } catch (e: Exception) {
-                    showSnackBar("Song is deleted or invalid")
-                }
-            } else {
-                pause()
+            if(!played) {
+                musicSrv!!.playSong()
             }
+            start()
+            played = true
         }
     }
 
@@ -702,13 +687,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     fun setPlayIcons() {
         binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
         binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
-        musicBound = !musicBound
     }
 
     fun setPauseIcons() {
         binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
         binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
-        musicBound = !musicBound
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -774,15 +757,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             showSnackBar("Unable to find market app")
         }
     }
-
-    private var alert_seek_max = 5
-    private var alert_seek_step = 1
-    private var alert_current_value = 0
-    private var trackCount = 0
-
-    private lateinit var seekValue: Array<String>
-
-    var timerSelectedValue = true
 
     private fun showTimer() {
         val timerArray: Array<String> = resources.getStringArray(R.array.timer)
@@ -930,13 +904,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     //play next
     fun playNext() {
         if (songList.size > 0) {
+            playingDuration = "0"
+            musicSrv!!.setPlayingPosition(playingDuration)
             musicSrv!!.playNext()
             played = true
-            if (playbackPaused) {
-                playbackPaused = false
-            }
-            musicBound = fromList
-            fromButton = true
             binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
             binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
         } else {
@@ -947,13 +918,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     //play previous
     fun playPrev() {
         if (songList.size > 0) {
+            playingDuration = "0"
+            musicSrv!!.setPlayingPosition(playingDuration)
             musicSrv!!.playPrev()
             played = true
-            if (playbackPaused) {
-                playbackPaused = false
-            }
-            musicBound = fromList
-            fromButton = true
             binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
             binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
         } else {
@@ -973,7 +941,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
             if (binding.viewPager.currentItem > 0) {
                 binding.viewPager.setCurrentItem(0, true)
-            } else if (musicSrv!! != null && musicSrv!!.isPng) {
+            } else if (musicSrv!! != null && musicSrv!!.isSongPlaying) {
                 moveTaskToBack(true)
             } else {
                 if (doubleBackToExitPressedOnce) {
@@ -1046,7 +1014,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun pause() {
-        playbackPaused = true
         binding.playingPanel.txtSongName.isSelected = false
         binding.playingPanel.txtSongArtist.isSelected = false
         musicSrv!!.pausePlayer()
@@ -1188,17 +1155,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 binding.playingPanel.currentPosition,
                 binding.playingPanel.totalDuration
             )
-            musicBound = true
             loadEqualizerSettings()
             initMediaSessions()
-            serviceInitialized = true
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             Log.e(TAG, "onServiceDisconnected: Service Disconnected")
             killApp()
-            musicBound = false
-            serviceInitialized = false
         }
     }
 

@@ -184,7 +184,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //Invoked when the audio focus of the system is updated.
         switch (focusState) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (!isPng()) {
+                if (!isSongPlaying()) {
                     if (ongoingCall) {
                         start();
                         ongoingCall = false;
@@ -194,7 +194,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-                if (isPng()) {
+                if (isSongPlaying()) {
                     pause();
                 }
 
@@ -203,7 +203,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 // Lost focus for a short time, but we have to stop
                 // playback. We don't release the media player because playback
                 // is likely to resume
-                if (isPng()) {
+                if (isSongPlaying()) {
                     player.setVolume(0.1f, 0.1f);
                     pause();
                     ongoingCall = true;
@@ -212,7 +212,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
                 // Lost focus for a short time, but it's ok to keep playing
                 // at an attenuated level
-                if (isPng()) {
+                if (isSongPlaying()) {
                     player.setVolume(0.1f, 0.1f);
                 }
                 break;
@@ -234,7 +234,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private final BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isPng()) {
+            if (isSongPlaying()) {
                 pause();
             }
         }
@@ -343,9 +343,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public void updateNotification() {
         if (player != null) {
-            if (isPng()) {
+            if (isSongPlaying()) {
                 togglePlayPauseNotification(true);
-            } else if (!isPng()) {
+            } else if (!isSongPlaying()) {
                 togglePlayPauseNotification(false);
             }
         }
@@ -515,7 +515,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         });
     }
 
-    public boolean isPng() {
+    public boolean isSongPlaying() {
         if (player != null) {
             return player.isPlaying();
         } else {
@@ -524,7 +524,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void pausePlayer() {
-        if (isPng()) player.pause();
+        if (isSongPlaying()) player.pause();
         if (fromButton) {
             createMediaStyleNotification();
         }
@@ -536,7 +536,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public void go() {
-        if (!isPng()) {
+        if (!isSongPlaying()) {
             requestAudioFocus();
             player.start();
         }
