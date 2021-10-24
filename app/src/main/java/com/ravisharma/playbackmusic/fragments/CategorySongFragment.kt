@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -37,14 +38,17 @@ import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 const val QUERY_ALBUM = "Album"
 const val QUERY_ARTIST = "Artist"
 const val PLAYLIST = "Playlist"
 
+@AndroidEntryPoint
 class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, CategoryAdapter.OnItemLongClicked {
 
     private var adView: AdView? = null
@@ -53,14 +57,12 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     private var category: String? = null
     private var adUnitId: String? = null
 
-    private lateinit var repository: PlaylistRepository
-
     private var songList: ArrayList<Song> = ArrayList()
 
     private lateinit var binding: ActivityCategorySongBinding
     private lateinit var playlistBinding: PlaylistsLayoutBinding
 
-    private lateinit var viewModel: CategorySongViewModel
+    private val viewModel: CategorySongViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,8 +101,6 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         // Inflate the layout for this fragment
         binding = ActivityCategorySongBinding.inflate(inflater, container, false)
         playlistBinding = binding.playlistLayout
-
-        viewModel = ViewModelProvider(this).get(CategorySongViewModel::class.java)
 
         return binding.root
     }
@@ -159,7 +159,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 })
             }
             "Last Played" -> {
-                viewModel.getLastPlayedSongsList(requireContext()).observe(viewLifecycleOwner, { lastPlayedList ->
+                viewModel.getLastPlayedSongsList().observe(viewLifecycleOwner, { lastPlayedList ->
                     songList.clear()
                     for ((song) in lastPlayedList) {
                         songList.add(song)
@@ -168,7 +168,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 })
             }
             "Most Played" -> {
-                viewModel.getMostPlayedSongsList(requireContext()).observe(viewLifecycleOwner, { mostPlayedList ->
+                viewModel.getMostPlayedSongsList().observe(viewLifecycleOwner, { mostPlayedList ->
                     songList.clear()
                     for ((song) in mostPlayedList) {
                         songList.add(song)
@@ -177,8 +177,8 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 })
             }
             else -> {
-                repository = PlaylistRepository(context)
-                repository.getPlaylistSong(actName!!).observe(viewLifecycleOwner, { playlists ->
+//                repository = PlaylistRepository(context)
+                viewModel.getPlaylistSong(actName!!).observe(viewLifecycleOwner, { playlists ->
                     songList.clear()
                     for ((_, _, song) in playlists) {
                         songList.add(song)
@@ -236,7 +236,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
 
     override fun onItemClick(position: Int) {
         val onFragmentItemClicked = activity as OnFragmentItemClicked?
-        onFragmentItemClicked!!.OnFragmentItemClick(position, songList, false)
+        onFragmentItemClicked!!.onFragmentItemClick(position, songList, false)
     }
 
     override fun onItemLongClick(position: Int) {
@@ -279,7 +279,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 1 -> addNextSongToPlayingList(songList[mposition])
                 2 -> addSongToPlayingList(songList[mposition])
                 3 ->                         // Delete Song Code
-                    repository.removeSong(actName, songList[mposition].id)
+                    viewModel.removeSong(actName, songList[mposition].id)
                 4 -> {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "audio/*"
@@ -323,7 +323,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 1 -> {
                     val list = arrayListOf(songList[mPosition])
                     val onFragmentItemClicked = activity as OnFragmentItemClicked?
-                    onFragmentItemClicked!!.OnFragmentItemClick(0, list, false)
+                    onFragmentItemClicked!!.onFragmentItemClick(0, list, false)
                 }
                 2 -> {
                     addNextSongToPlayingList(songList[mPosition])
@@ -399,7 +399,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                                 val intentSender = recoverableSecurityException.userAction
                                         .actionIntent.intentSender
                                 try {
-                                    deleteUri = uri
+                                    DELETE_URI = uri
                                     startIntentSenderForResult(intentSender, 20123,
                                             null, 0, 0, 0, null)
                                 } catch (ex: SendIntentException) {
@@ -439,6 +439,6 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     }
 
     interface OnFragmentItemClicked {
-        fun OnFragmentItemClick(position: Int, songsArrayList: ArrayList<Song>, nowPlaying: Boolean)
+        fun onFragmentItemClick(position: Int, songsArrayList: ArrayList<Song>, nowPlaying: Boolean)
     }
 }

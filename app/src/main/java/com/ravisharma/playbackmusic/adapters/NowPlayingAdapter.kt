@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic.adapters
 
-import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -16,7 +15,7 @@ import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.utils.StartDragListener
 import java.util.concurrent.TimeUnit
 
-class NowPlayingAdapter(private var c: Context, private var dragListener: StartDragListener) : RecyclerView.Adapter<NowPlayingAdapter.ViewHolder>() {
+class NowPlayingAdapter(private var dragListener: StartDragListener) : RecyclerView.Adapter<NowPlayingAdapter.ViewHolder>() {
 
     private var songs: ArrayList<Song> = ArrayList()
 

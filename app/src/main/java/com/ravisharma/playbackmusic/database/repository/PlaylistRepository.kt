@@ -7,31 +7,22 @@ import androidx.lifecycle.MutableLiveData
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.model.Playlist
+import javax.inject.Inject
 
-class PlaylistRepository(context: Context?) {
-    //    private val setupDao: SetupDao
+class PlaylistRepository @Inject constructor(
     private val playlistDao: PlaylistDao
-    private var playlistSong: LiveData<List<Playlist>> = MutableLiveData()
-
-    private val database: PlaylistDatabase
-
-    init {
-        database = PlaylistDatabase.getInstance(context)
-        playlistDao = database.playlistDao()
-    }
-
+) {
     //Playlist Operations
+    val allPlaylistSongs: List<Playlist>
+        get() = playlistDao.allPlaylistSongs
+
     fun getPlaylistSong(playlistName: String): LiveData<List<Playlist>> {
-        playlistSong = playlistDao.getPlaylistSong(playlistName)
-        return playlistSong
+        return playlistDao.getPlaylistSong(playlistName)
     }
 
     fun getPlaylist(playlistName: String): List<Playlist> {
         return playlistDao.getPlaylist(playlistName)
     }
-
-    val allPlaylistSongs: List<Playlist>
-        get() = playlistDao.allPlaylistSongs
 
     fun isSongExist(playlistName: String, songId: Long): Long {
         return playlistDao.isSongExist(playlistName, songId)

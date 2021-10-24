@@ -25,11 +25,13 @@ import android.util.Log
 import android.view.*
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -66,6 +68,7 @@ import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByN
 import com.ravisharma.playbackmusic.utils.*
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import java.io.File
@@ -73,8 +76,10 @@ import java.io.IOException
 import java.lang.Runnable
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragmentItemClicked,
     CategorySongFragment.OnFragmentItemClicked {
 
@@ -82,7 +87,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var viewModel: MainActivityViewModel
+    private val viewModel: MainActivityViewModel by viewModels()
 
     private var adView: AdView? = null
     private var latestVersion: String? = null
@@ -121,9 +126,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private var am: AlarmManager? = null
 
-    private lateinit var manage: PrefManager
-    private lateinit var tinydb: TinyDB
-    private lateinit var repository: PlaylistRepository
+    @Inject
+    lateinit var manage: PrefManager
+
+    @Inject
+    lateinit var tinydb: TinyDB
+
+    @Inject
+    lateinit var lastPlayedRepository : LastPlayedRepository
+
+    @Inject
+    lateinit var mostPlayedRepository: MostPlayedRepository
 
     @JvmField
     var mEqualizer: Equalizer? = null
@@ -187,15 +200,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         }.attach()
 
-        manage = PrefManager(applicationContext)
-        tinydb = TinyDB(this)
-        repository = PlaylistRepository(this)
-
-        val viewModelFactory = MainViewModelFactory(repository, tinydb)
-
-        viewModel = ViewModelProvider(this, viewModelFactory).get(
-            MainActivityViewModel::class.java
-        )
+//        repository = PlaylistRepository(this)
 
         getPlayingListData().observe(this, { songs ->
             songList = songs
@@ -370,12 +375,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             ) {
                 val position = data.getIntExtra("position", -1)
                 val songsArrayList: ArrayList<Song> = data.getParcelableArrayListExtra("songList")!!
-                OnFragmentItemClick(position, songsArrayList, false)
+                onFragmentItemClick(position, songsArrayList, false)
             }
 
             if (requestCode == NOW_PLAYING && data != null) {
                 val position = data.getIntExtra("position", -1)
-                OnFragmentItemClick(position, songList, true)
+                onFragmentItemClick(position, songList, true)
             }
 
             if (!(requestCode == NOW_PLAYING
@@ -385,8 +390,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         || requestCode == SEARCH_RESULT
                         || requestCode == PLAYLIST)
             ) {
-                if (deleteUri != null) {
-                    val file = File(deleteUri!!.path!!)
+                if (DELETE_URI != null) {
+                    val file = File(DELETE_URI!!.path!!)
                     if (file.exists()) {
                         file.delete()
                         if (file.exists()) {
@@ -397,8 +402,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                             }
                         }
                     }
-                    contentResolver.delete(deleteUri!!, null, null)
-                    deleteUri = null
+                    contentResolver.delete(DELETE_URI!!, null, null)
+                    DELETE_URI = null
                     for (fragment in supportFragmentManager.fragments) {
                         fragment.onActivityResult(requestCode, resultCode, data)
                     }
@@ -407,7 +412,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
-    override fun OnFragmentItemClick(
+    override fun onFragmentItemClick(
         position: Int,
         songsArrayList: ArrayList<Song>,
         nowPlaying: Boolean
@@ -780,16 +785,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         val trackArray: Array<String> = resources.getStringArray(R.array.tracks)
         val dialog = AlertDialog.Builder(this, R.style.AlertDialogCustom)
         val dialogBinding: AlertTimerBinding = AlertTimerBinding.inflate(layoutInflater)
-//        val v = LayoutInflater.from(this).inflate(R.layout.alert_timer, null)
+
         dialog.setView(dialogBinding.root)
-//        val dialogBinding.txtTimer = v.findViewById<TextView>(R.id.dialogBinding.txtTimer)
-//        val dialogBinding.txtTracks = v.findViewById<TextView>(R.id.dialogBinding.txtTracks)
-//        val dialogBinding.txtSeekValue = v.findViewById<TextView>(R.id.dialogBinding.txtSeekValue)
-//        val dialogBinding.txtSave = v.findViewById<TextView>(R.id.dialogBinding.txtSave)
-//        val dialogBinding.txtOnOff = v.findViewById<TextView>(R.id.dialogBinding.txtOnOff)
-//        val dialogBinding.alertSeekBar = v.findViewById<SeekBar>(R.id.dialogBinding.alertSeekBar)
-//        val dialogBinding.timerSwitch: SwitchCompat = v.findViewById(R.id.dialogBinding.timerSwitch)
-//        val dialogBinding.timerBlocker = v.findViewById<FrameLayout>(R.id.dialogBinding.timerBlocker)
         dialogBinding.alertSeekBar.max = alert_seek_max / alert_seek_step
         val alertDialog = dialog.create()
         alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -1405,7 +1402,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
-    var observer: ContentObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
+    private var observer: ContentObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
         override fun onChange(selfChange: Boolean) {
             super.onChange(selfChange)
             val provider = SongsProvider()
@@ -1432,30 +1429,28 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInPlaylists() {
         val songListByName = songListByName.value!!
         if (songListByName.size > 0) {
-            val playListArrayList: MutableList<String> = ArrayList()
-            playListArrayList.add("NormalSongs")
-            playListArrayList.add("Songs")
-            for (playListName in playListArrayList) {
-                val songList = tinydb.getListObject(playListName, Song::class.java)
-                val iterator = songList.iterator()
-                while (iterator.hasNext()) {
-                    val value = iterator.next()
-                    if (!songListByName.contains(value)) {
-                        iterator.remove()
+            CoroutineScope(Dispatchers.IO).launch {
+                val playListArrayList: MutableList<String> = ArrayList()
+                playListArrayList.add("NormalSongs")
+                playListArrayList.add("Songs")
+                for (playListName in playListArrayList) {
+                    val songList = tinydb.getListObject(playListName, Song::class.java)
+                    val iterator = songList.iterator()
+                    while (iterator.hasNext()) {
+                        val value = iterator.next()
+                        if (!songListByName.contains(value)) {
+                            iterator.remove()
+                        }
                     }
-                }
-                if (playListName == "Songs" && songList.size == 0) {
-                    val manage = PrefManager(this)
-                    manage.storeInfo(getString(R.string.Songs), false)
-                }
-                tinydb.putListObject(playListName, songList)
-            }
-            val playlists = repository.allPlaylistSongs
-            for ((_, _, s) in playlists) {
-                if (!songListByName.contains(s)) {
-                    repository.removeSong(s.id)
+                    if (playListName == "Songs" && songList.size == 0) {
+                        manage.storeInfo(getString(R.string.Songs), false)
+                    }
+                    tinydb.putListObject(playListName, songList)
                 }
             }
+
+            viewModel.removeSongFromPlaylist()
+
             if (getPlayingListData().value != null) {
                 val songsToRemove = ArrayList<Song>()
                 for (s in getPlayingListData().value!!) {
@@ -1468,9 +1463,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     removeFromPlayingList(s)
                 }
             }
-            val lastPlayedRepository = LastPlayedRepository(this)
+
             lastPlayedRepository.getLastPlayedSongsList()
-                .observe(this, { lastPlayed: List<LastPlayed>? ->
+                .observe(this@MainActivity, { lastPlayed: List<LastPlayed>? ->
                     if (lastPlayed != null) {
                         for ((s) in lastPlayed) {
                             if (!songListByName.contains(s)) {
@@ -1479,9 +1474,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         }
                     }
                 })
-            val mostPlayedRepository = MostPlayedRepository(this)
+
             mostPlayedRepository.getMostPlayedSongs()
-                .observe(this, { mostPlayed: List<MostPlayed>? ->
+                .observe(this@MainActivity, { mostPlayed: List<MostPlayed>? ->
                     if (mostPlayed != null) {
                         for ((s) in mostPlayed) {
                             if (!songListByName.contains(s)) {

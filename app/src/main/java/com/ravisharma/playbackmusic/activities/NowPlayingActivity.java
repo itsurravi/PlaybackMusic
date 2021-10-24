@@ -46,6 +46,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class NowPlayingActivity extends AppCompatActivity implements NowPlayingAdapter.OnItemClicked, StartDragListener {
 
     private FrameLayout adContainerView;
@@ -60,7 +65,9 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
     private TextView songTitle, songArtist, songDuration;
 
     private int curpos;
-    private PlaylistRepository repository;
+
+    @Inject
+    public PlaylistRepository repository;
 
     private Song playingSong;
     private ArrayList<Song> playingList;
@@ -79,7 +86,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
 
         playingList = new ArrayList<>();
 
-        repository = new PlaylistRepository(this);
+//        repository = new PlaylistRepository(this);
 
         Bundle b = getIntent().getExtras();
         curpos = b.getInt("songPos");
@@ -168,7 +175,7 @@ public class NowPlayingActivity extends AppCompatActivity implements NowPlayingA
         recyclerView = findViewById(R.id.song_list);
         recyclerView.setHasFixedSize(true);
 
-        adapter = new NowPlayingAdapter(this, this);
+        adapter = new NowPlayingAdapter(this);
         recyclerView.setAdapter(adapter);
 
         layoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);

@@ -1,7 +1,5 @@
 package com.ravisharma.playbackmusic.fragments
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,7 +44,8 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
             }
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         }
-        albumList.observe(this, { albums ->
+
+        albumList.observe(viewLifecycleOwner, { albums ->
             if (albums.size > 0) {
                 albumsList.clear()
                 albumsList.addAll(albums)
@@ -57,11 +56,6 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
     }
 
     override fun onAlbumClick(position: Int) {
-        /*val i = Intent(context, CategorySongActivity::class.java)
-        i.putExtra("albumId", albumsList[position].albumId.toString())
-        i.putExtra("actName", albumsList[position].albumName)
-        activity!!.startActivityForResult(i, MainActivity.ALBUM_SONGS)*/
-
         val bundle = Bundle().apply {
             putString("argType", QUERY_ALBUM)
             putString("albumId", albumsList[position].albumId.toString())

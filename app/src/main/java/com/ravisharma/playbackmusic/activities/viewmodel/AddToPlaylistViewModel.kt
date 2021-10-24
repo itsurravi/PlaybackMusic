@@ -9,23 +9,27 @@ import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.prefrences.PrefManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddToPlaylistViewModel : ViewModel() {
+@HiltViewModel
+class AddToPlaylistViewModel @Inject constructor(
+    private val repository: PlaylistRepository,
+    private val pref : PrefManager
+) : ViewModel() {
 
     private var playlists: MutableLiveData<ArrayList<String>> = MutableLiveData()
 
-    fun getAllPlaylists(context: Context): MutableLiveData<ArrayList<String>> {
+    fun getAllPlaylists(): MutableLiveData<ArrayList<String>> {
         viewModelScope.launch {
-            val p = PrefManager(context)
-            playlists.value = p.allPlaylist
+            playlists.value = pref.allPlaylist
         }
 
         return playlists
     }
 
     fun addToPlaylist(context: Context, playListName: String, song: Song) {
-        val repository = PlaylistRepository(context)
         viewModelScope.launch {
             val exist: Long = repository.isSongExist(playListName, song.id)
             if (exist > 0) {

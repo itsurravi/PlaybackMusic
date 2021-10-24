@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import android.widget.TextView.OnEditorActionListener
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -23,17 +24,18 @@ import com.ravisharma.playbackmusic.adapters.SongAdapter
 import com.ravisharma.playbackmusic.adapters.SongAdapter.OnItemLongClicked
 import com.ravisharma.playbackmusic.databinding.ActivitySearchBinding
 import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.utils.deleteUri
+import com.ravisharma.playbackmusic.utils.DELETE_URI
 import com.ravisharma.playbackmusic.utils.longclick.LongClickItems
 import com.ravisharma.playbackmusic.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), SongAdapter.OnItemClicked, OnItemLongClicked {
     private var adView: AdView? = null
-    private var adapter: SongAdapter? = null
     private var songList: ArrayList<Song> = ArrayList()
-    private lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModels()
     private var mposition = 0
 
     private lateinit var binding: ActivitySearchBinding
@@ -43,8 +45,6 @@ class SearchActivity : AppCompatActivity(), SongAdapter.OnItemClicked, OnItemLon
         binding = ActivitySearchBinding.inflate(LayoutInflater.from(this))
         setTheme(R.style.SearchTheme)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(this).get(SearchViewModel::class.java)
 
         initRecyclerView()
         initListeners()
@@ -72,7 +72,7 @@ class SearchActivity : AppCompatActivity(), SongAdapter.OnItemClicked, OnItemLon
             layoutManager = LinearLayoutManager(this@SearchActivity, RecyclerView.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
-            adapter = SongAdapter(this@SearchActivity).apply {
+            adapter = SongAdapter().apply {
                 setOnClick(this@SearchActivity)
                 setOnLongClick(this@SearchActivity)
             }
@@ -137,8 +137,8 @@ class SearchActivity : AppCompatActivity(), SongAdapter.OnItemClicked, OnItemLon
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            if (deleteUri != null) {
-                contentResolver.delete(deleteUri!!, null, null)
+            if (DELETE_URI != null) {
+                contentResolver.delete(DELETE_URI!!, null, null)
                 songList.removeAt(mposition)
                 (binding.songList.adapter as SongAdapter).setList(songList)
             }

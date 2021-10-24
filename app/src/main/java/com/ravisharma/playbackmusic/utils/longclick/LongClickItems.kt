@@ -177,7 +177,7 @@ class LongClickItems {
                             val intentSender = recoverableSecurityException.userAction
                                     .actionIntent.intentSender
                             try {
-                                deleteUri = uri
+                                DELETE_URI = uri
                                 (context as Activity).startIntentSenderForResult(intentSender, 20123,
                                         null, 0, 0, 0, null)
                             } catch (ex: SendIntentException) {

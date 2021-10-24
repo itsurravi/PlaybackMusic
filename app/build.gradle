@@ -4,6 +4,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'dagger.hilt.android.plugin'
 
 repositories {
     maven {
@@ -95,5 +96,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation "io.coil-kt:coil:1.4.0"
+
+    //dagger hilt dependency
+    implementation "com.google.dagger:hilt-android:2.38.1"
+    kapt "com.google.dagger:hilt-compiler:2.38.1"
+    // Activity KTX for viewModels()
+    implementation "androidx.activity:activity-ktx:1.3.1"
+    implementation 'androidx.fragment:fragment-ktx:1.3.6'
 }
 

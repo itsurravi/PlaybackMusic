@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +18,6 @@ import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.artistList
 import com.ravisharma.playbackmusic.utils.openFragment
 import java.util.*
 
-/**
- * A simple [Fragment] subclass.
- */
 class ArtistFragment : Fragment(), OnArtistClicked {
 
     private var artistsList: ArrayList<Artist> = ArrayList()
@@ -46,7 +42,7 @@ class ArtistFragment : Fragment(), OnArtistClicked {
             }
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         }
-        artistList.observe(this, { artists ->
+        artistList.observe(viewLifecycleOwner, { artists ->
             if (artists.size > 0) {
                 artistsList.clear()
                 artistsList.addAll(artists)

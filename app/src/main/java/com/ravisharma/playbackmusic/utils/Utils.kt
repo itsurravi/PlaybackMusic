@@ -51,7 +51,7 @@ fun addSongToPlayingList(song: Song) {
 }
 
 //audio file Uri for delete
-var deleteUri : Uri? = null
+var DELETE_URI : Uri? = null
 var swiped : Boolean = false
 var moved : Boolean = false
 var fileDelete : Boolean = false

@@ -7,10 +7,14 @@ import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.prefrences.TinyDB
+import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.curPlayingSong
 import com.ravisharma.playbackmusic.utils.curPlayingSongPosition
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MainActivityViewModel(
+@HiltViewModel
+class MainActivityViewModel @Inject constructor(
     private val repository: PlaylistRepository,
     private val tinyDb: TinyDB
 ) : ViewModel() {
@@ -50,5 +54,14 @@ class MainActivityViewModel(
 
     fun addSong(playlist: Playlist) {
         repository.addSong(playlist)
+    }
+
+    fun removeSongFromPlaylist() {
+        val playlists = repository.allPlaylistSongs
+        for ((_, _, s) in playlists) {
+            if (!songListByName.value!!.contains(s)) {
+                repository.removeSong(s.id)
+            }
+        }
     }
 }

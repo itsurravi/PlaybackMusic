@@ -7,10 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.prefrences.PrefManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PlaylistFragmentViewModel : ViewModel() {
+@HiltViewModel
+class PlaylistFragmentViewModel @Inject constructor(
+    private val repository: PlaylistRepository
+) : ViewModel() {
 
     private var playlists: MutableLiveData<ArrayList<String>> = MutableLiveData()
 
@@ -23,20 +28,17 @@ class PlaylistFragmentViewModel : ViewModel() {
         return playlists
     }
 
-    fun getPlaylist(context: Context, playlistName: String): List<Playlist> {
-        val repository = PlaylistRepository(context)
+    fun getPlaylist(playlistName: String): List<Playlist> {
         return repository.getPlaylist(playlistName)
     }
 
-    fun renamePlaylist(context: Context, oldPlaylistName: String, newPlaylistName: String) {
-        val repository = PlaylistRepository(context)
+    fun renamePlaylist(oldPlaylistName: String, newPlaylistName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.renamePlaylist(oldPlaylistName, newPlaylistName)
         }
     }
 
-    fun removePlaylist(context: Context, playlistName: String) {
-        val repository = PlaylistRepository(context)
+    fun removePlaylist(playlistName: String) {
         repository.removePlaylist(playlistName)
     }
 }

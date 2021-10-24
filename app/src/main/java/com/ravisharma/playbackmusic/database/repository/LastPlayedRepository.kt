@@ -10,16 +10,19 @@ import com.ravisharma.playbackmusic.model.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LastPlayedRepository(context: Context) {
-
+class LastPlayedRepository @Inject constructor(
     private val lastPlayedDao: LastPlayedDao
-    private val database: PlaylistDatabase
+) {
 
-    init {
-        database = PlaylistDatabase.getInstance(context)
-        lastPlayedDao = database.lastPlayedDao()
-    }
+//    private val lastPlayedDao: LastPlayedDao
+//    private val database: PlaylistDatabase
+
+//    init {
+//        database = PlaylistDatabase.getInstance(context)
+//        lastPlayedDao = database.lastPlayedDao()
+//    }
 
     fun addSongToLastPlayed(song: Song) {
         CoroutineScope(Dispatchers.IO).launch {

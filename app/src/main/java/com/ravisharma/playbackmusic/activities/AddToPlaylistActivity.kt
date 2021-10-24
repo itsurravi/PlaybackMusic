@@ -2,9 +2,7 @@ package com.ravisharma.playbackmusic.activities
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.ImageView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -23,16 +21,18 @@ import com.ravisharma.playbackmusic.databinding.ActivityAddToPlaylistBinding
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
+@AndroidEntryPoint
 class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylistLongClicked {
     private var adView: AdView? = null
     private var song: Song? = null
 
     private lateinit var playlistAdapter: PlaylistAdapter
     private lateinit var list: ArrayList<String>
-    private lateinit var viewModel: AddToPlaylistViewModel
+
+    private val viewModel: AddToPlaylistViewModel by viewModels()
 
     private lateinit var binding: ActivityAddToPlaylistBinding
 
@@ -43,8 +43,6 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
 
         song = intent.getParcelableExtra("Song")
         list = ArrayList()
-
-        viewModel = ViewModelProvider(this).get(AddToPlaylistViewModel::class.java)
 
         initRecyclerView()
         setUpArrayList()
@@ -67,12 +65,13 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
     }
 
     private fun initRecyclerView() {
-        playlistAdapter = PlaylistAdapter(this, list)
-        playlistAdapter.setOnPlaylistClick(this)
-        playlistAdapter.setOnPlaylistLongClick(this)
+        playlistAdapter = PlaylistAdapter(this, list).apply {
+            setOnPlaylistClick(this@AddToPlaylistActivity)
+            setOnPlaylistLongClick(this@AddToPlaylistActivity)
+        }
 
         binding.playlistRecycler.apply {
-            addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@AddToPlaylistActivity, RecyclerView.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
@@ -81,10 +80,10 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
     }
 
     private fun setUpArrayList() {
-        viewModel.getAllPlaylists(this).observe(this, { strings ->
+        viewModel.getAllPlaylists().observe(this, { strings ->
             list.clear()
             list.addAll(strings!!)
-            binding.playlistRecycler.adapter?.notifyDataSetChanged()
+            playlistAdapter.notifyDataSetChanged()
         })
     }
 

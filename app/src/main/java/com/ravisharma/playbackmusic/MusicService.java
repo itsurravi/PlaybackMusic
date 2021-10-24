@@ -35,6 +35,11 @@ import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
 import com.ravisharma.playbackmusic.model.Song;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
 
@@ -70,8 +75,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     Notification playerNotification;
     NotificationManagerCompat notificationManagerCompat;
 
-    private MostPlayedRepository mostPlayedRepository;
-    private LastPlayedRepository lastPlayedRepository;
+    @Inject
+    public MostPlayedRepository mostPlayedRepository;
+    @Inject
+    public LastPlayedRepository lastPlayedRepository;
+    @Inject
+    public PlaylistRepository repository;
 
     private final IBinder musicBind = new MusicBinder();
 
@@ -103,9 +112,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         //initialize position
         songPosn = 0;
         initMusicPlayer();
-
-        mostPlayedRepository = new MostPlayedRepository(this);
-        lastPlayedRepository = new LastPlayedRepository(this);
 
         registerBecomingNoisyReceiver();
     }
@@ -384,7 +390,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         NotificationCompat.Action favorite;
 
-        PlaylistRepository repository = new PlaylistRepository(this);
         long exist = repository.isSongExist(getString(R.string.favTracks), playingSong.getId());
         if (exist > 0) {
             favorite = new NotificationCompat.Action

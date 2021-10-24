@@ -10,16 +10,11 @@ import com.ravisharma.playbackmusic.model.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MostPlayedRepository(context: Context) {
-
+class MostPlayedRepository @Inject constructor(
     private val mostPlayedDao: MostPlayedDao
-    private val database: PlaylistDatabase
-
-    init {
-        database = PlaylistDatabase.getInstance(context)
-        mostPlayedDao = database.mostPlayedDao()
-    }
+) {
 
     fun addSongToMostPlayed(song: Song) {
         CoroutineScope(Dispatchers.IO).launch {

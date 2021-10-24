@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic.adapters
 
-import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import com.ravisharma.playbackmusic.model.Song
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.concurrent.TimeUnit
 
-class SongAdapter(private var c: Context) : RecyclerView.Adapter<SongAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+class SongAdapter : RecyclerView.Adapter<SongAdapter.ViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private var songs: ArrayList<Song> = ArrayList()
 

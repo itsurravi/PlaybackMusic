@@ -34,7 +34,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SplashScreen extends AppCompatActivity {
 
     public String CHANNEL_ID;
@@ -95,6 +99,13 @@ public class SplashScreen extends AppCompatActivity {
         manage.storeAppVersion(buildVersion);
     }
 
+    @Inject
+    public PlaylistRepository repository;
+    @Inject
+    public LastPlayedRepository lastPlayedRepository;
+    @Inject
+    public MostPlayedRepository mostPlayedRepository;
+
     private void checkInPlaylists() {
         ArrayList<Song> songListByName = SongsProvider.Companion.getSongListByName().getValue();
         if (songListByName != null) {
@@ -110,7 +121,7 @@ public class SplashScreen extends AppCompatActivity {
             }
             TinyDB tinydb = new TinyDB(this);
 
-            PlaylistRepository repository = new PlaylistRepository(this);
+
 
             List<String> playListArrayList = new ArrayList<>();
             playListArrayList.add("NormalSongs");
@@ -142,7 +153,7 @@ public class SplashScreen extends AppCompatActivity {
                 }
             }
 
-            LastPlayedRepository lastPlayedRepository = new LastPlayedRepository(this);
+//            LastPlayedRepository lastPlayedRepository = new LastPlayedRepository(this);
             lastPlayedRepository.getLastPlayedSongsList().observe(this, lastPlayed -> {
                 if (lastPlayed != null) {
                     for (LastPlayed played : lastPlayed) {
@@ -154,7 +165,7 @@ public class SplashScreen extends AppCompatActivity {
                 }
             });
 
-            MostPlayedRepository mostPlayedRepository = new MostPlayedRepository(this);
+//            MostPlayedRepository mostPlayedRepository = new MostPlayedRepository(this);
             mostPlayedRepository.getMostPlayedSongs().observe(this, mostPlayed -> {
                 if (mostPlayed != null) {
                     for (MostPlayed played : mostPlayed) {
@@ -206,7 +217,7 @@ public class SplashScreen extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 runTask();
