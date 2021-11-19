@@ -1,12 +1,13 @@
 package com.ravisharma.playbackmusic
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
+import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -28,6 +29,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -43,7 +46,6 @@ import com.google.gson.Gson
 import com.ravisharma.playbackmusic.MusicService.MusicBinder
 import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.activities.EqualizerActivity
-import com.ravisharma.playbackmusic.activities.NowPlayingActivity
 import com.ravisharma.playbackmusic.activities.SearchActivity
 import com.ravisharma.playbackmusic.broadcast.Timer
 import com.ravisharma.playbackmusic.database.model.LastPlayed
@@ -78,9 +80,10 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragmentItemClicked,
-    CategorySongFragment.OnFragmentItemClicked {
+    NowPlayingFragment.OnFragmentItemClicked, CategorySongFragment.OnFragmentItemClicked {
 
     private var TAG: String? = null
+    private var CHANNEL_ID: String? = null
 
     private lateinit var binding: ActivityMainBinding
 
@@ -93,7 +96,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     lateinit var tinydb: TinyDB
 
     @Inject
-    lateinit var lastPlayedRepository : LastPlayedRepository
+    lateinit var lastPlayedRepository: LastPlayedRepository
 
     @Inject
     lateinit var mostPlayedRepository: MostPlayedRepository
@@ -116,7 +119,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private var lastShuffle = false
     private var lastRepeat = false
     private var lastRepeatOne = false
-    
+
     var musicSrv: MusicService? = null
 
     var started = false
@@ -160,6 +163,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setNotificationChannel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkPermission()
+        } else {
+            runTask()
+        }
+
         instance = this
         TAG = getString(R.string.app_name)
 
@@ -167,9 +179,128 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         binding.toolbar.setTitleTextColor(resources.getColor(R.color.titleColor))
 
         setSupportActionBar(binding.toolbar)
+    }
+
+    private fun setNotificationChannel() {
+        CHANNEL_ID = getString(R.string.music_Service)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val imp = NotificationManager.IMPORTANCE_DEFAULT
+            val c = NotificationChannel(CHANNEL_ID, getString(R.string.PlaybackMusicService), imp)
+            c.setSound(null, null)
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(c)
+        }
+    }
+
+    /*
+     *  Permissions Checking
+     * */
+    private fun checkPermission() {
+        if ((ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WAKE_LOCK
+                    ) == PackageManager.PERMISSION_GRANTED &&
+                    (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED) &&
+                    (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.FOREGROUND_SERVICE
+                    ) == PackageManager.PERMISSION_GRANTED) &&
+                    (ContextCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.MODIFY_AUDIO_SETTINGS
+                    ) == PackageManager.PERMISSION_GRANTED))
+        ) {
+            runTask()
+        } else {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.WAKE_LOCK,
+                    Manifest.permission.FOREGROUND_SERVICE,
+                    Manifest.permission.MODIFY_AUDIO_SETTINGS
+                ), 1
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                runTask()
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    )
+                ) {
+                    finish()
+                } else {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setMessage(getString(R.string.permissionAlert))
+                        .setPositiveButton(
+                            getString(R.string.Grant)
+                        ) { dialog, id ->
+                            finish()
+                            val intent = Intent(
+                                android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                Uri.fromParts(
+                                    getString(R.string.packageName),
+                                    packageName,
+                                    null
+                                )
+                            )
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            startActivity(intent)
+                        }
+                        .setNegativeButton(
+                            getString(R.string.dont)
+                        ) { dialog, id -> finish() }
+                    builder.setCancelable(false)
+                    builder.create().show()
+                }
+            }
+        }
+    }
+
+    private fun runTask() {
+        clearPrefDataOnAppUpdate()
+        val provider = SongsProvider()
+        provider.fetchAllData(contentResolver).observe(this@MainActivity, { aBoolean ->
+            if (aBoolean) {
+                checkInPlaylists()
+                Handler(Looper.getMainLooper()).postDelayed({ setUpMainScreen() }, 1000)
+            }
+        })
+    }
+
+    private fun clearPrefDataOnAppUpdate() {
+        val version = manage.appVersion
+        val buildVersion = BuildConfig.VERSION_CODE
+        if (version == buildVersion) {
+            return
+        }
+        manage.clearAllData()
+        manage.storeAppVersion(buildVersion)
+    }
+
+    private fun setUpMainScreen() {
+        binding.splashScreen.splashLayout.visibility = View.GONE
+        binding.slidingLayout.visibility = View.VISIBLE
 
         setUpView()
-
         registerMediaChangeObserver()
     }
 
@@ -180,11 +311,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
         musicSrv = MusicService()
         binding.playingPanel.playerController.visibility = View.INVISIBLE
-        
+
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
 
         binding.viewPager.apply {
-            offscreenPageLimit = 2
+            offscreenPageLimit = 4
             adapter = sectionsPagerAdapter
         }
         val tabLayout = findViewById<TabLayout>(R.id.tabs)
@@ -279,10 +410,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             setPlayingList(songList)
             if (position != null) {
                 when {
-                    songList.size == 0 ->{
+                    songList.size == 0 -> {
                         start = false
                     }
-                    songList.size <= position.toInt() ->{
+                    songList.size <= position.toInt() -> {
                         songPosn = 0
                         setSongPosition(songPosn)
                     }
@@ -375,30 +506,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            if ((requestCode == ALBUM_SONGS
-                        || requestCode == ARTIST_SONGS
-                        || requestCode == RECENT_ADDED
-                        || requestCode == SEARCH_RESULT
-                        || requestCode == PLAYLIST)
-                && data != null
-            ) {
+            if ((requestCode == SEARCH_RESULT) && data != null) {
                 val position = data.getIntExtra("position", -1)
                 val songsArrayList: ArrayList<Song> = data.getParcelableArrayListExtra("songList")!!
                 onFragmentItemClick(position, songsArrayList, false)
             }
 
-            if (requestCode == NOW_PLAYING && data != null) {
-                val position = data.getIntExtra("position", -1)
-                onFragmentItemClick(position, songList, true)
-            }
-
-            if (!(requestCode == NOW_PLAYING
-                        || requestCode == ALBUM_SONGS
-                        || requestCode == ARTIST_SONGS
-                        || requestCode == RECENT_ADDED
-                        || requestCode == SEARCH_RESULT
-                        || requestCode == PLAYLIST)
-            ) {
+            if (requestCode != SEARCH_RESULT) {
                 if (DELETE_URI != null) {
                     val file = File(DELETE_URI!!.path!!)
                     if (file.exists()) {
@@ -434,12 +548,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.shuffle = false
             setRepeatOff()
             manage.storeInfo(getString(R.string.Shuffle), false)
+        } else {
+            showHomePanel()
         }
-        setPlayingSong(songList[songPosn])
+
         setPlayingList(songList)
         setSongPosition(songPosn)
+        setPlayingSong(songList[songPosn])
+
         playingDuration = "0"
+
         musicSrv!!.setPlayingPosition(playingDuration)
+        musicSrv!!.setList(songList)
+        musicSrv!!.setSong(songPosn)
         musicSrv!!.playSong()
 
         played = true
@@ -449,10 +570,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     fun btnPlayPause() {
-        if(musicSrv!!.isSongPlaying){
+        if (musicSrv!!.isSongPlaying) {
             pause()
         } else {
-            if(!played) {
+            if (!played) {
                 musicSrv!!.playSong()
             }
             start()
@@ -537,9 +658,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne)
             }
             if (v == binding.playingPanel.imgPlaylist) {
-                val i = Intent(this@MainActivity, NowPlayingActivity::class.java)
-                i.putExtra("songPos", songPosn)
-                startActivityForResult(i, NOW_PLAYING)
+                binding.slidingLayout.panelState = PanelState.COLLAPSED
+                if (supportFragmentManager.findFragmentByTag("NowPlayingFragment") != null) {
+                    return
+                }
+                hideHomePanel()
+                val fragmentTransaction = supportFragmentManager.beginTransaction()
+                fragmentTransaction.apply {
+                    replace(R.id.container, NowPlayingFragment(), "NowPlayingFragment")
+                    addToBackStack(null)
+                    commit()
+                }
             }
             if (v == binding.playingPanel.imgFav) {
                 addToFavPlaylist()
@@ -674,6 +803,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
+    fun hideHomePanel() {
+        binding.container.visibility = View.VISIBLE
+        binding.mainLayout.visibility = View.GONE
+    }
+
+    private fun showHomePanel() {
+        supportFragmentManager.popBackStack()
+        binding.container.visibility = View.GONE
+        binding.mainLayout.visibility = View.VISIBLE
+    }
+
     private fun showSlideImage() {
         binding.playingPanel.slideImage.visibility = View.VISIBLE
         binding.playingPanel.slideImage2.visibility = View.INVISIBLE
@@ -724,11 +864,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 shareIntent.type = "text/plain"
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Playback Music Player")
                 var shareMessage = "\nDownload the light weight Playback Music Player app\n\n"
-                shareMessage = """
-                    ${shareMessage}https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}
-                    
-                    
-                    """.trimIndent()
+                shareMessage =
+                    "${shareMessage}https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
                 shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
                 startActivity(Intent.createChooser(shareIntent, "choose one"))
             } catch (e: Exception) {
@@ -950,7 +1087,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
                 doubleBackToExitPressedOnce = true
                 showSnackBar("Tap Again to Exit")
-                
+
                 Handler(Looper.getMainLooper()).postDelayed(
                     { doubleBackToExitPressedOnce = false },
                     2000
@@ -1106,17 +1243,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         })
     }
 
-    fun hideHomePanel() {
-        binding.container.visibility = View.VISIBLE
-        binding.mainLayout.visibility = View.GONE
-    }
-
-    private fun showHomePanel() {
-        supportFragmentManager.popBackStack()
-        binding.container.visibility = View.GONE
-        binding.mainLayout.visibility = View.VISIBLE
-    }
-
     inner class SectionsPagerAdapter internal constructor(fm: FragmentActivity?) :
         FragmentStateAdapter(
             fm!!
@@ -1196,8 +1322,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (latestVersion != null) {
                 var currentVer = versionStringToLong(currentVersion!!)
                 var latestVer = versionStringToLong(latestVersion!!)
-                var len = 0
-                len =
+                val len =
                     if (currentVer.length > latestVer.length) currentVer.length - latestVer.length else latestVer.length - currentVer.length
                 val sb = StringBuilder()
                 for (i in 0 until len) {
@@ -1367,18 +1492,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
-    private var observer: ContentObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
-        override fun onChange(selfChange: Boolean) {
-            super.onChange(selfChange)
-            val provider = SongsProvider()
-            provider.fetchAllData(contentResolver).observe(this@MainActivity, { aBoolean ->
-                if (aBoolean) {
-                    checkInPlaylists()
-                }
-            })
-        }
+    private var observer: ContentObserver =
+        object : ContentObserver(Handler(Looper.getMainLooper())) {
+            override fun onChange(selfChange: Boolean) {
+                super.onChange(selfChange)
+                val provider = SongsProvider()
+                provider.fetchAllData(contentResolver).observe(this@MainActivity, { aBoolean ->
+                    if (aBoolean) {
+                        checkInPlaylists()
+                    }
+                })
+            }
 
-    }
+        }
 
     private fun registerMediaChangeObserver() {
         contentResolver.registerContentObserver(
@@ -1393,10 +1519,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun checkInPlaylists() {
         val songListByName = songListByName.value!!
+        if (songListByName.size <= 1) {
+            manage.storeInfo(getString(R.string.ID), "remove")
+            manage.storeInfo(getString(R.string.Shuffle), false)
+            manage.storeInfo(getString(R.string.Repeat), false)
+            manage.storeInfo(getString(R.string.RepeatOne), false)
+            manage.storeInfo(getString(R.string.Started), false)
+            manage.storeInfo(getString(R.string.Songs), false)
+            manage.storeInfo("position", "remove")
+        }
         if (songListByName.size > 0) {
             val playListArrayList: MutableList<String> = ArrayList()
             playListArrayList.add("NormalSongs")
             playListArrayList.add("Songs")
+
             for (playListName in playListArrayList) {
                 val songList = tinydb.getListObject(playListName, Song::class.java)
                 val iterator = songList.iterator()
@@ -1460,12 +1596,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     companion object {
         private const val PREF_KEY = "equalizer"
         var d = 0
-        const val ALBUM_SONGS = 1
-        const val ARTIST_SONGS = 2
-        const val NOW_PLAYING = 3
-        const val SEARCH_RESULT = 4
-        const val PLAYLIST = 5
-        const val RECENT_ADDED = 6
+        const val SEARCH_RESULT = 2
 
         var instance: MainActivity? = null
             private set

@@ -42,16 +42,6 @@ class LongClickItems {
         showDialog(position)
     }
 
-    constructor(context: Context, position: Int, songList: ArrayList<Song>, type: String?) {
-        this.context = context
-        this.songList = songList
-        this.position = position
-
-        items = context.resources.getStringArray(R.array.longPressNowPlaying)
-        setDialog()
-        showNowPlayingDialog(position)
-    }
-
     private fun setDialog(){
         val ad = ArrayAdapter(context, R.layout.adapter_alert_list, items)
         binding = AlertListBinding.inflate(LayoutInflater.from(context))
@@ -112,34 +102,6 @@ class LongClickItems {
         }
     }
 
-    private fun showNowPlayingDialog(mPosition: Int) {
-        val dialog = AlertDialog.Builder(context)
-        dialog.setView(binding.root)
-        val alertDialog = dialog.create()
-        alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation_2
-        alertDialog.show()
-        binding.list.onItemClickListener = OnItemClickListener { parent, view, position, id ->
-            when (position) {
-                0 -> itemClick(mPosition)
-                1 -> {
-                    val i = Intent(context, AddToPlaylistActivity::class.java)
-                    i.putExtra("Song", songList[mPosition])
-                    context.startActivity(i)
-                }
-                2 -> {
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.type = "audio/*"
-                    val uri = Uri.parse(songList[mPosition].data)
-                    intent.putExtra(Intent.EXTRA_STREAM, uri)
-                    context.startActivity(Intent.createChooser(intent, "Share Via"))
-                }
-                3 -> context.showSongInfo(songList[mPosition])
-            }
-            alertDialog.dismiss()
-        }
-    }
-
     private fun showDeleteSongDialog(song: Song) {
         val b = AlertDialog.Builder(context, R.style.AlertDialogCustom)
         b.setTitle(context.getString(R.string.deleteMessage))
@@ -164,7 +126,6 @@ class LongClickItems {
                     if (fdelete.exists()) {
                         context.contentResolver.delete(uri, null, null)
                         if (position != 1) {
-                            updateList(position)
                             position = -1
                         }
                         context.showToast("Deleted")
@@ -201,9 +162,6 @@ class LongClickItems {
 
     private fun itemClick(position: Int) {
         when (context) {
-            is NowPlayingActivity -> {
-                context.onItemClick(position)
-            }
             is SearchActivity -> {
                 context.onItemClick(position)
             }
@@ -216,14 +174,6 @@ class LongClickItems {
             is SearchActivity -> {
                 context.onItemClick(list)
             }
-        }
-    }
-
-    private fun updateList(mposition: Int) {
-        if (context is NowPlayingActivity) {
-            context.updateList(mposition)
-        } else if (context is SearchActivity) {
-//            ((SearchActivity) context).updateList(mposition);
         }
     }
 }

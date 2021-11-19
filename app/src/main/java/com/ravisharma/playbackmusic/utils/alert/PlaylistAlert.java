@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import com.ravisharma.playbackmusic.R;
-import com.ravisharma.playbackmusic.prefrences.PrefManager;
 
 public class PlaylistAlert {
 
@@ -69,8 +68,6 @@ public class PlaylistAlert {
                         capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
                     }
                     playlistName = capitalizeWord.toString().trim();
-                    PrefManager p = new PrefManager(context);
-                    p.createNewPlaylist(playlistName);
                     listener.OnOkClicked(playlistName);
                 }
                 edPlayListName.setText("");
@@ -130,8 +127,6 @@ public class PlaylistAlert {
                         capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
                     }
                     playlistName = capitalizeWord.toString().trim();
-                    PrefManager p = new PrefManager(context);
-                    p.renamePlaylist(oldPlaylistName, playlistName);
                     listener.OnOkClicked(playlistName);
                 }
                 edPlayListName.setText("");

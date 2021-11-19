@@ -94,7 +94,10 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
 
     override fun onPlaylistLongClick(position: Int) {}
     private fun showCreateListAlert() {
-        val listener = AlertClickListener { setUpArrayList() }
+        val listener = AlertClickListener {
+            viewModel.createNewPlaylist(it)
+            setUpArrayList()
+        }
         val alert = PlaylistAlert(this, listener)
         alert.showCreateListAlert()
     }

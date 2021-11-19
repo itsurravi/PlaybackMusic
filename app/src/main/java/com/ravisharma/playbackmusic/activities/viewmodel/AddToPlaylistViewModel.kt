@@ -41,4 +41,8 @@ class AddToPlaylistViewModel @Inject constructor(
             }
         }
     }
+
+    fun createNewPlaylist(playListName: String) {
+        pref.createNewPlaylist(playListName)
+    }
 }

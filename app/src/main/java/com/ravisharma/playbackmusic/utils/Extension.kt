@@ -1,5 +1,6 @@
 package com.ravisharma.playbackmusic.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -38,7 +39,7 @@ fun Context.showToast(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
-fun AppCompatActivity.openFragment(fragment: Fragment) {
+fun Activity.openFragment(fragment: Fragment) {
     (this as MainActivity).hideHomePanel()
     val fragmentTransaction = supportFragmentManager.beginTransaction()
     fragmentTransaction.apply {

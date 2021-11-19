@@ -65,7 +65,6 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
 
         val fragment = CategorySongFragment()
         fragment.arguments = bundle
-
         (activity as MainActivity).openFragment(fragment)
     }
 }

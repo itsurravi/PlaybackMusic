@@ -20,7 +20,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 39
-        versionName "2.7.2"
+        versionName "2.7.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures{
@@ -43,7 +43,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildToolsVersion = '29.0.3'
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

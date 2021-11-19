@@ -14,15 +14,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlaylistFragmentViewModel @Inject constructor(
-    private val repository: PlaylistRepository
+    private val repository: PlaylistRepository,
+    private val prefManager: PrefManager
 ) : ViewModel() {
 
     private var playlists: MutableLiveData<ArrayList<String>> = MutableLiveData()
 
     fun getAllPlaylists(context: Context): MutableLiveData<ArrayList<String>> {
         viewModelScope.launch {
-            val p = PrefManager(context)
-            playlists.value = p.allPlaylist
+            playlists.value = prefManager.allPlaylist
         }
 
         return playlists
@@ -33,12 +33,18 @@ class PlaylistFragmentViewModel @Inject constructor(
     }
 
     fun renamePlaylist(oldPlaylistName: String, newPlaylistName: String) {
+        prefManager.renamePlaylist(oldPlaylistName, newPlaylistName);
         viewModelScope.launch(Dispatchers.IO) {
             repository.renamePlaylist(oldPlaylistName, newPlaylistName)
         }
     }
 
+    fun createNewPlaylist(playListName: String) {
+        prefManager.createNewPlaylist(playListName)
+    }
+
     fun removePlaylist(playlistName: String) {
         repository.removePlaylist(playlistName)
+        prefManager.deletePlaylist(playlistName)
     }
 }

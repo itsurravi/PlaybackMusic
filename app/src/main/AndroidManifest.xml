@@ -60,25 +60,16 @@
         <activity
             android:name=".activities.SearchActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.NowPlayingActivity"
-            android:screenOrientation="portrait" />
 
         <activity
-            android:name=".SplashScreen"
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".MainActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
 
                 <category android:name="android.intent.category.APP_MUSIC" />

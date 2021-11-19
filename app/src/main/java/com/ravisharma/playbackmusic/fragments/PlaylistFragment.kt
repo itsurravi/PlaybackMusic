@@ -11,7 +11,6 @@ import android.widget.AdapterView.OnItemClickListener
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,9 +26,9 @@ import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.OnPlaylistLongClick
 import com.ravisharma.playbackmusic.databinding.FragmentPlaylistBinding
 import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel
 import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.prefrences.PrefManager
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
+import com.ravisharma.playbackmusic.utils.openFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
@@ -80,7 +79,7 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     }
 
     private fun initRecyclerView() {
-        playlistAdapter = PlaylistAdapter(requireContext(), playListArrayList).apply {
+        playlistAdapter = PlaylistAdapter(requireActivity(), playListArrayList).apply {
             setOnPlaylistClick(this@PlaylistFragment)
             setOnPlaylistLongClick(this@PlaylistFragment)
         }
@@ -94,11 +93,11 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     }
 
     private fun setUpArrayList() {
-        viewModel.getAllPlaylists(requireContext()).observe(this, { strings ->
+        viewModel.getAllPlaylists(requireContext()).observe(viewLifecycleOwner, { strings ->
             playListArrayList.clear()
             playListArrayList.add(getString(R.string.favTracks))
             playListArrayList.addAll(strings!!)
-            playlistAdapter!!.notifyDataSetChanged()
+            playlistAdapter.notifyDataSetChanged()
         })
     }
 
@@ -112,12 +111,7 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     private fun openFragment(bundle: Bundle) {
         val fragment = CategorySongFragment()
         fragment.arguments = bundle
-        instance!!.hideHomePanel()
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, fragment)
-            .addToBackStack(null)
-            .commit()
+        requireActivity().openFragment(fragment)
     }
 
     override fun onClick(view: View) {
@@ -181,8 +175,6 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
                 1 -> showCreateUpdatePlaylistDialog(false, playListArrayList[position])
                 2 -> {
                     viewModel.removePlaylist(playListArrayList[position])
-                    val p = PrefManager(context)
-                    p.deletePlaylist(playListArrayList[position])
                     setUpArrayList()
                 }
             }
@@ -192,7 +184,9 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
 
     private fun showCreateUpdatePlaylistDialog(createList: Boolean, oldPlaylistName: String?) {
         val listener = AlertClickListener { newPlaylistName ->
-            if (!createList) {
+            if (createList) {
+                viewModel.createNewPlaylist(newPlaylistName)
+            } else {
                 viewModel.renamePlaylist(oldPlaylistName!!, newPlaylistName)
             }
             setUpArrayList()
