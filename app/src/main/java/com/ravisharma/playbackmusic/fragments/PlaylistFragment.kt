@@ -65,6 +65,8 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
             cardMostPlayed.setOnClickListener(this@PlaylistFragment)
             btnAddNewPlaylist.setOnClickListener(this@PlaylistFragment)
         }
+
+        setUpArrayList()
     }
 
     private fun loadBanner2() {
@@ -93,7 +95,7 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     }
 
     private fun setUpArrayList() {
-        viewModel.getAllPlaylists(requireContext()).observe(viewLifecycleOwner, { strings ->
+        viewModel.getAllPlaylists().observe(viewLifecycleOwner, { strings ->
             playListArrayList.clear()
             playListArrayList.add(getString(R.string.favTracks))
             playListArrayList.addAll(strings!!)
@@ -175,7 +177,6 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
                 1 -> showCreateUpdatePlaylistDialog(false, playListArrayList[position])
                 2 -> {
                     viewModel.removePlaylist(playListArrayList[position])
-                    setUpArrayList()
                 }
             }
             alertDialog.dismiss()
@@ -189,7 +190,6 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
             } else {
                 viewModel.renamePlaylist(oldPlaylistName!!, newPlaylistName)
             }
-            setUpArrayList()
         }
         val alert = PlaylistAlert(context, listener)
         if (createList) {
@@ -197,11 +197,6 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
         } else {
             alert.showUpdateListAlert(oldPlaylistName)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setUpArrayList()
     }
 
     override fun onDestroy() {

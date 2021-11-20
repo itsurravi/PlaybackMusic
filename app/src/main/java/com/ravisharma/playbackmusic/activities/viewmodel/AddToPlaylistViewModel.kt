@@ -2,15 +2,14 @@ package com.ravisharma.playbackmusic.activities.viewmodel
 
 import android.content.Context
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.prefrences.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.LinkedHashSet
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,14 +18,10 @@ class AddToPlaylistViewModel @Inject constructor(
     private val pref : PrefManager
 ) : ViewModel() {
 
-    private var playlists: MutableLiveData<ArrayList<String>> = MutableLiveData()
-
     fun getAllPlaylists(): MutableLiveData<ArrayList<String>> {
-        viewModelScope.launch {
-            playlists.value = pref.allPlaylist
-        }
-
-        return playlists
+        return pref.fetchAllPlayList().map {
+            ArrayList(LinkedHashSet(it))
+        } as MutableLiveData<ArrayList<String>>
     }
 
     fun addToPlaylist(context: Context, playListName: String, song: Song) {
@@ -43,6 +38,8 @@ class AddToPlaylistViewModel @Inject constructor(
     }
 
     fun createNewPlaylist(playListName: String) {
-        pref.createNewPlaylist(playListName)
+        viewModelScope.launch {
+            pref.createNewPlaylist(playListName)
+        }
     }
 }

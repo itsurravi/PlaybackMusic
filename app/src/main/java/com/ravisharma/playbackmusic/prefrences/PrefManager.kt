@@ -1,110 +1,172 @@
-package com.ravisharma.playbackmusic.prefrences;
+package com.ravisharma.playbackmusic.prefrences
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import com.ravisharma.playbackmusic.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
-import com.ravisharma.playbackmusic.R;
+private val Context.dataStore by preferencesDataStore(
+    name = "playback_info",
+    produceMigrations = ::sharedPreferencesMigration
+)
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+private fun sharedPreferencesMigration(context: Context) =
+    listOf(SharedPreferencesMigration(context, context.getString(R.string.playback_info)))
 
-public class PrefManager {
+class PrefManager(c: Context) {
 
-    SharedPreferences sp;
-    SharedPreferences.Editor ed;
-    private final String Playlist;
+    private val Playlist: String = c.getString(R.string.playLists)
 
-    public PrefManager(Context c) {
-        sp = c.getSharedPreferences(c.getString(R.string.playback_info), Context.MODE_PRIVATE);
-        ed = sp.edit();
-        Playlist = c.getString(R.string.playLists);
-    }
+    private val dataStore = c.dataStore
 
-    public void clearAllData() {
-        ed.remove("ID");
-        ed.remove("Shuffle");
-        ed.remove("RepeatOne");
-        ed.remove("Repeat");
-        ed.remove("Songs");
-        ed.remove("position");
-        ed.remove("Started");
-        ed.apply();
-    }
-
-    public void storeInfo(String key, String data) {
-        if (data.equals("remove")) {
-            ed.remove(key);
-        } else {
-            ed.putString(key, data);
+    fun clearAllData() {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.edit {
+                    it.remove(intPreferencesKey("ID"))
+                    it.remove(intPreferencesKey("position"))
+                    it.remove(booleanPreferencesKey("Shuffle"))
+                    it.remove(booleanPreferencesKey("RepeatOne"))
+                    it.remove(booleanPreferencesKey("Repeat"))
+                    it.remove(booleanPreferencesKey("Songs"))
+                    it.remove(booleanPreferencesKey("Started"))
+                }
+            }
         }
-        ed.apply();
     }
 
-    public void storeInfo(String key, boolean data) {
-        ed.putBoolean(key, data);
-        ed.apply();
-    }
-
-    public void storeAppVersion(int data) {
-        ed.putInt("appVersion", data);
-        ed.apply();
-    }
-
-    public int getAppVersion() {
-        return sp.getInt("appVersion", -1);
-    }
-
-    public String get_s_Info(String key) {
-        return sp.getString(key, "");
-    }
-
-    public boolean get_b_Info(String key) {
-        return sp.getBoolean(key, false);
-    }
-
-    public void createNewPlaylist(String playlistName) {
-        Set<String> list = sp.getStringSet(Playlist, null);
-        List<String> l;
-        if (list == null) {
-            l = new ArrayList<>();
-        } else {
-            l = new ArrayList<>(list);
+    fun storeInfo(key: String?, data: String) {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.edit {
+                    if (data == "remove") {
+                        it.remove(stringPreferencesKey(key!!))
+                    } else {
+                        it[stringPreferencesKey(key!!)] = data
+                    }
+                }
+            }
         }
-        l.add(playlistName);
-        Set<String> list2 = new LinkedHashSet<>(l);
-        ed.putStringSet(Playlist, list2);
-        ed.apply();
     }
 
-    public void renamePlaylist(String oldName, String newName){
-        Set<String> list = sp.getStringSet(Playlist, null);
-        List<String> l;
+    fun storeInfo(key: String?, data: Boolean) {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.edit {
+                    it[booleanPreferencesKey(key!!)] = data
+                }
+            }
+        }
+    }
+
+    fun storeAppVersion(data: Int) {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.edit {
+                    it[intPreferencesKey("appVersion")] = data
+                }
+            }
+        }
+    }
+
+    val appVersion: Int
+        get() = runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.getValueFlow(intPreferencesKey("appVersion"), -1).first()
+            }
+        }
+
+    fun get_s_Info(key: String?): String {
+        return runBlocking { dataStore.getValueFlow(stringPreferencesKey(key!!), "").first() }
+    }
+
+    fun get_b_Info(key: String?): Boolean {
+        return runBlocking { dataStore.getValueFlow(booleanPreferencesKey(key!!), false).first() }
+    }
+
+    suspend fun createNewPlaylist(playlistName: String) {
+        val list =
+            dataStore.getValueFlow(stringSetPreferencesKey(Playlist), LinkedHashSet())
+                .first()
+        val l: MutableList<String> = if (list == null) {
+            ArrayList()
+        } else {
+            ArrayList(list)
+        }
+        l.add(playlistName)
+        val list2: Set<String> = LinkedHashSet(l)
+
+        dataStore.edit {
+            it[stringSetPreferencesKey(Playlist)] = list2
+        }
+    }
+
+    suspend fun renamePlaylist(oldName: String, newName: String) {
+        val list =
+            dataStore.getValueFlow(stringSetPreferencesKey(Playlist), LinkedHashSet())
+                .first()
+        val l: MutableList<String>
         if (list != null) {
-            l = new ArrayList<>(list);
-            l.set(l.indexOf(oldName), newName);
-            Set<String> list2 = new LinkedHashSet<>(l);
-            ed.putStringSet(Playlist, list2);
-            ed.apply();
+
+            l = ArrayList(list)
+            l[l.indexOf(oldName)] = newName
+            val list2: Set<String> = LinkedHashSet(l)
+
+            dataStore.edit {
+                it[stringSetPreferencesKey(Playlist)] = list2
+            }
         }
     }
 
-    public ArrayList<String> getAllPlaylist() {
-        Set<String> list = sp.getStringSet(Playlist, null);
-        if (list == null) {
-            list = new LinkedHashSet<>();
+    fun fetchAllPlayList() =
+        dataStore.getValueFlow(
+            stringSetPreferencesKey(Playlist),
+            LinkedHashSet()
+        ).map {
+            ArrayList(LinkedHashSet(it))
+        }.asLiveData()
+
+    suspend fun deletePlaylist(playlistName: String) {
+        val list = dataStore.getValueFlow(
+            stringSetPreferencesKey(Playlist),
+            LinkedHashSet()
+        ).first()
+
+        val l: MutableList<String> = ArrayList(list)
+        l.remove(playlistName)
+        val list2: Set<String> = LinkedHashSet(l)
+
+        dataStore.edit {
+            it[stringSetPreferencesKey(Playlist)] = list2
         }
-        return new ArrayList<>(list);
     }
+}
 
-    public void deletePlaylist(String playlistName) {
-        Set<String> list = sp.getStringSet(Playlist, null);
-        List<String> l = new ArrayList<>(list);
-        l.remove(playlistName);
-
-        Set<String> list2 = new LinkedHashSet<>(l);
-        ed.putStringSet(Playlist, list2);
-        ed.apply();
-    }
+fun <T> DataStore<Preferences>.getValueFlow(
+    key: Preferences.Key<T>,
+    defaultValue: T,
+): Flow<T> {
+    return this.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            preferences[key] ?: defaultValue
+        }
 }

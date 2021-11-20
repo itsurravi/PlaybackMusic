@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.database
 
 import android.content.Context
+import androidx.lifecycle.map
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -18,8 +19,10 @@ import com.ravisharma.playbackmusic.prefrences.PrefManager
 import com.ravisharma.playbackmusic.prefrences.TinyDB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Database(entities = [Playlist::class, MostPlayed::class, LastPlayed::class], version = 3)
 abstract class PlaylistDatabase : RoomDatabase() {
@@ -37,13 +40,10 @@ abstract class PlaylistDatabase : RoomDatabase() {
         fun getInstance(context: Context?): PlaylistDatabase {
             if (instance == null) {
                 Companion.context = context
-                instance = Room.databaseBuilder(context!!,
-                        PlaylistDatabase::class.java,
-                        "PlaylistDB")
-                        .addCallback(callback)
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
-                        .allowMainThreadQueries()
-                        .build()
+                instance = Room.databaseBuilder(
+                    context!!, PlaylistDatabase::class.java, "PlaylistDB"
+                ).addCallback(callback).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .allowMainThreadQueries().build()
             }
             return instance as PlaylistDatabase
         }
@@ -86,14 +86,17 @@ abstract class PlaylistDatabase : RoomDatabase() {
 
         private fun transferSongsInDB() {
             val tinydb = TinyDB(context)
-            val p = PrefManager(context)
+            val p = PrefManager(context!!)
             val fav = context!!.getString(R.string.favTracks)
 
             val list = ArrayList<String>()
 
             CoroutineScope(Dispatchers.IO).launch {
                 list.add(fav)
-                list.addAll(p.allPlaylist)
+                val differ = async {
+                    p.fetchAllPlayList().value!!
+                }
+                list.addAll(differ.await())
                 for (pName in list) {
                     val songList = ArrayList<Song>()
                     songList.addAll(tinydb.getListObject(pName, Song::class.java))

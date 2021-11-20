@@ -1,15 +1,13 @@
 package com.ravisharma.playbackmusic.fragments.viewmodels
 
-import android.content.Context
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.prefrences.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.LinkedHashSet
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,14 +16,10 @@ class PlaylistFragmentViewModel @Inject constructor(
     private val prefManager: PrefManager
 ) : ViewModel() {
 
-    private var playlists: MutableLiveData<ArrayList<String>> = MutableLiveData()
-
-    fun getAllPlaylists(context: Context): MutableLiveData<ArrayList<String>> {
-        viewModelScope.launch {
-            playlists.value = prefManager.allPlaylist
-        }
-
-        return playlists
+    fun getAllPlaylists(): MutableLiveData<ArrayList<String>> {
+        return prefManager.fetchAllPlayList().map {
+            ArrayList(LinkedHashSet(it))
+        } as MutableLiveData<ArrayList<String>>
     }
 
     fun getPlaylist(playlistName: String): List<Playlist> {
@@ -33,18 +27,23 @@ class PlaylistFragmentViewModel @Inject constructor(
     }
 
     fun renamePlaylist(oldPlaylistName: String, newPlaylistName: String) {
-        prefManager.renamePlaylist(oldPlaylistName, newPlaylistName);
         viewModelScope.launch(Dispatchers.IO) {
+            prefManager.renamePlaylist(oldPlaylistName, newPlaylistName)
             repository.renamePlaylist(oldPlaylistName, newPlaylistName)
         }
     }
 
     fun createNewPlaylist(playListName: String) {
-        prefManager.createNewPlaylist(playListName)
+        viewModelScope.launch(Dispatchers.IO) {
+            prefManager.createNewPlaylist(playListName)
+        }
     }
 
     fun removePlaylist(playlistName: String) {
         repository.removePlaylist(playlistName)
-        prefManager.deletePlaylist(playlistName)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            prefManager.deletePlaylist(playlistName)
+        }
     }
 }

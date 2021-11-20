@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
@@ -12,6 +13,7 @@ import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByN
 import com.ravisharma.playbackmusic.utils.curPlayingSong
 import com.ravisharma.playbackmusic.utils.curPlayingSongPosition
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,6 +70,8 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun createNewPlaylist(playListName: String) {
-        pref.createNewPlaylist(playListName)
+        viewModelScope.launch {
+            pref.createNewPlaylist(playListName)
+        }
     }
 }

@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import coil.load
 import com.google.android.gms.ads.AdRequest
@@ -38,8 +39,10 @@ import com.ravisharma.playbackmusic.utils.*
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
@@ -59,6 +62,9 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
     private var curpos = -1
 
     private val viewModel: MainActivityViewModel by viewModels()
+
+    @Inject
+    lateinit var manage: PrefManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -116,8 +122,9 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                             "No Song Left in Storage",
                             Toast.LENGTH_SHORT
                         ).show()
-                        val manage = PrefManager(requireContext())
-                        manage.storeInfo(requireContext().getString(R.string.Songs), false)
+                        lifecycleScope.launch {
+                            manage.storeInfo(requireContext().getString(R.string.Songs), false)
+                        }
                         Handler(Looper.getMainLooper()).postDelayed({ System.exit(0) }, 1000)
                     } else {
                         setPlayingList(songListByName.value!!)
