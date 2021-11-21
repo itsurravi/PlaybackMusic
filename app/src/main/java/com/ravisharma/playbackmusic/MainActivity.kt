@@ -565,8 +565,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
         played = true
         started = true
-        binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
-        binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+        setPauseIcons()
     }
 
     fun btnPlayPause() {
@@ -842,6 +841,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //menu item selected
         when (item.itemId) {
+            R.id.shuffleLibrary -> shuffleLibrarySongs()
             R.id.timer -> showTimer()
             R.id.equalizer -> {
                 val eq = Intent(this@MainActivity, EqualizerActivity::class.java)
@@ -1045,8 +1045,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.setPlayingPosition(playingDuration)
             musicSrv!!.playNext()
             played = true
-            binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
-            binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+            setPauseIcons()
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show()
         }
@@ -1059,8 +1058,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.setPlayingPosition(playingDuration)
             musicSrv!!.playPrev()
             played = true
-            binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
-            binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+            setPauseIcons()
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show()
         }
@@ -1591,6 +1589,37 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun showSnackBar(message: String) {
         Snackbar.make(binding.slidingLayout, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    fun shuffleLibrarySongs() {
+        playingDuration = "0"
+        musicSrv!!.setPlayingPosition(playingDuration)
+        musicSrv!!.setShuffle(true)
+
+        lastShuffle = true
+
+        binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
+
+        normalList.clear()
+        songList.clear()
+
+        normalList.addAll(songListByName.value!!)
+        songList.addAll(songListByName.value!!)
+        songList.shuffle()
+
+        manage.storeInfo(getString(R.string.Shuffle), lastShuffle)
+        Log.d(TAG, playingSong!!.title)
+        songPosn = 0
+
+        setPlayingList(songList)
+        setSongPosition(songPosn)
+        setPlayingSong(songList[songPosn])
+
+        musicSrv!!.playSong()
+
+        played = true
+        started = true
+        setPauseIcons()
     }
 
     companion object {

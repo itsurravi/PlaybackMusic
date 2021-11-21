@@ -95,6 +95,7 @@
     <string name="Cancel">Cancel</string>
     <string name="ok">Create</string>
     <string name="createNewPlaylist">Create New Playlist</string>
+    <string name="shuffleLibrary">Shuffle Library</string>
     <string name="location">Location:</string>
     <string name="duration">Duration:</string>
     <string name="notAvailable">Not Available</string>

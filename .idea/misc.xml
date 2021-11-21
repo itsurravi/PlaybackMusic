@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable-anydpi/ic_equalizer2.xml" value="0.38125" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable-anydpi/ic_fav.xml" value="0.38125" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable-anydpi/ic_fav_not.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_about.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_category_song.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_main.xml" value="0.3446153846153846" />

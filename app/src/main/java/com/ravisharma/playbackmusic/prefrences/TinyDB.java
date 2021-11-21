@@ -16,20 +16,11 @@ import java.util.Arrays;
 public class TinyDB {
 
     private final SharedPreferences preferences;
-    private final Context context;
 
     public TinyDB(Context appContext) {
         preferences = appContext.getSharedPreferences(appContext.getString(R.string.DB), Context.MODE_PRIVATE);
-        context = appContext;
     }
 
-
-    /**
-     * Put ArrayList of String into SharedPreferences with 'key' and save
-     *
-     * @param key        SharedPreferences key
-     * @param stringList ArrayList of String to be added
-     */
     public void putListString(String key, ArrayList<String> stringList) {
         checkForNullKey(key);
         String[] myStringList = stringList.toArray(new String[stringList.size()]);
@@ -68,21 +59,10 @@ public class TinyDB {
         preferences.edit().remove(key).commit();
     }
 
-
-    /**
-     * Check if external storage is writable or not
-     *
-     * @return true if writable, false otherwise
-     */
     public static boolean isExternalStorageWritable() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
-    /**
-     * Check if external storage is readable or not
-     *
-     * @return true if readable, false otherwise
-     */
     public static boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
 
