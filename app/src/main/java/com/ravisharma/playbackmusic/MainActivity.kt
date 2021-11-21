@@ -548,8 +548,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.shuffle = false
             setRepeatOff()
             manage.storeInfo(getString(R.string.Shuffle), false)
-        } else {
-            showHomePanel()
         }
 
         setPlayingList(songList)

@@ -15,6 +15,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -143,6 +144,12 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
             }
         }
 
+        viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(viewLifecycleOwner) { playlists ->
+            for ((_, _, song) in playlists) {
+                binding.imgFav.isVisible = song.id == playingSong.id
+            }
+        }
+
         curPlayingSong.observe(viewLifecycleOwner) { song ->
             Log.d("Playing", "Chnaged")
             playingSong = song
@@ -160,6 +167,10 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                 error(R.drawable.logo)
                 crossfade(true)
             }
+
+            val exist = viewModel.isSongExist(getString(R.string.favTracks), playingSong.id)
+
+            binding.imgFav.isVisible = exist > 0
         }
     }
 
@@ -320,6 +331,10 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
     }
 
     interface OnFragmentItemClicked {
-        fun onFragmentItemClick(position: Int, songsArrayList: java.util.ArrayList<Song>, nowPlaying: Boolean)
+        fun onFragmentItemClick(
+            position: Int,
+            songsArrayList: java.util.ArrayList<Song>,
+            nowPlaying: Boolean
+        )
     }
 }
