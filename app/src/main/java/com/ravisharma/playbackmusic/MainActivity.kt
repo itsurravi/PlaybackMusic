@@ -379,8 +379,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
             checkInFav(playingSong)
 
-            manage.storeInfo(getString(R.string.position), songPosn.toString())
-            manage.storeInfo(getString(R.string.ID), songPosn.toString())
+            manage.putStringPref(getString(R.string.position), songPosn.toString())
+            manage.putStringPref(getString(R.string.ID), songPosn.toString())
         })
 
         viewModel.getSongPosition().observe(this, { integer ->
@@ -392,16 +392,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             Log.d("Playing", "Position Changed $songPosn")
         })
 
-        lastSongId = manage.get_s_Info(getString(R.string.ID))
-        lastShuffle = manage.get_b_Info(getString(R.string.Shuffle))
-        lastRepeat = manage.get_b_Info(getString(R.string.Repeat))
-        lastRepeatOne = manage.get_b_Info(getString(R.string.RepeatOne))
-        playingDuration = manage.get_s_Info(getString(R.string.currentPlayingDuration))
+        lastSongId = manage.getStringPref(getString(R.string.ID))
+        lastShuffle = manage.getBooleanPref(getString(R.string.Shuffle))
+        lastRepeat = manage.getBooleanPref(getString(R.string.Repeat))
+        lastRepeatOne = manage.getBooleanPref(getString(R.string.RepeatOne))
+        playingDuration = manage.getStringPref(getString(R.string.currentPlayingDuration))
 
-        var start = manage.get_b_Info(getString(R.string.Started))
-        val position = manage.get_s_Info(getString(R.string.position))
+        var start = manage.getBooleanPref(getString(R.string.Started))
+        val position = manage.getStringPref(getString(R.string.position))
 
-        if (manage.get_b_Info(getString(R.string.Songs))) {
+        if (manage.getBooleanPref(getString(R.string.Songs))) {
             songList.clear()
             normalList.clear()
             songList.addAll(viewModel.getTinyDbSongs(getString(R.string.Songs)))
@@ -490,6 +490,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         loadBanner1()
 
         CheckUpdate().execute()
+
+        AppRate(this)
+            .setShowIfAppHasCrashed(false)
+            .setMinDaysUntilPrompt(10)
+            .setMinLaunchesUntilPrompt(15)
+            .init()
     }
 
     private fun loadBanner1() {
@@ -547,7 +553,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
             musicSrv!!.shuffle = false
             setRepeatOff()
-            manage.storeInfo(getString(R.string.Shuffle), false)
+            manage.putBooleanPref(getString(R.string.Shuffle), false)
         }
 
         setPlayingList(songList)
@@ -625,7 +631,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     Toast.makeText(this, getString(R.string.Shuffle_Off), Toast.LENGTH_SHORT).show()
                     false
                 }
-                manage.storeInfo(getString(R.string.Shuffle), lastShuffle)
+                manage.putBooleanPref(getString(R.string.Shuffle), lastShuffle)
                 Log.d(TAG, playingSong!!.title)
                 songPosn = songList.indexOf(playingSong)
                 setPlayingList(songList)
@@ -651,8 +657,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     Toast.makeText(this, getString(R.string.Repeat_Off), Toast.LENGTH_SHORT).show()
                 }
 
-                manage.storeInfo(getString(R.string.Repeat), lastRepeat)
-                manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne)
+                manage.putBooleanPref(getString(R.string.Repeat), lastRepeat)
+                manage.putBooleanPref(getString(R.string.RepeatOne), lastRepeatOne)
             }
             if (v == binding.playingPanel.imgPlaylist) {
                 binding.slidingLayout.panelState = PanelState.COLLAPSED
@@ -692,8 +698,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
         binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_off)
 
-        manage.storeInfo(getString(R.string.Repeat), lastRepeat)
-        manage.storeInfo(getString(R.string.RepeatOne), lastRepeatOne)
+        manage.putBooleanPref(getString(R.string.Repeat), lastRepeat)
+        manage.putBooleanPref(getString(R.string.RepeatOne), lastRepeatOne)
     }
 
     fun addToFavPlaylist() {
@@ -1095,11 +1101,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun killApp() {
         if (musicSrv != null) {
             if (played) {
-                manage.storeInfo(getString(R.string.ID), songPosn.toString())
-                manage.storeInfo(getString(R.string.Started), started)
-                manage.storeInfo(getString(R.string.Songs), true)
-                manage.storeInfo(getString(R.string.position), songPosn.toString())
-                manage.storeInfo(
+                manage.putStringPref(getString(R.string.ID), songPosn.toString())
+                manage.putBooleanPref(getString(R.string.Started), started)
+                manage.putBooleanPref(getString(R.string.Songs), true)
+                manage.putStringPref(getString(R.string.position), songPosn.toString())
+                manage.putStringPref(
                     getString(R.string.currentPlayingDuration),
                     musicSrv!!.player.currentPosition.toString()
                 )
@@ -1516,13 +1522,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInPlaylists() {
         val songListByName = songListByName.value!!
         if (songListByName.size <= 1) {
-            manage.storeInfo(getString(R.string.ID), "remove")
-            manage.storeInfo(getString(R.string.Shuffle), false)
-            manage.storeInfo(getString(R.string.Repeat), false)
-            manage.storeInfo(getString(R.string.RepeatOne), false)
-            manage.storeInfo(getString(R.string.Started), false)
-            manage.storeInfo(getString(R.string.Songs), false)
-            manage.storeInfo("position", "remove")
+            manage.putStringPref(getString(R.string.ID), "remove")
+            manage.putBooleanPref(getString(R.string.Shuffle), false)
+            manage.putBooleanPref(getString(R.string.Repeat), false)
+            manage.putBooleanPref(getString(R.string.RepeatOne), false)
+            manage.putBooleanPref(getString(R.string.Started), false)
+            manage.putBooleanPref(getString(R.string.Songs), false)
+            manage.putStringPref("position", "remove")
         }
         if (songListByName.size > 0) {
             val playListArrayList: MutableList<String> = ArrayList()
@@ -1539,7 +1545,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     }
                 }
                 if (playListName == "Songs" && songList.size == 0) {
-                    manage.storeInfo(getString(R.string.Songs), false)
+                    manage.putBooleanPref(getString(R.string.Songs), false)
                 }
                 tinydb.putListObject(playListName, songList)
             }
@@ -1605,7 +1611,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         songList.addAll(songListByName.value!!)
         songList.shuffle()
 
-        manage.storeInfo(getString(R.string.Shuffle), lastShuffle)
+        manage.putBooleanPref(getString(R.string.Shuffle), lastShuffle)
         Log.d(TAG, playingSong!!.title)
         songPosn = 0
 

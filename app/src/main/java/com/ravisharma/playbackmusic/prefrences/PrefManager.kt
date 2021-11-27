@@ -48,7 +48,7 @@ class PrefManager(c: Context) {
         }
     }
 
-    fun storeInfo(key: String?, data: String) {
+    fun putStringPref(key: String?, data: String) {
         runBlocking {
             withContext(Dispatchers.Default) {
                 dataStore.edit {
@@ -62,11 +62,21 @@ class PrefManager(c: Context) {
         }
     }
 
-    fun storeInfo(key: String?, data: Boolean) {
+    fun putBooleanPref(key: String?, data: Boolean) {
         runBlocking {
             withContext(Dispatchers.Default) {
                 dataStore.edit {
                     it[booleanPreferencesKey(key!!)] = data
+                }
+            }
+        }
+    }
+
+    fun putLongPref(key: String?, data: Long) {
+        runBlocking {
+            withContext(Dispatchers.Default) {
+                dataStore.edit {
+                    it[longPreferencesKey(key!!)] = data
                 }
             }
         }
@@ -89,12 +99,16 @@ class PrefManager(c: Context) {
             }
         }
 
-    fun get_s_Info(key: String?): String {
+    fun getStringPref(key: String?): String {
         return runBlocking { dataStore.getValueFlow(stringPreferencesKey(key!!), "").first() }
     }
 
-    fun get_b_Info(key: String?): Boolean {
+    fun getBooleanPref(key: String?): Boolean {
         return runBlocking { dataStore.getValueFlow(booleanPreferencesKey(key!!), false).first() }
+    }
+
+    fun getLongPref(key: String?, default: Long): Long {
+        return runBlocking { dataStore.getValueFlow(longPreferencesKey(key!!), default).first() }
     }
 
     suspend fun createNewPlaylist(playlistName: String) {

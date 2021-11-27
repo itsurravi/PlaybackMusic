@@ -124,7 +124,7 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                             Toast.LENGTH_SHORT
                         ).show()
                         lifecycleScope.launch {
-                            manage.storeInfo(requireContext().getString(R.string.Songs), false)
+                            manage.putBooleanPref(requireContext().getString(R.string.Songs), false)
                         }
                         Handler(Looper.getMainLooper()).postDelayed({ System.exit(0) }, 1000)
                     } else {
