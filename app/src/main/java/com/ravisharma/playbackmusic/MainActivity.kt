@@ -75,6 +75,7 @@ import java.io.IOException
 import java.lang.Runnable
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -1348,7 +1349,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun versionStringToLong(version: String): String {
-        val split = version.split("\\.")
+//        val split = version.split("\\.")
+        val split = Pattern.compile("\\.").split(version)
         val sb = StringBuilder()
         for (s in split) {
             sb.append(s)
@@ -1366,7 +1368,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=$packageName")
+                        Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
                     )
                 )
             } catch (e: Exception) {

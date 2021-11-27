@@ -67,8 +67,6 @@ class AppRate(private val hostActivity: Activity) {
                 showDefaultDialog()
             }
         }
-
-        showDefaultDialog()
     }
 
     private fun initExceptionHandler() {
