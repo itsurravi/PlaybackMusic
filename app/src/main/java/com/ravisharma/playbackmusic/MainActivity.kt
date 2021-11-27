@@ -890,13 +890,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun launchMarket() {
-        val uri = Uri.parse("market://details?id=$packageName")
-        val myAppLinkToMarket = Intent(Intent.ACTION_VIEW, uri)
         try {
-            startActivity(myAppLinkToMarket)
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+            )
         } catch (e: ActivityNotFoundException) {
             showSnackBar("Unable to find market app")
         }
+
+        manage.putBooleanPref(PrefsContract.PREF_DONT_SHOW_AGAIN, true)
     }
 
     private fun showTimer() {
