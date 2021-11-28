@@ -107,7 +107,7 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
     }
 
     private fun setObservers() {
-        getPlayingListData().observe(viewLifecycleOwner) { songs ->
+        viewModel.getPlayingList().observe(viewLifecycleOwner) { songs ->
             playingList = songs
             nowPlayingAdapter.setList(playingList)
             if (swiped || fileDelete) {

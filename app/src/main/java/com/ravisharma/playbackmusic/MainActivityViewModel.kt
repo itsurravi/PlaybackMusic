@@ -12,6 +12,7 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.curPlayingSong
 import com.ravisharma.playbackmusic.utils.curPlayingSongPosition
+import com.ravisharma.playbackmusic.utils.getPlayingListData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +26,15 @@ class MainActivityViewModel @Inject constructor(
 
     private var pSong: MutableLiveData<Song> = MutableLiveData()
     private var sPosition: MutableLiveData<Int> = MutableLiveData()
+    private var currentPlayingList = MutableLiveData<ArrayList<Song>>()
+
+    init {
+        currentPlayingList = getPlayingListData()
+    }
+
+    fun getPlayingList(): LiveData<ArrayList<Song>> {
+        return currentPlayingList
+    }
 
     fun getPlayingSong(): LiveData<Song> {
         pSong = curPlayingSong

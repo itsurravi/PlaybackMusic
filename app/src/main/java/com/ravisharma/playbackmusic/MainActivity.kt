@@ -311,7 +311,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             bindService(playIntent, musicConnection, BIND_AUTO_CREATE)
         }
         musicSrv = MusicService()
-        binding.playingPanel.playerController.visibility = View.INVISIBLE
+        binding.playingPanel.playerController.alpha = 0f
 
         val sectionsPagerAdapter = SectionsPagerAdapter(this)
 
@@ -332,12 +332,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         }.attach()
 
-        getPlayingListData().observe(this, { songs ->
+        viewModel.getPlayingList().observe(this, { songs ->
             songList = songs
             if (songList.size > 0) {
                 Log.d("Playing", "List Changed " + songList.size)
                 musicSrv!!.setList(songList)
-                if (playingDuration!!.isNotEmpty() || playingDuration!!.isNotBlank()) {
+                if (playingDuration != null && (playingDuration!!.isNotEmpty() || playingDuration!!.isNotBlank())) {
                     musicSrv!!.setPlayingPosition(playingDuration)
                 }
                 viewModel.saveTinyDbSongs(getString(R.string.NormalSongs), normalList)
@@ -380,8 +380,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
             checkInFav(playingSong)
 
-            manage.putStringPref(getString(R.string.position), songPosn.toString())
-            manage.putStringPref(getString(R.string.ID), songPosn.toString())
+            if (played) {
+                manage.putStringPref(getString(R.string.position), songPosn.toString())
+                manage.putStringPref(getString(R.string.ID), songPosn.toString())
+            }
         })
 
         viewModel.getSongPosition().observe(this, { integer ->
@@ -744,7 +746,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun onSlideListener(): SlidingUpPanelLayout.PanelSlideListener {
         return object : SlidingUpPanelLayout.PanelSlideListener {
-            override fun onPanelSlide(panel: View, slideOffset: Float) {}
+            override fun onPanelSlide(panel: View, slideOffset: Float) {
+                Log.e("OffsetData", "$slideOffset")
+                if (started) {
+                    binding.playingPanel.playerController.alpha = slideOffset
+                }
+            }
             override fun onPanelStateChanged(
                 panel: View,
                 previousState: PanelState,
@@ -756,7 +763,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         binding.playingPanel.txtSongArtist.isSelected = false
 
                         binding.playingPanel.btnPlayPauseSlide.visibility = View.VISIBLE
-                        binding.playingPanel.playerController.visibility = View.INVISIBLE
 
                         if (songList.size > 0) {
                             showSlideImage()
@@ -764,7 +770,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                             hideSlideImage()
                         }
                     } else if (newState == PanelState.EXPANDED) {
-                        binding.playingPanel.playerController.visibility = View.VISIBLE
                         if (musicSrv!!.player.isPlaying) {
                             binding.playingPanel.txtSongName.isSelected = true
                             binding.playingPanel.txtSongArtist.isSelected = true
@@ -781,19 +786,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun setSongImageOnImageView() {
-
-        binding.playingPanel.controlBack.load(Uri.parse(playingSong!!.art)) {
+        val art = Uri.parse(playingSong!!.art)
+        binding.playingPanel.controlBack.load(art) {
             error(R.drawable.logo)
             crossfade(true)
         }
 
-        binding.playingPanel.cardImage.load(Uri.parse(playingSong!!.art)) {
+        binding.playingPanel.cardImage.load(art) {
             error(R.drawable.logo)
-            transformations(RoundedCornersTransformation(50f))
+            transformations(RoundedCornersTransformation(25f))
             crossfade(true)
         }
 
-        binding.playingPanel.slideImage.load(Uri.parse(playingSong!!.art)) {
+        binding.playingPanel.slideImage.load(art) {
             error(R.drawable.logo)
             transformations(RoundedCornersTransformation(10f))
             crossfade(true)
@@ -1557,9 +1562,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
             viewModel.removeSongFromPlaylist()
 
-            if (getPlayingListData().value != null) {
+            if (viewModel.getPlayingList().value != null) {
                 val songsToRemove = ArrayList<Song>()
-                for (s in getPlayingListData().value!!) {
+                for (s in viewModel.getPlayingList().value!!) {
                     if (!songListByName.contains(s)) {
                         songsToRemove.add(s)
                     }
@@ -1600,7 +1605,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         Snackbar.make(binding.slidingLayout, message, Snackbar.LENGTH_SHORT).show()
     }
 
-    fun shuffleLibrarySongs() {
+    private fun shuffleLibrarySongs() {
         playingDuration = "0"
         musicSrv!!.setPlayingPosition(playingDuration)
         musicSrv!!.setShuffle(true)
@@ -1617,7 +1622,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         songList.shuffle()
 
         manage.putBooleanPref(getString(R.string.Shuffle), lastShuffle)
-        Log.d(TAG, playingSong!!.title)
+
         songPosn = 0
 
         setPlayingList(songList)
