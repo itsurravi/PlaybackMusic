@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -94,7 +95,12 @@ abstract class PlaylistDatabase : RoomDatabase() {
             CoroutineScope(Dispatchers.IO).launch {
                 list.add(fav)
                 val differ = async {
-                    p.fetchAllPlayList().value!!
+                    try {
+                        p.fetchAllPlayList().value!!
+                    }
+                    catch (e: Exception){
+                        ArrayList<String>()
+                    }
                 }
                 list.addAll(differ.await())
                 for (pName in list) {

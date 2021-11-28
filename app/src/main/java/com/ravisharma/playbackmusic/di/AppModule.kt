@@ -19,6 +19,14 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun providePrefManager(@ApplicationContext context: Context) = PrefManager(context)
+
+    @Provides
+    @Singleton
+    fun provideTinyDb(@ApplicationContext context: Context) = TinyDB(context)
+
+    @Provides
+    @Singleton
     fun providePlaylistDatabase(@ApplicationContext context: Context) = PlaylistDatabase.getInstance(context)
 
     @Provides
@@ -36,12 +44,4 @@ object AppModule {
     @Provides
     @Singleton
     fun providePlaylistRepository(playlistDao: PlaylistDao) = PlaylistRepository(playlistDao)
-
-    @Provides
-    @Singleton
-    fun providePrefManager(@ApplicationContext context: Context) = PrefManager(context)
-
-    @Provides
-    @Singleton
-    fun provideTinyDb(@ApplicationContext context: Context) = TinyDB(context)
 }
