@@ -35,7 +35,6 @@ import java.util.*
 
 class NameWise : Fragment(), SongAdapter.OnItemClicked, SongAdapter.OnItemLongClicked {
     private var songList: ArrayList<Song> = ArrayList()
-    var recyclerView: FastScrollRecyclerView? = null
 
     private lateinit var binding: FragmentNameWiseBinding
 

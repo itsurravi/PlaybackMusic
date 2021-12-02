@@ -38,41 +38,33 @@ public class PlaylistAlert {
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_2;
         alertDialog.show();
 
-        tvCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        tvCancel.setOnClickListener(v12 -> alertDialog.dismiss());
 
         edPlayListName.requestFocus();
 
-        tvOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = edPlayListName.getText().toString().trim();
-                if (playlistName.length() > 0) {
-                    if (playlistName.equalsIgnoreCase("My Favorites") ||
-                            playlistName.equalsIgnoreCase("Recent Added") ||
-                            playlistName.equalsIgnoreCase("Last Played") ||
-                            playlistName.equalsIgnoreCase("Most Played")){
+        tvOk.setOnClickListener(v1 -> {
+            String playlistName = edPlayListName.getText().toString().trim();
+            if (playlistName.length() > 0) {
+                if (playlistName.equalsIgnoreCase("My Favorites") ||
+                        playlistName.equalsIgnoreCase("Recent Added") ||
+                        playlistName.equalsIgnoreCase("Last Played") ||
+                        playlistName.equalsIgnoreCase("Most Played")){
 
-                        Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    String[] words = playlistName.split("\\s+");
-                    StringBuilder capitalizeWord = new StringBuilder();
-                    for (String w : words) {
-                        String first = w.substring(0, 1);
-                        String second = w.substring(1);
-                        capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
-                    }
-                    playlistName = capitalizeWord.toString().trim();
-                    listener.OnOkClicked(playlistName);
+                    Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                edPlayListName.setText("");
-                alertDialog.dismiss();
+                String[] words = playlistName.split("\\s+");
+                StringBuilder capitalizeWord = new StringBuilder();
+                for (String w : words) {
+                    String first = w.substring(0, 1);
+                    String second = w.substring(1);
+                    capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
+                }
+                playlistName = capitalizeWord.toString().trim();
+                listener.OnOkClicked(playlistName);
             }
+            edPlayListName.setText("");
+            alertDialog.dismiss();
         });
     }
 
@@ -96,42 +88,34 @@ public class PlaylistAlert {
         dialogTitle.setText("Rename Playlist");
         edPlayListName.setText(oldPlaylistName);
 
-        tvCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
+        tvCancel.setOnClickListener(v12 -> alertDialog.dismiss());
 
         edPlayListName.requestFocus();
         tvOk.setText("Rename");
 
-        tvOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playlistName = edPlayListName.getText().toString().trim();
-                if (playlistName.length() > 0) {
-                    if (playlistName.equalsIgnoreCase("My Favorites") ||
-                            playlistName.equalsIgnoreCase("Recent Added") ||
-                            playlistName.equalsIgnoreCase("Last Played") ||
-                            playlistName.equalsIgnoreCase("Most Played")){
+        tvOk.setOnClickListener(v1 -> {
+            String playlistName = edPlayListName.getText().toString().trim();
+            if (playlistName.length() > 0) {
+                if (playlistName.equalsIgnoreCase("My Favorites") ||
+                        playlistName.equalsIgnoreCase("Recent Added") ||
+                        playlistName.equalsIgnoreCase("Last Played") ||
+                        playlistName.equalsIgnoreCase("Most Played")){
 
-                        Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    String[] words = playlistName.split("\\s+");
-                    StringBuilder capitalizeWord = new StringBuilder();
-                    for (String w : words) {
-                        String first = w.substring(0, 1);
-                        String second = w.substring(1);
-                        capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
-                    }
-                    playlistName = capitalizeWord.toString().trim();
-                    listener.OnOkClicked(playlistName);
+                    Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                edPlayListName.setText("");
-                alertDialog.dismiss();
+                String[] words = playlistName.split("\\s+");
+                StringBuilder capitalizeWord = new StringBuilder();
+                for (String w : words) {
+                    String first = w.substring(0, 1);
+                    String second = w.substring(1);
+                    capitalizeWord.append(first.toUpperCase()).append(second.toLowerCase()).append(" ");
+                }
+                playlistName = capitalizeWord.toString().trim();
+                listener.OnOkClicked(playlistName);
             }
+            edPlayListName.setText("");
+            alertDialog.dismiss();
         });
     }
 }

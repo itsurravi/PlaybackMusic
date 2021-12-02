@@ -1063,6 +1063,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.playNext()
             played = true
             setPauseIcons()
+            songPosn = musicSrv!!.songPosn
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show()
         }
@@ -1076,6 +1077,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             musicSrv!!.playPrev()
             played = true
             setPauseIcons()
+            songPosn = musicSrv!!.songPosn
         } else {
             Toast.makeText(this, "List is Empty", Toast.LENGTH_SHORT).show()
         }
