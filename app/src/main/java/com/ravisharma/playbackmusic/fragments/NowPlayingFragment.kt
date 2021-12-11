@@ -129,6 +129,7 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                         Handler(Looper.getMainLooper()).postDelayed({ System.exit(0) }, 1000)
                     } else {
                         setPlayingList(songListByName.value!!)
+                        instance!!.musicSrv!!.setList(songListByName.value!!)
                         instance!!.musicSrv!!.setSong(0)
                         instance!!.musicSrv!!.playSong()
                     }
