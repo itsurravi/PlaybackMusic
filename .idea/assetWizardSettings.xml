@@ -365,7 +365,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material/icons/materialiconsround/close/round_close_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../Android_SDK/icons/material/materialiconsround/volume_mute/round_volume_mute_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -376,8 +376,8 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_close_24" />
-                            <entry key="sourceFile" value="D:\Android\2.psd" />
+                            <entry key="outputName" value="ic_volume_down" />
+                            <entry key="sourceFile" value="C:\Users\ravik\Downloads\close.svg" />
                           </map>
                         </option>
                       </PersistentState>

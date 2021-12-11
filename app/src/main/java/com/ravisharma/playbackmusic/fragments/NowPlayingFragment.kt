@@ -144,12 +144,6 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
             }
         }
 
-        viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(viewLifecycleOwner) { playlists ->
-            for ((_, _, song) in playlists) {
-                binding.imgFav.isVisible = song.id == playingSong.id
-            }
-        }
-
         curPlayingSong.observe(viewLifecycleOwner) { song ->
             Log.d("Playing", "Chnaged")
             playingSong = song
@@ -167,10 +161,6 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                 error(R.drawable.logo)
                 crossfade(true)
             }
-
-            val exist = viewModel.isSongExist(getString(R.string.favTracks), playingSong.id)
-
-            binding.imgFav.isVisible = exist > 0
         }
     }
 
@@ -219,7 +209,7 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
 
     private var simpleCallback: ItemTouchHelper.SimpleCallback =
         object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.START or ItemTouchHelper.END or ItemTouchHelper.UP or
+            ItemTouchHelper.UP or
                     ItemTouchHelper.DOWN, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
             override fun onMove(
@@ -236,25 +226,7 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                if ((playingList.get(position) == playingSong)) {
-                    if (playingList.size > 0) {
-                        instance!!.playNext()
-                    }
-                }
-                playingList.removeAt(position)
-                nowPlayingAdapter.setList(playingList)
-                swiped = true
-                setPlayingList(playingList)
-            }
 
-            override fun getSwipeDirs(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-            ): Int {
-                return if (!instance!!.played) {
-                    0
-                } else super.getSwipeDirs(recyclerView, viewHolder)
             }
 
             override fun clearView(
@@ -269,6 +241,13 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
 
             override fun isLongPressDragEnabled(): Boolean {
                 return false
+            }
+
+            override fun getSwipeDirs(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                return 0
             }
         }
 
@@ -321,6 +300,18 @@ class NowPlayingFragment : Fragment(), NowPlayingAdapter.OnItemClicked,
                 }
                 alertDialog.dismiss()
             }
+    }
+
+    override fun onItemRemove(position: Int) {
+        if (playingList[position] == playingSong) {
+            if (playingList.size > 0) {
+                instance!!.playNext()
+            }
+        }
+        playingList.removeAt(position)
+        nowPlayingAdapter.setList(playingList)
+        swiped = true
+        setPlayingList(playingList)
     }
 
     override fun onDestroy() {

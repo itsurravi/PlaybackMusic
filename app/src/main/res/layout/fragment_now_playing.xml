@@ -42,7 +42,7 @@
             <ImageView
                 android:id="@+id/imgSave"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/save_as_playlist"
@@ -58,27 +58,13 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <RelativeLayout
+            <ImageView
+                android:id="@+id/songArt"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:layout_margin="10dp">
-
-                <ImageView
-                    android:id="@+id/songArt"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/logo" />
-
-                <ImageView
-                    android:id="@+id/imgFav"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_margin="4dp"
-                    android:src="@drawable/ic_fav" />
-            </RelativeLayout>
+                android:layout_margin="10dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/logo" />
 
             <LinearLayout
                 android:layout_width="match_parent"

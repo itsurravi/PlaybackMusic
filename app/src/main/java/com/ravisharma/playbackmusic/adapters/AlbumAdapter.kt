@@ -27,7 +27,7 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
     }
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
-        val currAlbum = albumsList[holder.adapterPosition]
+        val currAlbum = albumsList[holder.bindingAdapterPosition]
         holder.binding.apply {
             albumTitle.text = currAlbum.albumName
             artistTitle.text = currAlbum.albumArtist
@@ -38,7 +38,7 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
                 transformations(RoundedCornersTransformation(20f))
             }
 
-            albumBox.setOnClickListener { onClick.onAlbumClick(holder.adapterPosition) }
+            albumBox.setOnClickListener { onClick.onAlbumClick(holder.bindingAdapterPosition) }
         }
     }
 

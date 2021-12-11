@@ -19,7 +19,7 @@ android {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 44
+        versionCode 46
         versionName "2.8.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,6 +30,9 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            firebaseCrashlytics {
+                mappingFileUploadEnabled true
+            }
         }
         debug{
             minifyEnabled false

@@ -79,6 +79,10 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
+import android.media.AudioManager
+
+
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragmentItemClicked,
@@ -90,6 +94,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainActivityViewModel by viewModels()
+
+    private lateinit var audioManager: AudioManager
 
     @Inject
     lateinit var manage: PrefManager
@@ -161,12 +167,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     @JvmField
     var played = false
 
+    var maxVolume = 0
+    var curVolume = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setNotificationChannel()
+
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+        curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
         lifecycleScope.launchWhenStarted {
             delay(400)
@@ -503,6 +516,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             .setMinDaysUntilPrompt(10)
             .setMinLaunchesUntilPrompt(15)
             .init()
+
+        binding.playingPanel.seekBarVolume.max = maxVolume
+        binding.playingPanel.seekBarVolume.progress = curVolume
+
+        binding.playingPanel.seekBarVolume.setOnSeekBarChangeListener(object :
+            OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+        })
     }
 
     private fun loadBanner1() {
@@ -1095,7 +1126,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
             if (binding.viewPager.currentItem > 0) {
                 binding.viewPager.setCurrentItem(0, true)
-            } else if (musicSrv!! != null && musicSrv!!.isSongPlaying) {
+            } else if (musicSrv != null && musicSrv!!.isSongPlaying) {
                 moveTaskToBack(true)
             } else {
                 if (doubleBackToExitPressedOnce) {
@@ -1529,78 +1560,103 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             true, observer
         )
+        contentResolver.registerContentObserver(
+            android.provider.Settings.System.CONTENT_URI,
+            true, volObserver
+        )
     }
 
     private fun unRegisterMediaChangeObserver() {
         contentResolver.unregisterContentObserver(observer)
+        contentResolver.unregisterContentObserver(volObserver)
+    }
+
+    private var volObserver: ContentObserver =
+        object : ContentObserver(Handler(Looper.getMainLooper())) {
+
+        override fun deliverSelfNotifications(): Boolean {
+            return false
+        }
+
+        override fun onChange(selfChange: Boolean) {
+            val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+            curVolume = currentVolume
+            binding.playingPanel.seekBarVolume.progress = currentVolume
+        }
+
     }
 
     private fun checkInPlaylists() {
-        val songListByName = songListByName.value!!
-        if (songListByName.size <= 1) {
-            manage.putStringPref(getString(R.string.ID), "remove")
-            manage.putBooleanPref(getString(R.string.Shuffle), false)
-            manage.putBooleanPref(getString(R.string.Repeat), false)
-            manage.putBooleanPref(getString(R.string.RepeatOne), false)
-            manage.putBooleanPref(getString(R.string.Started), false)
-            manage.putBooleanPref(getString(R.string.Songs), false)
-            manage.putStringPref("position", "remove")
-        }
-        if (songListByName.size > 0) {
-            val playListArrayList: MutableList<String> = ArrayList()
-            playListArrayList.add("NormalSongs")
-            playListArrayList.add("Songs")
-
-            for (playListName in playListArrayList) {
-                val songList = tinydb.getListObject(playListName, Song::class.java)
-                val iterator = songList.iterator()
-                while (iterator.hasNext()) {
-                    val value = iterator.next()
-                    if (!songListByName.contains(value)) {
-                        iterator.remove()
-                    }
-                }
-                if (playListName == "Songs" && songList.size == 0) {
-                    manage.putBooleanPref(getString(R.string.Songs), false)
-                }
-                tinydb.putListObject(playListName, songList)
+        if(songListByName.value!=null) {
+            val songListByName = songListByName.value!!
+            if (songListByName.size <= 1) {
+                manage.putStringPref(getString(R.string.ID), "remove")
+                manage.putBooleanPref(getString(R.string.Shuffle), false)
+                manage.putBooleanPref(getString(R.string.Repeat), false)
+                manage.putBooleanPref(getString(R.string.RepeatOne), false)
+                manage.putBooleanPref(getString(R.string.Started), false)
+                manage.putBooleanPref(getString(R.string.Songs), false)
+                manage.putStringPref("position", "remove")
             }
+            if (songListByName.size > 0) {
+                val playListArrayList: MutableList<String> = ArrayList()
+                playListArrayList.add("NormalSongs")
+                playListArrayList.add("Songs")
 
-            viewModel.removeSongFromPlaylist()
-
-            if (viewModel.getPlayingList().value != null) {
-                val songsToRemove = ArrayList<Song>()
-                for (s in viewModel.getPlayingList().value!!) {
-                    if (!songListByName.contains(s)) {
-                        songsToRemove.add(s)
-                    }
-                }
-                for (s in songsToRemove) {
-                    removeFromPlayingList(s)
-                }
-            }
-
-            lastPlayedRepository.getLastPlayedSongsList()
-                .observe(this@MainActivity, { lastPlayed: List<LastPlayed>? ->
-                    if (lastPlayed != null) {
-                        for ((s) in lastPlayed) {
-                            if (!songListByName.contains(s)) {
-                                lastPlayedRepository.deleteSongFromLastPlayed(s.id)
-                            }
+                for (playListName in playListArrayList) {
+                    val songList = tinydb.getListObject(playListName, Song::class.java)
+                    val iterator = songList.iterator()
+                    while (iterator.hasNext()) {
+                        val value = iterator.next()
+                        if (!songListByName.contains(value)) {
+                            iterator.remove()
                         }
                     }
-                })
+                    if (playListName == "Songs" && songList.size == 0) {
+                        manage.putBooleanPref(getString(R.string.Songs), false)
+                    }
+                    tinydb.putListObject(playListName, songList)
+                }
 
-            mostPlayedRepository.getMostPlayedSongs()
-                .observe(this@MainActivity, { mostPlayed: List<MostPlayed>? ->
-                    if (mostPlayed != null) {
-                        for ((s) in mostPlayed) {
-                            if (!songListByName.contains(s)) {
-                                mostPlayedRepository.deleteMostPlayedSong(s.id)
-                            }
+                viewModel.removeSongFromPlaylist()
+
+                if (viewModel.getPlayingList().value != null) {
+                    val songsToRemove = ArrayList<Song>()
+                    for (s in viewModel.getPlayingList().value!!) {
+                        if (!songListByName.contains(s)) {
+                            songsToRemove.add(s)
                         }
                     }
-                })
+                    for (s in songsToRemove) {
+                        removeFromPlayingList(s)
+                    }
+                }
+
+                lastPlayedRepository.getLastPlayedSongsList()
+                    .observe(this@MainActivity, { lastPlayed: List<LastPlayed>? ->
+                        if (lastPlayed != null) {
+                            for ((s) in lastPlayed) {
+                                if (!songListByName.contains(s)) {
+                                    lastPlayedRepository.deleteSongFromLastPlayed(s.id)
+                                }
+                            }
+                        }
+                    })
+
+                mostPlayedRepository.getMostPlayedSongs()
+                    .observe(this@MainActivity, { mostPlayed: List<MostPlayed>? ->
+                        if (mostPlayed != null) {
+                            for ((s) in mostPlayed) {
+                                if (!songListByName.contains(s)) {
+                                    mostPlayedRepository.deleteMostPlayedSong(s.id)
+                                }
+                            }
+                        }
+                    })
+            } else {
+                started = false
+                stopApp()
+            }
         } else {
             started = false
             stopApp()

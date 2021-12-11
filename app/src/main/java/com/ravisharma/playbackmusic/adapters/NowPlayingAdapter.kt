@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic.adapters
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
@@ -34,6 +35,7 @@ class NowPlayingAdapter(private var dragListener: StartDragListener) : RecyclerV
     interface OnItemClicked {
         fun onItemClick(position: Int)
         fun onOptionsClick(position: Int)
+        fun onItemRemove(position: Int)
     }
 
     inner class ViewHolder(val binding: AdapNowPlayingBinding) : RecyclerView.ViewHolder(binding.root)
@@ -60,7 +62,15 @@ class NowPlayingAdapter(private var dragListener: StartDragListener) : RecyclerV
             }
 
             songBox.setOnClickListener { onClick.onItemClick(holder.adapterPosition) }
-            imgOptions.setOnClickListener { onClick.onOptionsClick(holder.adapterPosition) }
+            songBox.setOnLongClickListener {
+                onClick.onOptionsClick(holder.adapterPosition)
+                true
+            }
+
+            imgRemove.setOnClickListener {
+                onClick.onItemRemove(holder.adapterPosition)
+            }
+
             ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     dragListener.requestDrag(holder)
