@@ -19,7 +19,7 @@ android {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 46
+        versionCode 47
         versionName "2.8.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
