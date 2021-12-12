@@ -17,38 +17,33 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/shuffleLibrary"
-        android:orderInCategory="3"
-        android:title="@string/shuffleLibrary" />
-
-    <item
         android:id="@+id/timer"
-        android:orderInCategory="4"
+        android:orderInCategory="3"
         android:title="Sleep Timer" />
 
     <item
         android:id="@+id/rescan"
-        android:orderInCategory="5"
+        android:orderInCategory="4"
         android:title="Scan Library" />
 
     <item
         android:id="@+id/share"
-        android:orderInCategory="6"
+        android:orderInCategory="5"
         android:title="Share" />
 
     <item
         android:id="@+id/rateUs"
-        android:orderInCategory="7"
+        android:orderInCategory="6"
         android:title="Rate Us" />
 
     <item
         android:id="@+id/suggestion"
-        android:orderInCategory="8"
+        android:orderInCategory="7"
         android:title="Suggestion" />
 
     <item
         android:id="@+id/about"
-        android:orderInCategory="9"
+        android:orderInCategory="8"
         android:title="About" />
 
 </menu>

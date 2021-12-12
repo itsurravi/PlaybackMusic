@@ -129,10 +129,10 @@
                 android:id="@+id/cardImage"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="40dp"
+                android:layout_marginEnd="10dp"
                 android:layout_marginBottom="40dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="20dp"
                 android:elevation="10dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toTopOf="@id/imgFav"
@@ -238,7 +238,7 @@
                 android:layout_weight="2"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/uamp_ic_play_arrow_white_48dp"
-                app:layout_constraintBottom_toTopOf="@id/seekBarVolume"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft"
                 tools:targetApi="lollipop" />
@@ -296,40 +296,6 @@
                 app:layout_constraintStart_toEndOf="@id/btn_Next"
                 app:layout_constraintTop_toTopOf="@id/btn_Next"
                 tools:targetApi="lollipop" />
-
-            <ImageView
-                android:id="@+id/imgVolumeDown"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:src="@drawable/ic_volume_down"
-                app:layout_constraintBottom_toBottomOf="@id/seekBarVolume"
-                app:layout_constraintEnd_toStartOf="@id/seekBarVolume"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft"
-                app:layout_constraintTop_toTopOf="@id/seekBarVolume" />
-
-            <SeekBar
-                android:id="@+id/seekBarVolume"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:padding="7dp"
-                android:progressTint="@color/seek_progress"
-                android:thumbTint="@color/textColor"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/imgVolumeUp"
-                app:layout_constraintStart_toEndOf="@id/imgVolumeDown" />
-
-            <ImageView
-                android:id="@+id/imgVolumeUp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_volume_up"
-                app:layout_constraintBottom_toBottomOf="@id/seekBarVolume"
-                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
-                app:layout_constraintStart_toEndOf="@id/seekBarVolume"
-                app:layout_constraintTop_toTopOf="@id/seekBarVolume" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineLeft"

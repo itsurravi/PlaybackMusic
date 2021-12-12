@@ -11,7 +11,7 @@
     <include
         android:id="@+id/splash_screen"
         layout="@layout/activity_splash_screen"
-        tools:visibility="gone"/>
+        tools:visibility="gone" />
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
         android:id="@+id/sliding_layout"
@@ -23,7 +23,8 @@
         app:umanoDragView="@+id/dragView"
         app:umanoOverlay="true"
         app:umanoPanelHeight="64dp"
-        app:umanoShadowHeight="4dp">
+        app:umanoShadowHeight="4dp"
+        tools:visibility="visible">
 
         <!-- MAIN CONTENT -->
         <LinearLayout
@@ -38,36 +39,54 @@
                 android:layout_marginBottom="64dp"
                 android:visibility="gone" />
 
-            <LinearLayout
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:id="@+id/mainLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginBottom="64dp"
                 android:orientation="vertical">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
+                <com.google.android.material.appbar.AppBarLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorPrimary"
-                    app:popupTheme="@style/AppTheme" />
+                    android:layout_height="wrap_content">
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabs"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/colorPrimary"
-                    app:tabIndicatorColor="@color/tabIndicatorColor"
-                    app:tabSelectedTextColor="@color/tabSelectedTextColor"
-                    app:tabTextAppearance="@style/MineCustomTabText"
-                    app:tabTextColor="@color/tabTextColor" />
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorPrimary"
+                        app:popupTheme="@style/AppTheme" />
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tabs"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@color/colorPrimary"
+                        app:tabIndicatorFullWidth="true"
+                        app:tabIndicatorAnimationMode="elastic"
+                        app:tabIndicatorColor="@color/tabIndicatorColor"
+                        app:tabSelectedTextColor="@color/tabSelectedTextColor"
+                        app:tabTextAppearance="@style/MineCustomTabText"
+                        app:tabTextColor="@color/tabTextColor" />
+                </com.google.android.material.appbar.AppBarLayout>
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/view_pager"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-            </LinearLayout>
+                    android:layout_height="match_parent"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabShuffle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="14dp"
+                    android:src="@drawable/ic_shuffle_24"
+                    app:tint="@android:color/white"
+                    app:backgroundTint="@color/scrollThumb" />
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </LinearLayout>
 
         <!-- SLIDING LAYOUT -->

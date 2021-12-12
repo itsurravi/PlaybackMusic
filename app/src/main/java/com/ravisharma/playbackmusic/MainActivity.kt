@@ -80,8 +80,8 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
 import android.media.AudioManager
-
-
+import androidx.core.view.isVisible
+import androidx.viewpager2.widget.ViewPager2
 
 
 @AndroidEntryPoint
@@ -349,6 +349,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         }.attach()
 
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                binding.fabShuffle.isVisible = position == 1 && positionOffset == 0f
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                super.onPageScrollStateChanged(state)
+                if(binding.fabShuffle.isVisible && state != 0) {
+                    binding.fabShuffle.isVisible = false
+                }
+            }
+        })
+
         viewModel.getPlayingList().observe(this, { songs ->
             songList = songs
             if (songList.size > 0) {
@@ -507,6 +525,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             imgFav.setOnClickListener(this@MainActivity)
         }
 
+        binding.fabShuffle.setOnClickListener {
+            shuffleLibrarySongs()
+        }
+
         loadBanner1()
 
         CheckUpdate().execute()
@@ -516,24 +538,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             .setMinDaysUntilPrompt(10)
             .setMinLaunchesUntilPrompt(15)
             .init()
-
-        binding.playingPanel.seekBarVolume.max = maxVolume
-        binding.playingPanel.seekBarVolume.progress = curVolume
-
-        binding.playingPanel.seekBarVolume.setOnSeekBarChangeListener(object :
-            OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0)
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
-            }
-        })
     }
 
     private fun loadBanner1() {
@@ -829,7 +833,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
         binding.playingPanel.cardImage.load(art) {
             error(R.drawable.logo)
-            transformations(RoundedCornersTransformation(25f))
+            transformations(RoundedCornersTransformation(20f))
             crossfade(true)
         }
 
@@ -886,7 +890,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //menu item selected
         when (item.itemId) {
-            R.id.shuffleLibrary -> shuffleLibrarySongs()
             R.id.timer -> showTimer()
             R.id.equalizer -> {
                 val eq = Intent(this@MainActivity, EqualizerActivity::class.java)
@@ -1560,30 +1563,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             true, observer
         )
-        contentResolver.registerContentObserver(
-            android.provider.Settings.System.CONTENT_URI,
-            true, volObserver
-        )
     }
 
     private fun unRegisterMediaChangeObserver() {
         contentResolver.unregisterContentObserver(observer)
-        contentResolver.unregisterContentObserver(volObserver)
-    }
-
-    private var volObserver: ContentObserver =
-        object : ContentObserver(Handler(Looper.getMainLooper())) {
-
-        override fun deliverSelfNotifications(): Boolean {
-            return false
-        }
-
-        override fun onChange(selfChange: Boolean) {
-            val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-            curVolume = currentVolume
-            binding.playingPanel.seekBarVolume.progress = currentVolume
-        }
-
     }
 
     private fun checkInPlaylists() {
