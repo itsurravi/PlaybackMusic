@@ -62,9 +62,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:background="@color/colorPrimary"
-                        app:tabIndicatorFullWidth="true"
                         app:tabIndicatorAnimationMode="elastic"
                         app:tabIndicatorColor="@color/tabIndicatorColor"
+                        app:tabIndicatorFullWidth="false"
                         app:tabSelectedTextColor="@color/tabSelectedTextColor"
                         app:tabTextAppearance="@style/MineCustomTabText"
                         app:tabTextColor="@color/tabTextColor" />
@@ -82,9 +82,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|end"
                     android:layout_margin="14dp"
+                    android:contentDescription="@string/shuffle_library_songs"
                     android:src="@drawable/ic_shuffle_24"
-                    app:tint="@android:color/white"
-                    app:backgroundTint="@color/scrollThumb" />
+                    app:backgroundTint="@color/scrollThumb"
+                    app:tint="@android:color/white" />
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </LinearLayout>

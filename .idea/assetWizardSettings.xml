@@ -365,7 +365,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$PROJECT_DIR$/../Android_SDK/icons/material/materialiconsround/shuffle/round_shuffle_24.xml" />
+                                      <entry key="url" value="file:/$PROJECT_DIR$/../Android_SDK/icons/material/materialiconsround/play_circle/round_play_circle_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -376,7 +376,7 @@
                         <option name="values">
                           <map>
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_shuffle_24" />
+                            <entry key="outputName" value="ic_play_circle" />
                             <entry key="sourceFile" value="C:\Users\ravik\Downloads\close.svg" />
                           </map>
                         </option>

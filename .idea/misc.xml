@@ -13,11 +13,15 @@
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_close_round_32.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_left.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_options.xml" value="0.38125" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_play_24.xml" value="0.24078947368421053" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_play_circle.xml" value="0.24078947368421053" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_save_24.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_shuffle_24.xml" value="0.24078947368421053" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_time.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_volume_down.xml" value="0.38125" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/ic_volume_up.xml" value="0.38125" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/uamp_ic_pause_white_48dp.xml" value="0.24078947368421053" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/drawable/uamp_ic_play_arrow_white_48dp.xml" value="0.24078947368421053" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_about.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_add_to_playlist.xml" value="0.39666357738646896" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/activity_category_song.xml" value="0.3594871794871795" />

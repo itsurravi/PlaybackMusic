@@ -356,14 +356,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 positionOffsetPixels: Int
             ) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                binding.fabShuffle.isVisible = position == 1 && positionOffset == 0f
+                binding.fabShuffle.isVisible = position != 0
             }
 
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                if(binding.fabShuffle.isVisible && state != 0) {
-                    binding.fabShuffle.isVisible = false
-                }
             }
         })
 

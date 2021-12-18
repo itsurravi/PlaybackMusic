@@ -170,6 +170,7 @@
     <string name="favTracks">My Favorites</string>
 
     <string name="back">Back</string>
+    <string name="shuffle_library_songs">Shuffle Library Songs</string>
 
 
 </resources>
