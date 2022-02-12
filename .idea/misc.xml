@@ -33,6 +33,10 @@
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/adap_song.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/adapter_albums.xml" value="0.22833876221498373" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/adapter_playlist.xml" value="0.3651041666666667" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/layout/alert_list.xml" value="0.15763888888888888" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/layout/alert_playlist.xml" value="0.15763888888888888" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/layout/alert_popup_message.xml" value="0.2305921052631579" />
+        <entry key="..\:/Android/Playback Music/app/src/main/res/layout/alert_timer.xml" value="0.15763888888888888" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/fragment_albums.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/fragment_name_wise.xml" value="0.3594871794871795" />
         <entry key="..\:/Android/Playback Music/app/src/main/res/layout/fragment_now_playing.xml" value="0.3594871794871795" />

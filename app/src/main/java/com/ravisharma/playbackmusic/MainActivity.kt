@@ -82,6 +82,7 @@ import kotlin.system.exitProcess
 import android.media.AudioManager
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
+import com.ravisharma.playbackmusic.databinding.AlertPopupMessageBinding
 
 
 @AndroidEntryPoint
@@ -170,6 +171,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     var maxVolume = 0
     var curVolume = 0
 
+    private var menu: Menu? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -237,6 +240,26 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         ) {
             runTask()
         } else {
+            showPermissionReasonDialog()
+        }
+    }
+
+    private fun showPermissionReasonDialog() {
+        val dialog = AlertDialog.Builder(this, R.style.AlertDialogCustom)
+        val dialogBinding: AlertPopupMessageBinding =
+            AlertPopupMessageBinding.inflate(layoutInflater)
+        dialog.setView(dialogBinding.root)
+
+        val alertDialog = dialog.create()
+        alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.setCancelable(false)
+
+        dialogBinding.txtTitle.text = getString(R.string.permissionHead)
+        dialogBinding.txtMessage.text = getString(R.string.permissionReason)
+        dialogBinding.txtSave.text = getString(R.string.permissionAgree)
+
+        dialogBinding.txtSave.setOnClickListener {
+            alertDialog.dismiss()
             ActivityCompat.requestPermissions(
                 this, arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -247,6 +270,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 ), 1
             )
         }
+        alertDialog.show()
     }
 
     override fun onRequestPermissionsResult(
@@ -296,12 +320,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun runTask() {
         clearPrefDataOnAppUpdate()
         val provider = SongsProvider()
-        provider.fetchAllData(contentResolver).observe(this@MainActivity, { aBoolean ->
+        provider.fetchAllData(contentResolver).observe(this@MainActivity) { aBoolean ->
             if (aBoolean) {
                 checkInPlaylists()
                 Handler(Looper.getMainLooper()).postDelayed({ setUpMainScreen() }, 1000)
             }
-        })
+        }
     }
 
     private fun clearPrefDataOnAppUpdate() {
@@ -364,7 +388,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         })
 
-        viewModel.getPlayingList().observe(this, { songs ->
+        viewModel.getPlayingList().observe(this) { songs ->
             songList = songs
             if (songList.size > 0) {
                 Log.d("Playing", "List Changed " + songList.size)
@@ -389,9 +413,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
 
             }
-        })
+        }
 
-        viewModel.getPlayingSong().observe(this, { song ->
+        viewModel.getPlayingSong().observe(this) { song ->
             playingSong = song
             Log.d("Playing", "Playing Song " + playingSong!!.title)
 
@@ -416,16 +440,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 manage.putStringPref(getString(R.string.position), songPosn.toString())
                 manage.putStringPref(getString(R.string.ID), songPosn.toString())
             }
-        })
+        }
 
-        viewModel.getSongPosition().observe(this, { integer ->
+        viewModel.getSongPosition().observe(this) { integer ->
             songPosn = integer
             if (songPosn >= songList.size) {
                 songPosn = 0
             }
             musicSrv!!.setSong(songPosn)
             Log.d("Playing", "Position Changed $songPosn")
-        })
+        }
 
         lastSongId = manage.getStringPref(getString(R.string.ID))
         lastShuffle = manage.getBooleanPref(getString(R.string.Shuffle))
@@ -491,7 +515,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_off)
         }
 
-        viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(this, { playlists ->
+        viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(this) { playlists ->
             var check = false
             if (started) {
                 for ((_, _, song) in playlists) {
@@ -503,7 +527,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             } else {
                 binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
             }
-        })
+        }
 
         binding.slidingLayout.apply {
             addPanelSlideListener(onSlideListener())
@@ -788,6 +812,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     binding.playingPanel.playerController.alpha = slideOffset
                 }
             }
+
             override fun onPanelStateChanged(
                 panel: View,
                 previousState: PanelState,
@@ -880,6 +905,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        this.menu = menu
         menuInflater.inflate(R.menu.main, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -898,11 +924,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
             R.id.rescan -> {
                 val scan = SongsProvider()
-                scan.fetchAllData(contentResolver).observe(this, { aBoolean ->
+                scan.fetchAllData(contentResolver).observe(this) { aBoolean ->
                     if (aBoolean) {
-                        showSnackBar("Media Scan Completed")
+                        showSnackBar(getString(R.string.mediaScan))
                     }
-                })
+                }
             }
             R.id.share -> try {
                 val shareIntent = Intent(Intent.ACTION_SEND)
@@ -937,7 +963,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
             )
         } catch (e: ActivityNotFoundException) {
-            showSnackBar("Unable to find market app")
+            showSnackBar(getString(R.string.unableToFindMarketApp))
         }
 
         manage.putBooleanPref(PrefsContract.PREF_DONT_SHOW_AGAIN, true)
@@ -1134,7 +1160,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     return
                 }
                 doubleBackToExitPressedOnce = true
-                showSnackBar("Tap Again to Exit")
+                showSnackBar(getString(R.string.tapToExit))
 
                 Handler(Looper.getMainLooper()).postDelayed(
                     { doubleBackToExitPressedOnce = false },
@@ -1402,10 +1428,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun updateAlertDialog() {
         val builder = AlertDialog.Builder(this, R.style.AlertDialogCustom)
-        builder.setTitle("New Update Available")
-        builder.setMessage("\nCurrent Version: $currentVersion\nLatest Version: $latestVersion\n")
+        builder.setTitle(getString(R.string.newUpdate))
+        builder.setMessage(getString(R.string.updateMessage, currentVersion, latestVersion))
         builder.setCancelable(false)
-        builder.setPositiveButton("Update") { dialog, which ->
+        builder.setPositiveButton(getString(R.string.updateButton)) { dialog, which ->
             try {
                 startActivity(
                     Intent(
@@ -1418,125 +1444,136 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
             dialog.dismiss()
         }
-        builder.setNegativeButton("Not Now") { dialog, which -> dialog.dismiss() }
+        builder.setNegativeButton(getString(R.string.updateLater)) { dialog, which -> dialog.dismiss() }
         val ad = builder.create()
         ad.show()
     }
 
     private fun saveEqualizerSettings() {
-        if (Settings.equalizerModel != null) {
-            val settings = EqualizerSettings()
-            settings.bassStrength = Settings.equalizerModel.bassStrength
-            settings.virtualizerStrength = Settings.equalizerModel.virtualizerStrength
-            settings.presetPos = Settings.equalizerModel.presetPos
-            settings.reverbPreset = Settings.equalizerModel.reverbPreset
-            settings.seekbarpos = Settings.equalizerModel.seekbarpos
-            settings.isEqualizerEnabled = Settings.equalizerModel.isEqualizerEnabled
-            settings.isEqualizerReloaded = Settings.equalizerModel.isEqualizerReloaded
-            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-            val gson = Gson()
-            preferences.edit()
-                .putString(PREF_KEY, gson.toJson(settings))
-                .apply()
-        }
-        if (mEqualizer != null) {
-            mEqualizer!!.release()
-            mEqualizer = null
-        }
-        if (bassBoost != null) {
-            bassBoost!!.release()
-            bassBoost = null
-        }
-        if (virtualizer != null) {
-            virtualizer!!.release()
-            virtualizer = null
-        }
-        if (presetReverb != null) {
-            presetReverb!!.release()
-            presetReverb = null
+        try {
+            if (Settings.equalizerModel != null) {
+                val settings = EqualizerSettings()
+                settings.bassStrength = Settings.equalizerModel.bassStrength
+                settings.virtualizerStrength = Settings.equalizerModel.virtualizerStrength
+                settings.presetPos = Settings.equalizerModel.presetPos
+                settings.reverbPreset = Settings.equalizerModel.reverbPreset
+                settings.seekbarpos = Settings.equalizerModel.seekbarpos
+                settings.isEqualizerEnabled = Settings.equalizerModel.isEqualizerEnabled
+                settings.isEqualizerReloaded = Settings.equalizerModel.isEqualizerReloaded
+                val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+                val gson = Gson()
+                preferences.edit()
+                    .putString(PREF_KEY, gson.toJson(settings))
+                    .apply()
+            }
+            if (mEqualizer != null) {
+                mEqualizer!!.release()
+                mEqualizer = null
+            }
+            if (bassBoost != null) {
+                bassBoost!!.release()
+                bassBoost = null
+            }
+            if (virtualizer != null) {
+                virtualizer!!.release()
+                virtualizer = null
+            }
+            if (presetReverb != null) {
+                presetReverb!!.release()
+                presetReverb = null
+            }
+        } catch (exp: Exception) {
+
         }
     }
 
     private fun loadEqualizerSettings() {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val gson = Gson()
-        val settings =
-            gson.fromJson(preferences.getString(PREF_KEY, "{}"), EqualizerSettings::class.java)
-        val model = EqualizerModel()
-        model.isEqualizerEnabled = settings.isEqualizerEnabled
-        model.isEqualizerReloaded = settings.isEqualizerReloaded
-        model.bassStrength = settings.bassStrength
-        model.virtualizerStrength = settings.virtualizerStrength
-        model.presetPos = settings.presetPos
-        model.reverbPreset = settings.reverbPreset
-        model.seekbarpos = settings.seekbarpos
-        Settings.isEqualizerEnabled = settings.isEqualizerEnabled
-        Settings.isEqualizerReloaded = settings.isEqualizerReloaded
-        Settings.bassStrength = settings.bassStrength
-        Settings.virtualizerStrength = settings.virtualizerStrength
-        Settings.presetPos = settings.presetPos
-        Settings.reverbPreset = settings.reverbPreset
-        Settings.seekbarpos = settings.seekbarpos
-        Settings.equalizerModel = model
-        if (Settings.equalizerModel == null) {
-            Settings.equalizerModel = EqualizerModel()
-            Settings.equalizerModel.reverbPreset = PresetReverb.PRESET_NONE
-            Settings.equalizerModel.bassStrength = (1000 / 19).toShort()
-            Settings.equalizerModel.virtualizerStrength = (1000 / 19).toShort()
-        }
-        if (mEqualizer != null) {
-            mEqualizer!!.release()
-            mEqualizer = null
-        }
-        if (bassBoost != null) {
-            bassBoost!!.release()
-            bassBoost = null
-        }
-        if (virtualizer != null) {
-            virtualizer!!.release()
-            virtualizer = null
-        }
-        if (presetReverb != null) {
-            presetReverb!!.release()
-            presetReverb = null
-        }
-        mEqualizer = Equalizer(0, sessionId)
-        bassBoost = BassBoost(0, sessionId)
-        presetReverb = PresetReverb(0, sessionId)
-        virtualizer = Virtualizer(0, sessionId)
-        val bassBoostSettingTemp = bassBoost!!.properties
-        val bassBoostSetting = BassBoost.Settings(bassBoostSettingTemp.toString())
-        bassBoostSetting.strength = Settings.equalizerModel.bassStrength
-        bassBoost!!.properties = bassBoostSetting
-        val virtualizerSettingTemp = virtualizer!!.properties
-        val virtualizerSetting = Virtualizer.Settings(virtualizerSettingTemp.toString())
-        virtualizerSetting.strength = Settings.equalizerModel.virtualizerStrength
-        virtualizer!!.properties = virtualizerSetting
-        presetReverb!!.preset = Settings.equalizerModel.reverbPreset
-        mEqualizer!!.enabled = Settings.isEqualizerEnabled
-        bassBoost!!.enabled = Settings.isEqualizerEnabled
-        virtualizer!!.enabled = Settings.isEqualizerEnabled
-        presetReverb!!.enabled = Settings.isEqualizerEnabled
         try {
-            if (Settings.presetPos == 0) {
-                for (bandIdx in 0 until mEqualizer!!.numberOfBands) {
+            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+            val gson = Gson()
+            val settings =
+                gson.fromJson(preferences.getString(PREF_KEY, "{}"), EqualizerSettings::class.java)
+            val model = EqualizerModel()
+            model.isEqualizerEnabled = settings.isEqualizerEnabled
+            model.isEqualizerReloaded = settings.isEqualizerReloaded
+            model.bassStrength = settings.bassStrength
+            model.virtualizerStrength = settings.virtualizerStrength
+            model.presetPos = settings.presetPos
+            model.reverbPreset = settings.reverbPreset
+            model.seekbarpos = settings.seekbarpos
+            Settings.isEqualizerEnabled = settings.isEqualizerEnabled
+            Settings.isEqualizerReloaded = settings.isEqualizerReloaded
+            Settings.bassStrength = settings.bassStrength
+            Settings.virtualizerStrength = settings.virtualizerStrength
+            Settings.presetPos = settings.presetPos
+            Settings.reverbPreset = settings.reverbPreset
+            Settings.seekbarpos = settings.seekbarpos
+            Settings.equalizerModel = model
+            if (Settings.equalizerModel == null) {
+                Settings.equalizerModel = EqualizerModel()
+                Settings.equalizerModel.reverbPreset = PresetReverb.PRESET_NONE
+                Settings.equalizerModel.bassStrength = (1000 / 19).toShort()
+                Settings.equalizerModel.virtualizerStrength = (1000 / 19).toShort()
+            }
+            if (mEqualizer != null) {
+                mEqualizer!!.release()
+                mEqualizer = null
+            }
+            if (bassBoost != null) {
+                bassBoost!!.release()
+                bassBoost = null
+            }
+            if (virtualizer != null) {
+                virtualizer!!.release()
+                virtualizer = null
+            }
+            if (presetReverb != null) {
+                presetReverb!!.release()
+                presetReverb = null
+            }
+            mEqualizer = Equalizer(0, sessionId)
+            bassBoost = BassBoost(0, sessionId)
+            presetReverb = PresetReverb(0, sessionId)
+            virtualizer = Virtualizer(0, sessionId)
+            val bassBoostSettingTemp = bassBoost!!.properties
+            val bassBoostSetting = BassBoost.Settings(bassBoostSettingTemp.toString())
+            bassBoostSetting.strength = Settings.equalizerModel.bassStrength
+            bassBoost!!.properties = bassBoostSetting
+            val virtualizerSettingTemp = virtualizer!!.properties
+            val virtualizerSetting = Virtualizer.Settings(virtualizerSettingTemp.toString())
+            virtualizerSetting.strength = Settings.equalizerModel.virtualizerStrength
+            virtualizer!!.properties = virtualizerSetting
+            presetReverb!!.preset = Settings.equalizerModel.reverbPreset
+            mEqualizer!!.enabled = Settings.isEqualizerEnabled
+            bassBoost!!.enabled = Settings.isEqualizerEnabled
+            virtualizer!!.enabled = Settings.isEqualizerEnabled
+            presetReverb!!.enabled = Settings.isEqualizerEnabled
+            try {
+                if (Settings.presetPos == 0) {
+                    for (bandIdx in 0 until mEqualizer!!.numberOfBands) {
+                        mEqualizer!!.setBandLevel(
+                            bandIdx.toShort(), Settings.seekbarpos[bandIdx]
+                                .toShort()
+                        )
+                    }
+                } else {
+                    mEqualizer!!.usePreset(Settings.presetPos.toShort())
+                }
+            } catch (e: Exception) {
+                Settings.presetPos = 0
+                var bandIdx: Short = 0
+                while (bandIdx < mEqualizer!!.numberOfBands) {
                     mEqualizer!!.setBandLevel(
-                        bandIdx.toShort(), Settings.seekbarpos[bandIdx]
+                        bandIdx, Settings.seekbarpos[bandIdx.toInt()]
                             .toShort()
                     )
+                    bandIdx++
                 }
-            } else {
-                mEqualizer!!.usePreset(Settings.presetPos.toShort())
             }
-        } catch (e: Exception) {
-            Settings.presetPos = 0
-            var bandIdx: Short = 0
-            while (bandIdx < mEqualizer!!.numberOfBands) {
-                mEqualizer!!.setBandLevel(
-                    bandIdx, Settings.seekbarpos[bandIdx.toInt()]
-                        .toShort()
-                )
-                bandIdx++
+        } catch (exp: Exception) {
+            menu?.let { menu ->
+                val menuItem = menu.findItem(R.id.equalizer)
+                menuItem.isVisible = false
             }
         }
     }
@@ -1546,11 +1583,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             override fun onChange(selfChange: Boolean) {
                 super.onChange(selfChange)
                 val provider = SongsProvider()
-                provider.fetchAllData(contentResolver).observe(this@MainActivity, { aBoolean ->
+                provider.fetchAllData(contentResolver).observe(this@MainActivity) { aBoolean ->
                     if (aBoolean) {
                         checkInPlaylists()
                     }
-                })
+                }
             }
 
         }
@@ -1567,7 +1604,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun checkInPlaylists() {
-        if(songListByName.value!=null) {
+        if (songListByName.value != null) {
             val songListByName = songListByName.value!!
             if (songListByName.size <= 1) {
                 manage.putStringPref(getString(R.string.ID), "remove")
@@ -1613,7 +1650,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
 
                 lastPlayedRepository.getLastPlayedSongsList()
-                    .observe(this@MainActivity, { lastPlayed: List<LastPlayed>? ->
+                    .observe(this@MainActivity) { lastPlayed: List<LastPlayed>? ->
                         if (lastPlayed != null) {
                             for ((s) in lastPlayed) {
                                 if (!songListByName.contains(s)) {
@@ -1621,10 +1658,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                                 }
                             }
                         }
-                    })
+                    }
 
                 mostPlayedRepository.getMostPlayedSongs()
-                    .observe(this@MainActivity, { mostPlayed: List<MostPlayed>? ->
+                    .observe(this@MainActivity) { mostPlayed: List<MostPlayed>? ->
                         if (mostPlayed != null) {
                             for ((s) in mostPlayed) {
                                 if (!songListByName.contains(s)) {
@@ -1632,14 +1669,38 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                                 }
                             }
                         }
-                    })
+                    }
             } else {
                 started = false
-                stopApp()
+                showNoSongFoundDialog()
             }
         } else {
             started = false
-            stopApp()
+            showNoSongFoundDialog()
+        }
+    }
+
+    private fun showNoSongFoundDialog() {
+        try {
+            val dialog = AlertDialog.Builder(this, R.style.AlertDialogCustom)
+            val dialogBinding: AlertPopupMessageBinding =
+                AlertPopupMessageBinding.inflate(layoutInflater)
+            dialog.setView(dialogBinding.root)
+
+            val alertDialog = dialog.create()
+            alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            alertDialog.setCancelable(false)
+
+            dialogBinding.txtTitle.text = getString(R.string.noFileFound)
+            dialogBinding.txtMessage.text = getString(R.string.noFileFoundMessage)
+            dialogBinding.txtSave.text = getString(R.string.noFileFoundButton)
+
+            dialogBinding.txtSave.setOnClickListener {
+                alertDialog.dismiss()
+            }
+            alertDialog.show()
+        } catch(exp: Exception) {
+
         }
     }
 

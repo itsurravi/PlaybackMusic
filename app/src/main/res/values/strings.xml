@@ -171,6 +171,22 @@
 
     <string name="back">Back</string>
     <string name="shuffle_library_songs">Shuffle Library Songs</string>
+    <string name="mediaScan">Media Scan Completed</string>
+    <string name="unableToFindMarketApp">Unable to find market app</string>
+    <string name="tapToExit">Tap Again to Exit</string>
 
+    <string name="newUpdate">New Update Available</string>
+    <string name="updateMessage">\nCurrent Version: %1$s \nLatest Version: %2$s</string>
+    <string name="updateButton">Update</string>
+    <string name="updateLater">Not Now</string>
 
+    <string name="permissionHead">Permission Required</string>
+    <string name="permissionReason">Playback Music is an Local Audio File Player.\n\nPlayback Music plays only Song / Audio files that are located in your device storage.\n\nDue to this reason, this app requires storage permission to play Songs / Audio files.\n</string>
+    <string name="permissionAgree">Agree</string>
+
+    <string name="noFileFound">No Song / Audio File Found</string>
+    <string name="noFileFoundMessage">This Player will not work if your device have no Song / Audio file in storage.</string>
+    <string name="noFileFoundButton">OK</string>
+
+    <string name="noSongDialog">noSongDialog</string>
 </resources>
