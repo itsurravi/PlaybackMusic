@@ -1699,7 +1699,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 alertDialog.dismiss()
             }
             alertDialog.show()
-        } catch(exp: Exception) {
+        } catch (exp: Exception) {
 
         }
     }
@@ -1709,34 +1709,41 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     private fun shuffleLibrarySongs() {
-        playingDuration = "0"
-        musicSrv!!.setPlayingPosition(playingDuration)
-        musicSrv!!.setShuffle(true)
+        songListByName.value?.let { songsList ->
+            if (songsList.size > 0) {
 
-        lastShuffle = true
+                playingDuration = "0"
+                musicSrv!!.setPlayingPosition(playingDuration)
+                musicSrv!!.setShuffle(true)
 
-        binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
+                lastShuffle = true
 
-        normalList.clear()
-        songList.clear()
+                binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
 
-        normalList.addAll(songListByName.value!!)
-        songList.addAll(songListByName.value!!)
-        songList.shuffle()
+                normalList.clear()
+                songList.clear()
 
-        manage.putBooleanPref(getString(R.string.Shuffle), lastShuffle)
+                normalList.addAll(songListByName.value!!)
+                songList.addAll(songListByName.value!!)
+                songList.shuffle()
 
-        songPosn = 0
+                manage.putBooleanPref(getString(R.string.Shuffle), lastShuffle)
 
-        setPlayingList(songList)
-        setSongPosition(songPosn)
-        setPlayingSong(songList[songPosn])
+                songPosn = 0
 
-        musicSrv!!.playSong()
+                setPlayingList(songList)
+                setSongPosition(songPosn)
+                setPlayingSong(songList[songPosn])
 
-        played = true
-        started = true
-        setPauseIcons()
+                musicSrv!!.playSong()
+
+                played = true
+                started = true
+                setPauseIcons()
+            } else {
+                Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
+            }
+        } ?: Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

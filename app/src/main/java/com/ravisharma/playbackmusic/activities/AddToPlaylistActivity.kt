@@ -80,11 +80,11 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
     }
 
     private fun setUpArrayList() {
-        viewModel.getAllPlaylists().observe(this, { strings ->
+        viewModel.getAllPlaylists().observe(this) { strings ->
             list.clear()
             list.addAll(strings!!)
             playlistAdapter.notifyDataSetChanged()
-        })
+        }
     }
 
     override fun onPlaylistClick(position: Int) {

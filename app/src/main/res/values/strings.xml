@@ -38,7 +38,7 @@
     <string name="deleteMessage">Do you want to delete?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="notValid">Not Valid Search</string>
+    <string name="notValid">Not a Valid Search</string>
     <string name="notValidLength">"Search Length Not Valid"</string>
 
     <string name="ID">ID</string>
@@ -189,4 +189,5 @@
     <string name="noFileFoundButton">OK</string>
 
     <string name="noSongDialog">noSongDialog</string>
+    <string name="noSongFoundToPlay">No Song Found to Play</string>
 </resources>

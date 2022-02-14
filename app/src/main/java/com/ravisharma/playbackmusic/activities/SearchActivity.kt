@@ -77,13 +77,13 @@ class SearchActivity : AppCompatActivity(), SongAdapter.OnItemClicked, OnItemLon
                 setOnLongClick(this@SearchActivity)
             }
         }
-        viewModel.getSearchList().observe(this, { songs ->
+        viewModel.getSearchList().observe(this) { songs ->
             if (songs.isNotEmpty()) {
                 songList.clear()
                 songList.addAll(songs)
                 (binding.songList.adapter as SongAdapter).setList(songList)
             }
-        })
+        }
     }
 
     private fun initListeners() {
