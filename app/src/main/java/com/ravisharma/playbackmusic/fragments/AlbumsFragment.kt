@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter
@@ -37,22 +37,26 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
 
         binding.albumList.apply {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
             itemAnimator = DefaultItemAnimator()
-            adapter = AlbumAdapter(context, albumsList).apply {
+            adapter = AlbumAdapter().apply {
                 setOnClick(this@AlbumsFragment)
             }
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         }
 
-        albumList.observe(viewLifecycleOwner, { albums ->
+        albumList.observe(viewLifecycleOwner) { albums ->
             if (albums.size > 0) {
                 albumsList.clear()
                 albumsList.addAll(albums)
-                albumsList.sortWith { (_, _, albumName1), (_, _, albumName2) -> albumName1.compareTo(albumName2) }
-                binding.albumList.adapter?.notifyDataSetChanged()
+                albumsList.sortWith { (_, _, albumName1), (_, _, albumName2) ->
+                    albumName1.compareTo(
+                        albumName2
+                    )
+                }
+                (binding.albumList.adapter as AlbumAdapter).submitList(albumsList)
             }
-        })
+        }
     }
 
     override fun onAlbumClick(position: Int) {

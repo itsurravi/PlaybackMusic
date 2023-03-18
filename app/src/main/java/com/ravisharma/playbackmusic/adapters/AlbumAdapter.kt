@@ -1,8 +1,9 @@
 package com.ravisharma.playbackmusic.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -12,22 +13,42 @@ import com.ravisharma.playbackmusic.databinding.AdapterAlbumsBinding
 import com.ravisharma.playbackmusic.model.Album
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
-class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Album>) :
-    RecyclerView.Adapter<AlbumViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+class AlbumAdapter : RecyclerView.Adapter<AlbumViewHolder>(),
+    FastScrollRecyclerView.SectionedAdapter {
+
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<Album>() {
+        override fun areItemsTheSame(oldItemPosition: Album, newItemPosition: Album): Boolean {
+            return oldItemPosition.albumId == newItemPosition.albumId
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Album, newItemPosition: Album): Boolean {
+            return oldItemPosition == newItemPosition
+        }
+    }
+
+    private val mDiffer = AsyncListDiffer(this, diffUtilCallback)
+
+    fun submitList(list: List<Album>) {
+        mDiffer.submitList(list)
+    }
 
     private lateinit var onClick: OnAlbumClicked
 
     override fun getSectionName(position: Int): String {
-        return albumsList[position].albumName[0].toString()
+        return mDiffer.currentList[position].albumName[0].toString()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
-        val binding = AdapterAlbumsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = AdapterAlbumsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return AlbumViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AlbumViewHolder, position: Int) {
-        val currAlbum = albumsList[holder.bindingAdapterPosition]
+        val currAlbum = mDiffer.currentList[holder.bindingAdapterPosition]
         holder.binding.apply {
             albumTitle.text = currAlbum.albumName
             artistTitle.text = currAlbum.albumArtist
@@ -43,10 +64,11 @@ class AlbumAdapter(private var c: Context, private var albumsList: ArrayList<Alb
     }
 
     override fun getItemCount(): Int {
-        return albumsList.size
+        return mDiffer.currentList.size
     }
 
-    inner class AlbumViewHolder(val binding: AdapterAlbumsBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class AlbumViewHolder(val binding: AdapterAlbumsBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     //make interface like this
     interface OnAlbumClicked {
