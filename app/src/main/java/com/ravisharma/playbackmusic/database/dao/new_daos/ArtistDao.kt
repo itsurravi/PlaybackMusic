@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.database.dao.new_daos
 
 import androidx.room.*
+import com.ravisharma.playbackmusic.database.model.new_data.ArtistWithSongCount
 import com.ravisharma.playbackmusic.database.model.new_data.tables.Artist
 import com.ravisharma.playbackmusic.database.model.new_data.embedded.ArtistWithSongs
 import com.ravisharma.playbackmusic.utils.Constants
@@ -26,11 +27,11 @@ interface ArtistDao {
     @Query("SELECT * FROM ${Constants.Tables.ARTIST_TABLE} WHERE name LIKE '%' || :query || '%'")
     suspend fun searchArtists(query: String): List<Artist>
 
-//    @Transaction
-//    @Query("SELECT ${Constants.Tables.ARTIST_TABLE}.name as artistName, COUNT(*) as count " +
-//            "FROM ${Constants.Tables.ARTIST_TABLE} JOIN ${Constants.Tables.SONG_TABLE} ON " +
-//            "${Constants.Tables.ARTIST_TABLE}.name = ${Constants.Tables.SONG_TABLE}.artist " +
-//            "GROUP BY ${Constants.Tables.ARTIST_TABLE}.name")
-//    fun getAllArtistsWithSongCount(): Flow<List<ArtistWithSongCount>>
+    @Transaction
+    @Query("SELECT ${Constants.Tables.ARTIST_TABLE}.name as artistName, COUNT(*) as count " +
+            "FROM ${Constants.Tables.ARTIST_TABLE} JOIN ${Constants.Tables.SONG_TABLE} ON " +
+            "${Constants.Tables.ARTIST_TABLE}.name = ${Constants.Tables.SONG_TABLE}.artist " +
+            "GROUP BY ${Constants.Tables.ARTIST_TABLE}.name")
+    fun getAllArtistsWithSongCount(): Flow<List<ArtistWithSongCount>>
 
 }

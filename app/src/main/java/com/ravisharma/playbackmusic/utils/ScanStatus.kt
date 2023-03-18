@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.database.model.new_data
+package com.ravisharma.playbackmusic.utils
 
 sealed class ScanStatus {
     object ScanStarted: ScanStatus()

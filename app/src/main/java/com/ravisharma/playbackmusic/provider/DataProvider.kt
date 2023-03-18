@@ -20,10 +20,6 @@ class DataManager(
     private val songDao: SongDao,
     private val albumDao: AlbumDao,
     private val artistDao: ArtistDao,
-    private val albumArtistDao: AlbumArtistDao,
-    private val composerDao: ComposerDao,
-    private val lyricistDao: LyricistDao,
-    private val genreDao: GenreDao,
     private val playlistDao: PlaylistDao2,
 ) {
 
@@ -64,14 +60,9 @@ class DataManager(
         val songs = ArrayList<Song2>()
         val albumArtMap = HashMap<String, String?>()
         val artistSet = TreeSet<String>()
-        val albumArtistSet = TreeSet<String>()
-        val composerSet = TreeSet<String>()
-        val genreSet = TreeSet<String>()
-        val lyricistSet = TreeSet<String>()
         do {
             try {
                 val file = File(cursor.getString(dataIndex))
-//                if (blacklistedSongLocations.contains(file.path)) continue
                 if (!file.exists()) throw FileNotFoundException()
                 val songMetadata = mExtractor.getSongMetadata(file.path)
                 Log.e("ModifiedDate", "${cursor.getString(dateModifiedIndex).toLong()}")
@@ -95,10 +86,6 @@ class DataManager(
                 )
                 songs.add(song)
                 artistSet.add(song.artist)
-                albumArtistSet.add(song.albumArtist)
-                composerSet.add(song.composer)
-                lyricistSet.add(song.lyricist)
-                genreSet.add(song.genre)
                 if (albumArtMap[song.album] == null) {
                     albumArtMap[song.album] =
                         ContentUris.withAppendedId(songCover, cursor.getLong(albumIdIndex))
@@ -113,10 +100,6 @@ class DataManager(
         cursor.close()
         albumDao.insertAllAlbums(albumArtMap.entries.map { (t, u) -> Album(t, u) })
         artistDao.insertAllArtists(artistSet.map { Artist(it) })
-        albumArtistDao.insertAllAlbumArtists(albumArtistSet.map { AlbumArtist(it) })
-        composerDao.insertAllComposers(composerSet.map { Composer(it) })
-        lyricistDao.insertAllLyricists(lyricistSet.map { Lyricist(it) })
-        genreDao.insertAllGenres(genreSet.map { Genre(it) })
         songDao.insertAllSongs(songs)
 //        notificationManager.removeScanningNotification()
 //        _scanStatus.send(ScanStatus.ScanComplete)

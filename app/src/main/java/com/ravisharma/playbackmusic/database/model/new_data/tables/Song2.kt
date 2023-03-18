@@ -20,31 +20,7 @@ import com.ravisharma.playbackmusic.utils.Constants
             parentColumns = ["name"],
             childColumns = ["artist"],
             onDelete = ForeignKey.SET_NULL
-        ),
-        ForeignKey(
-            entity = Genre::class,
-            parentColumns = ["genre"],
-            childColumns = ["genre"],
-            onDelete = ForeignKey.SET_NULL,
-        ),
-        ForeignKey(
-            entity = AlbumArtist::class,
-            parentColumns = ["name"],
-            childColumns = ["albumArtist"],
-            onDelete = ForeignKey.SET_NULL
-        ),
-        ForeignKey(
-            entity = Lyricist::class,
-            parentColumns = ["name"],
-            childColumns = ["lyricist"],
-            onDelete = ForeignKey.SET_NULL
-        ),
-        ForeignKey(
-            entity = Composer::class,
-            parentColumns = ["name"],
-            childColumns = ["composer"],
-            onDelete = ForeignKey.SET_NULL
-        ),
+        )
     ]
 )
 data class Song2(
