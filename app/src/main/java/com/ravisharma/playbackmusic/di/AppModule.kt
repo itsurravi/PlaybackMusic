@@ -1,6 +1,10 @@
 package com.ravisharma.playbackmusic.di
 
 import android.content.Context
+import com.google.android.gms.tasks.TaskExecutors
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.ravisharma.playbackmusic.PlaybackApp
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
@@ -11,6 +15,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.util.concurrent.Executor
 import javax.inject.Singleton
 
 @Module

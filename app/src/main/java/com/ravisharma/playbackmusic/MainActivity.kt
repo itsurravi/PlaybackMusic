@@ -6,11 +6,15 @@ import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
@@ -23,18 +27,25 @@ import android.os.*
 import android.preference.PreferenceManager
 import android.provider.MediaStore
 import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.google.android.gms.ads.AdRequest
@@ -54,6 +65,7 @@ import com.ravisharma.playbackmusic.database.model.MostPlayed
 import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository
 import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository
 import com.ravisharma.playbackmusic.databinding.ActivityMainBinding
+import com.ravisharma.playbackmusic.databinding.AlertPopupMessageBinding
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerModel
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerSettings
@@ -66,23 +78,19 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
+import com.ravisharma.playbackmusic.utils.UpdateManager.FlexibleUpdateDownloadListener
+import com.ravisharma.playbackmusic.utils.UpdateManager.UpdateInfoListener
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
 import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
-import java.lang.Runnable
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
-import android.media.AudioManager
-import androidx.core.view.isVisible
-import androidx.viewpager2.widget.ViewPager2
-import com.ravisharma.playbackmusic.databinding.AlertPopupMessageBinding
 
 
 @AndroidEntryPoint
@@ -552,7 +560,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
         loadBanner1()
 
-        CheckUpdate().execute()
+        mUpdateManager = UpdateManager.Builder(this).mode(UpdateManager.FLEXIBLE)
+        mUpdateManager?.start()
+
+        mUpdateManager?.onResume()
 
         AppRate(this)
             .setShowIfAppHasCrashed(false)
@@ -1367,7 +1378,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     //Check of app update
 
-    internal inner class CheckUpdate : CoroutinesAsyncTask<Void?, Void?, Void?>("UpdateCheck") {
+    /*internal inner class CheckUpdate : CoroutinesAsyncTask<Void?, Void?, Void?>("UpdateCheck") {
         override fun doInBackground(vararg params: Void?): Void? {
             try {
                 latestVersion = Jsoup
@@ -1385,6 +1396,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     .first()
                     .ownText()
             } catch (e: IOException) {
+                e.printStackTrace()
+            } catch(e: Exception) {
+                Log.e("Excpetion", e.toString())
                 e.printStackTrace()
             }
             return null
@@ -1447,7 +1461,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         builder.setNegativeButton(getString(R.string.updateLater)) { dialog, which -> dialog.dismiss() }
         val ad = builder.create()
         ad.show()
-    }
+    }*/
 
     private fun saveEqualizerSettings() {
         try {
@@ -1754,4 +1768,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         var instance: MainActivity? = null
             private set
     }
+
+    // Declare the UpdateManager
+    var mUpdateManager: UpdateManager? = null
+
 }
