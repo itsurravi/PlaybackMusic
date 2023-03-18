@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:486309004706:android:70145acf7a434e37781efb",
         "android_client_info": {
-          "package_name": "com.ravisharma.playbackmusic"
+          "package_name": "com.ravisharma.playbackmusic.debug"
         }
       },
       "oauth_client": [

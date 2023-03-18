@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -13,6 +14,7 @@ import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.InfoBinding
 import com.ravisharma.playbackmusic.model.Song
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun Context.showSongInfo(song: Song) {
@@ -47,4 +49,40 @@ fun Activity.openFragment(fragment: Fragment) {
         addToBackStack(null)
         commit()
     }
+}
+
+fun Float.round(decimals: Int): Float {
+    var multiplier = 1f
+    repeat(decimals) { multiplier *= 10 }
+    return kotlin.math.round(this * multiplier) / multiplier
+}
+
+fun Float.toMBfromB(): String{
+    val mb = this/(1024*1024)
+    return "${mb.round(2)} MB"
+}
+
+val dateFormat = SimpleDateFormat("dd:MM:yyyy")
+
+fun Long.formatToDate(): String {
+    val calender = Calendar.getInstance().apply {
+        timeInMillis = this@formatToDate
+    }
+    return dateFormat.format(calender.time)
+}
+
+fun Long.toMinutesAndSeconds(): String {
+    val totalSeconds = this/1000
+    val minutes = totalSeconds/60
+    val seconds = totalSeconds%60
+    return if (minutes == 0L) "$seconds secs"
+    else if (seconds == 0L) "$minutes mins"
+    else "$minutes mins $seconds secs"
+}
+
+fun Long.toMS(): String {
+    val totalSeconds = this/1000
+    val minutes = totalSeconds/60
+    val seconds = totalSeconds%60
+    return "${if(minutes < 10) "0" else ""}${minutes}:${if (seconds < 10) "0"  else ""}${seconds}"
 }

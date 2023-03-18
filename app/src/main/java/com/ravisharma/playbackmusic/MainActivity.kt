@@ -75,20 +75,19 @@ import com.ravisharma.playbackmusic.model.Playlist
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.prefrences.PrefManager
 import com.ravisharma.playbackmusic.prefrences.TinyDB
+import com.ravisharma.playbackmusic.provider.DataManager
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
-import com.ravisharma.playbackmusic.utils.UpdateManager.FlexibleUpdateDownloadListener
-import com.ravisharma.playbackmusic.utils.UpdateManager.UpdateInfoListener
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import org.jsoup.Jsoup
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -334,7 +333,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 Handler(Looper.getMainLooper()).postDelayed({ setUpMainScreen() }, 1000)
             }
         }
+        lifecycleScope.launch(Dispatchers.IO) {
+//            dataManager.scanForMusic(contentResolver)
+        }
     }
+
+    @Inject
+    lateinit var dataManager: DataManager
 
     private fun clearPrefDataOnAppUpdate() {
         val version = manage.appVersion
@@ -1118,7 +1123,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun setTimer(time: Int) {
         val i = Intent(this, Timer::class.java)
-        pi = PendingIntent.getBroadcast(this, 1234, i, 0)
+        pi = PendingIntent.getBroadcast(this, 1234, i, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         am = getSystemService(ALARM_SERVICE) as AlarmManager
         am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi
     }
