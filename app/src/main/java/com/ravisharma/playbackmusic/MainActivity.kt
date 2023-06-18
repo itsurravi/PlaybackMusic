@@ -579,7 +579,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
         val adRequest = AdRequest.Builder().build()
         val adSize = AdSize.BANNER
-        adView!!.adSize = adSize
+        adView!!.setAdSize(adSize)
         adView!!.loadAd(adRequest)
     }
 
@@ -1118,7 +1118,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun setTimer(time: Int) {
         val i = Intent(this, Timer::class.java)
-        pi = PendingIntent.getBroadcast(this, 1234, i, 0)
+        pi = PendingIntent.getBroadcast(this, 1234, i, PendingIntent.FLAG_IMMUTABLE)
         am = getSystemService(ALARM_SERVICE) as AlarmManager
         am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi
     }

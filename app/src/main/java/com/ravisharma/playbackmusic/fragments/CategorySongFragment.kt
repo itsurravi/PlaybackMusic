@@ -1,7 +1,10 @@
 package com.ravisharma.playbackmusic.fragments
 
 import android.app.RecoverableSecurityException
-import android.content.*
+import android.content.ContentUris
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.IntentSender.SendIntentException
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -12,11 +15,15 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,7 +36,6 @@ import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity
 import com.ravisharma.playbackmusic.adapters.CategoryAdapter
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.databinding.ActivityCategorySongBinding
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.databinding.PlaylistsLayoutBinding
@@ -37,19 +43,22 @@ import com.ravisharma.playbackmusic.fragments.viewmodels.CategorySongViewModel
 import com.ravisharma.playbackmusic.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
-import com.ravisharma.playbackmusic.utils.*
+import com.ravisharma.playbackmusic.utils.DELETE_URI
+import com.ravisharma.playbackmusic.utils.addNextSongToPlayingList
+import com.ravisharma.playbackmusic.utils.addSongToPlayingList
+import com.ravisharma.playbackmusic.utils.curPlayingSong
+import com.ravisharma.playbackmusic.utils.removeFromPlayingList
+import com.ravisharma.playbackmusic.utils.showSongInfo
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.util.*
-import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 const val QUERY_ALBUM = "Album"
 const val QUERY_ARTIST = "Artist"
 const val PLAYLIST = "Playlist"
 
 @AndroidEntryPoint
-class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, CategoryAdapter.OnItemLongClicked {
+class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked,
+    CategoryAdapter.OnItemLongClicked {
 
     private var adView: AdView? = null
     private var id: String? = null
@@ -74,16 +83,19 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     category = QUERY_ALBUM
                     adUnitId = getString(R.string.AlbumSongsActId)
                 }
+
                 QUERY_ARTIST -> {
                     id = it.getString("artistId")
                     actName = it.getString("actName")
                     category = QUERY_ARTIST
                     adUnitId = getString(R.string.artistSongsActId)
                 }
+
                 PLAYLIST -> {
                     actName = it.getString("actName")
                     adUnitId = getString(R.string.playlistFragId)
                 }
+
                 else -> {
                     actName = it.getString("actName")
                     when (actName) {
@@ -96,8 +108,10 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         binding = ActivityCategorySongBinding.inflate(inflater, container, false)
         playlistBinding = binding.playlistLayout
@@ -108,7 +122,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adView = AdView(context)
+        adView = AdView(requireContext())
 
         initRecyclerView()
 
@@ -124,14 +138,16 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     }
 
     private fun loadBanner() {
-        val adRequest = AdRequest.Builder().build()
-        val adSize = AdSize.BANNER
-        adView!!.adUnitId = adUnitId
-        adView!!.adSize = adSize
+        adUnitId?.let { unitId ->
+            val adRequest = AdRequest.Builder().build()
+            val adSize = AdSize.BANNER
+            adView!!.adUnitId = unitId
+            adView!!.setAdSize(adSize)
 
-        binding.bannerContainerRecentActivity.addView(adView)
+            binding.bannerContainerRecentActivity.addView(adView)
 
-        adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
+        }
     }
 
     private fun initRecyclerView() {
@@ -158,6 +174,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     setUpLayout()
                 })
             }
+
             "Last Played" -> {
                 viewModel.getLastPlayedSongsList().observe(viewLifecycleOwner, { lastPlayedList ->
                     songList.clear()
@@ -167,6 +184,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     setUpLayout()
                 })
             }
+
             "Most Played" -> {
                 viewModel.getMostPlayedSongsList().observe(viewLifecycleOwner, { mostPlayedList ->
                     songList.clear()
@@ -176,6 +194,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     setUpLayout()
                 })
             }
+
             else -> {
 //                repository = PlaylistRepository(context)
                 viewModel.getPlaylistSong(actName!!).observe(viewLifecycleOwner, { playlists ->
@@ -194,11 +213,12 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
     }
 
     private fun fetchCategorySongs(it: String) {
-        viewModel.getCategorySongs(it, id!!, requireActivity().contentResolver).observe(viewLifecycleOwner, { songs ->
-            songList.clear()
-            songList.addAll(songs!!)
-            setUpLayout()
-        })
+        viewModel.getCategorySongs(it, id!!, requireActivity().contentResolver)
+            .observe(viewLifecycleOwner, { songs ->
+                songList.clear()
+                songList.addAll(songs!!)
+                setUpLayout()
+            })
     }
 
     private fun setUpLayout() {
@@ -241,9 +261,9 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
 
     override fun onItemLongClick(position: Int) {
         if (category == null
-                && actName != "Recent Added"
-                && actName != "Last Played"
-                && actName != "Most Played"
+            && actName != "Recent Added"
+            && actName != "Last Played"
+            && actName != "Most Played"
         ) {
             playlistLongClick(position)
         } else {
@@ -280,6 +300,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                 2 -> addSongToPlayingList(songList[mposition])
                 3 ->                         // Delete Song Code
                     viewModel.removeSong(actName, songList[mposition].id)
+
                 4 -> {
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "audio/*"
@@ -287,6 +308,7 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
                     }
                     startActivity(Intent.createChooser(intent, "Share Via"))
                 }
+
                 5 -> requireContext().showSongInfo(songList[mposition])
             }
             alertDialog.dismiss()
@@ -315,44 +337,52 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         alertDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation_2
         alertDialog.show()
 
-        binding.list.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            when (position) {
-                0 -> {
-                    onItemClick(mPosition)
-                }
-                1 -> {
-                    val list = arrayListOf(songList[mPosition])
-                    val onFragmentItemClicked = activity as OnFragmentItemClicked?
-                    onFragmentItemClicked!!.onFragmentItemClick(0, list, false)
-                }
-                2 -> {
-                    addNextSongToPlayingList(songList[mPosition])
-                }
-                3 -> {
-                    addSongToPlayingList(songList[mPosition])
-                }
-                4 -> {
-                    Intent(context, AddToPlaylistActivity::class.java).apply {
-                        putExtra("Song", songList[mPosition])
-                        context.startActivity(this)
+        binding.list.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                when (position) {
+                    0 -> {
+                        onItemClick(mPosition)
+                    }
+
+                    1 -> {
+                        val list = arrayListOf(songList[mPosition])
+                        val onFragmentItemClicked = activity as OnFragmentItemClicked?
+                        onFragmentItemClicked!!.onFragmentItemClick(0, list, false)
+                    }
+
+                    2 -> {
+                        addNextSongToPlayingList(songList[mPosition])
+                    }
+
+                    3 -> {
+                        addSongToPlayingList(songList[mPosition])
+                    }
+
+                    4 -> {
+                        Intent(context, AddToPlaylistActivity::class.java).apply {
+                            putExtra("Song", songList[mPosition])
+                            context.startActivity(this)
+                        }
+                    }
+
+                    5 -> {
+                        showDeleteSongDialog(mPosition)
+                    }
+
+                    6 -> {
+                        val intent = Intent(Intent.ACTION_SEND)
+                        intent.type = "audio/*"
+                        val uri = Uri.parse(songList[mPosition].data)
+                        intent.putExtra(Intent.EXTRA_STREAM, uri)
+                        context.startActivity(Intent.createChooser(intent, "Share Via"))
+                    }
+
+                    7 -> {
+                        context.showSongInfo(songList[mPosition])
                     }
                 }
-                5 -> {
-                    showDeleteSongDialog(mPosition)
-                }
-                6 -> {
-                    val intent = Intent(Intent.ACTION_SEND)
-                    intent.type = "audio/*"
-                    val uri = Uri.parse(songList[mPosition].data)
-                    intent.putExtra(Intent.EXTRA_STREAM, uri)
-                    context.startActivity(Intent.createChooser(intent, "Share Via"))
-                }
-                7 -> {
-                    context.showSongInfo(songList[mPosition])
-                }
+                alertDialog.dismiss()
             }
-            alertDialog.dismiss()
-        }
     }
 
     private val listener = object : DeleteListener {
@@ -367,56 +397,70 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked, Category
         val b = AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
         b.setTitle(getString(R.string.deleteMessage))
         b.setMessage(song.title)
-        b.setPositiveButton(getString(R.string.yes), DialogInterface.OnClickListener { dialog, which ->
-            if (songListByName.value!!.size == 1) {
-                Toast.makeText(context, "Can't Delete Last Song", Toast.LENGTH_SHORT).show()
-                return@OnClickListener
-            }
-            val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-            val projection = arrayOf(MediaStore.Audio.Media._ID)
-            val selection = MediaStore.Audio.Media.DATA + " = ?"
-            val selectionArgs = arrayOf(song.data)
-            val musicCursor = requireActivity().contentResolver.query(musicUri, projection,
-                    selection, selectionArgs, null)
+        b.setPositiveButton(
+            getString(R.string.yes),
+            DialogInterface.OnClickListener { dialog, which ->
+                if (songListByName.value!!.size == 1) {
+                    Toast.makeText(context, "Can't Delete Last Song", Toast.LENGTH_SHORT).show()
+                    return@OnClickListener
+                }
+                val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                val projection = arrayOf(MediaStore.Audio.Media._ID)
+                val selection = MediaStore.Audio.Media.DATA + " = ?"
+                val selectionArgs = arrayOf(song.data)
+                val musicCursor = requireActivity().contentResolver.query(
+                    musicUri, projection,
+                    selection, selectionArgs, null
+                )
 
-            musicCursor?.let {
-                if (it.moveToFirst()) {
-                    val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-                    val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
-                    try {
-                        val fdelete = File(selectionArgs[0])
-                        if (fdelete.exists()) {
-                            requireActivity().contentResolver.delete(uri, null, null)
-                            updateList(mPosition)
-                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-                            listener.onOkClicked()
-                        }
-                    } catch (e: Exception) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            val recoverableSecurityException: RecoverableSecurityException
-                            if (e is RecoverableSecurityException) {
-                                recoverableSecurityException = e as RecoverableSecurityException
-                                val intentSender = recoverableSecurityException.userAction
+                musicCursor?.let {
+                    if (it.moveToFirst()) {
+                        val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+                        val uri = ContentUris.withAppendedId(
+                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                            id
+                        )
+                        try {
+                            val fdelete = File(selectionArgs[0])
+                            if (fdelete.exists()) {
+                                requireActivity().contentResolver.delete(uri, null, null)
+                                updateList(mPosition)
+                                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                listener.onOkClicked()
+                            }
+                        } catch (e: Exception) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                val recoverableSecurityException: RecoverableSecurityException
+                                if (e is RecoverableSecurityException) {
+                                    recoverableSecurityException = e as RecoverableSecurityException
+                                    val intentSender = recoverableSecurityException.userAction
                                         .actionIntent.intentSender
-                                try {
-                                    DELETE_URI = uri
-                                    startIntentSenderForResult(intentSender, 20123,
-                                            null, 0, 0, 0, null)
-                                } catch (ex: SendIntentException) {
-                                    ex.printStackTrace()
+                                    try {
+                                        DELETE_URI = uri
+                                        startIntentSenderForResult(
+                                            intentSender, 20123,
+                                            null, 0, 0, 0, null
+                                        )
+                                    } catch (ex: SendIntentException) {
+                                        ex.printStackTrace()
+                                    }
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Can't Delete. Try Manually",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
-                            } else {
-                                Toast.makeText(context, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show()
                             }
                         }
+                    } else {
+                        Toast.makeText(context, "Can't Delete. Try Manually", Toast.LENGTH_SHORT)
+                            .show()
                     }
-                } else {
-                    Toast.makeText(context, "Can't Delete. Try Manually", Toast.LENGTH_SHORT).show()
+                    it.close()
                 }
-                it.close()
-            }
-            dialog.dismiss()
-        }).setNegativeButton(getString(R.string.no)) { dialog, which -> dialog.dismiss() }
+                dialog.dismiss()
+            }).setNegativeButton(getString(R.string.no)) { dialog, which -> dialog.dismiss() }
         val d = b.create()
         d.show()
     }

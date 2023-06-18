@@ -76,7 +76,7 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
 
         val adRequest = AdRequest.Builder().build()
         val adSize = AdSize.BANNER
-        adView!!.adSize = adSize
+        adView!!.setAdSize(adSize)
         adView!!.loadAd(adRequest)
     }
 

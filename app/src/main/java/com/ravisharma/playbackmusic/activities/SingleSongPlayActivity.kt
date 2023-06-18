@@ -112,7 +112,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
 
         val adRequest = AdRequest.Builder().build()
         val adSize = AdSize.BANNER
-        adView.adSize = adSize
+        adView.setAdSize(adSize)
         adView.loadAd(adRequest)
 
         adView.adListener = object : AdListener() {
