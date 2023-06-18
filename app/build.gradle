@@ -1,31 +1,25 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
-apply plugin: 'com.google.firebase.firebase-perf'
-apply plugin: 'dagger.hilt.android.plugin'
-
-repositories {
-    maven {
-        url "https://jitpack.io"
-    }
-    mavenCentral()
+plugins {
+    alias libs.plugins.android.application
+    alias libs.plugins.kotlin.android
+    alias libs.plugins.kapt
+    alias libs.plugins.google.sevices
+    alias libs.plugins.firebase.crashlytics
+    alias libs.plugins.firebase.perf
+    alias libs.plugins.hilt
 }
-
 android {
     namespace "com.ravisharma.playbackmusic"
 
-    compileSdk 33
+    compileSdk libs.versions.compileSdk.get().toInteger()
     defaultConfig {
         applicationId "com.ravisharma.playbackmusic"
-        minSdkVersion 21
-        targetSdk 33
-        versionCode 61
-        versionName "2.8.4"
+        minSdkVersion libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.compileSdk.get().toInteger()
+        versionCode libs.versions.versionCode.get().toInteger()
+        versionName libs.versions.versionName.get()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
     buildTypes {
@@ -36,7 +30,7 @@ android {
                 mappingFileUploadEnabled true
             }
         }
-        debug{
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -46,70 +40,56 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = libs.versions.jvm.get()
     }
-    namespace 'com.ravisharma.playbackmusic'
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.0'
-    implementation 'com.google.firebase:firebase-analytics:19.0.0'
-    implementation 'com.google.firebase:firebase-perf:20.0.2'
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.constraintlayout
+//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Added Dependencies
-    implementation "androidx.media:media:1.4.0"
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
-    implementation 'com.google.android.material:material:1.4.0'
-
-    implementation 'com.sothree.slidinguppanel:library:3.4.0'
-
-    implementation 'com.google.code.gson:gson:2.8.6'
-
-    implementation 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:0.7.0'
-
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
-
     implementation files('libs/jsoup.jar')
 
-    implementation 'com.google.android.gms:play-services-ads:20.2.0'
+    implementation libs.androidx.activity
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.datastore
+    implementation libs.androidx.fragment
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.lifecycle.livedata.ktx
+    kapt libs.androidx.lifecycle.compiler
 
-    def room_version = "2.5.1"
 
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-ktx:$room_version"
+    implementation libs.androidx.media
+    implementation libs.androidx.room.ktx
+    implementation libs.androidx.room.runtime
+    kapt libs.androidx.room.compiler
 
-    def lifecycle_version = "2.5.1"
-    // ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    // LiveData
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    implementation libs.androidx.work.runtime.ktx
 
-    implementation "androidx.core:core-ktx:1.3.1"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
+    implementation libs.coroutines.core
+    implementation libs.coroutines.android
+    implementation libs.coil
 
-    implementation "io.coil-kt:coil:1.4.0"
+    implementation libs.com.github.ybq.android.spinKit
+    implementation libs.com.recyclerview.fastscroll
+    implementation libs.com.slidinguppanel
+    implementation libs.com.verticalseekbar
 
-    //dagger hilt dependency
-    implementation "com.google.dagger:hilt-android:2.45"
-    kapt "com.google.dagger:hilt-compiler:2.45"
-    // Activity KTX for viewModels()
-    implementation "androidx.activity:activity-ktx:1.3.1"
-    implementation 'androidx.fragment:fragment-ktx:1.3.6'
+    implementation libs.firebase.crashlytics
+    implementation libs.firebase.analytics
+    implementation libs.firebase.perf
 
-    // Preferences DataStore
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation libs.google.ads
+    implementation libs.google.material
+    implementation libs.google.gson
+    implementation libs.google.play.core
 
-    implementation 'com.google.android.play:core:1.10.3'
-
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
 }
 
