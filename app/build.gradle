@@ -14,11 +14,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 31
+    namespace "com.ravisharma.playbackmusic"
+
+    compileSdk 33
     defaultConfig {
         applicationId "com.ravisharma.playbackmusic"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdk 33
         versionCode 61
         versionName "2.8.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -46,6 +48,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    namespace 'com.ravisharma.playbackmusic'
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -76,7 +79,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
 
-    def room_version = "2.4.0"
+    def room_version = "2.5.1"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
