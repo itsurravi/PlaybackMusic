@@ -33,7 +33,7 @@ interface ArtistDao {
     suspend fun searchArtists(query: String): List<Artist>
 
     @Transaction
-    @Query("SELECT ${Constants.Tables.ARTIST_TABLE}.name as artistName, COUNT(*) as count " +
+    @Query("SELECT ${Constants.Tables.ARTIST_TABLE}.name as name, COUNT(*) as count " +
             "FROM ${Constants.Tables.ARTIST_TABLE} JOIN ${Constants.Tables.SONG_TABLE} ON " +
             "${Constants.Tables.ARTIST_TABLE}.name = ${Constants.Tables.SONG_TABLE}.artist " +
             "GROUP BY ${Constants.Tables.ARTIST_TABLE}.name")

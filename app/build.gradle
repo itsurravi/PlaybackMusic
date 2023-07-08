@@ -45,6 +45,8 @@ android {
     }
 }
 dependencies {
+    implementation project(":data")
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation libs.androidx.appcompat
     implementation libs.androidx.constraintlayout
