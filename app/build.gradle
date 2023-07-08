@@ -25,14 +25,14 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             firebaseCrashlytics {
                 mappingFileUploadEnabled true
             }
         }
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -47,11 +47,8 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation libs.androidx.appcompat
     implementation libs.androidx.constraintlayout
-//    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Added Dependencies
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation files('libs/jsoup.jar')
 
     implementation libs.androidx.activity
