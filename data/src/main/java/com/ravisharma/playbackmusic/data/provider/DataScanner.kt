@@ -12,13 +12,15 @@ import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.data.utils.formatToDate
 import com.ravisharma.playbackmusic.data.utils.toMBfromB
 import com.ravisharma.playbackmusic.data.utils.toMS
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.TreeSet
 
-class DataManager(
+class DataScanner(
     private val songDao: SongDao,
     private val albumDao: AlbumDao,
     private val artistDao: ArtistDao,
@@ -26,10 +28,13 @@ class DataManager(
     private val composerDao: ComposerDao,
     private val lyricistDao: LyricistDao,
     private val genreDao: GenreDao,
-    private val playlistDao: PlaylistDao,
 ) {
+    private val _scanStatus = Channel<ScanStatus>()
+    val scanStatus = _scanStatus.receiveAsFlow()
 
     suspend fun performMusicScan(contentResolver: ContentResolver) {
+        _scanStatus.send(ScanStatus.ScanStarted)
+
         val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
         val projection = arrayOf(
             MediaStore.Audio.Media.DATA,
@@ -73,7 +78,6 @@ class DataManager(
         do {
             try {
                 val file = File(cursor.getString(dataIndex))
-//                if (blacklistedSongLocations.contains(file.path)) continue
                 if (!file.exists()) throw FileNotFoundException()
                 val songMetadata = mExtractor.getSongMetadata(file.path)
                 Log.e("ModifiedDate", "${cursor.getString(dateModifiedIndex).toLong()}")
@@ -110,7 +114,7 @@ class DataManager(
 //                Timber.e(e.message ?: e.localizedMessage ?: "FILE_DOES_NOT_EXIST")
             }
             parsedSongs++
-//            _scanStatus.send(ScanStatus.ScanProgress(parsedSongs, totalSongs))
+            _scanStatus.send(ScanStatus.ScanProgress(parsedSongs, totalSongs))
         } while (cursor.moveToNext())
         cursor.close()
         albumDao.insertAllAlbums(albumArtMap.entries.map { (t, u) -> Album(t, u) })
@@ -120,10 +124,10 @@ class DataManager(
         lyricistDao.insertAllLyricists(lyricistSet.map { Lyricist(it) })
         genreDao.insertAllGenres(genreSet.map { Genre(it) })
         songDao.insertAllSongs(songs)
-//        notificationManager.removeScanningNotification()
-//        _scanStatus.send(ScanStatus.ScanComplete)
-        songs.forEachIndexed { index, Song2 ->
-//            Log.e("Song2", Gson().toJson(Song2))
+        _scanStatus.send(ScanStatus.ScanComplete)
+
+        songs.forEachIndexed { index, song ->
+            Log.e("Song", "$song")
         }
     }
 }

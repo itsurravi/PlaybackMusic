@@ -35,5 +35,5 @@ abstract class MusicDatabase : RoomDatabase() {
     abstract fun composerDao(): ComposerDao
     abstract fun lyricistDao(): LyricistDao
     abstract fun genreDao(): GenreDao
-    abstract fun playList2Dao(): PlaylistDao
+    abstract fun playListDao(): PlaylistDao
 }
