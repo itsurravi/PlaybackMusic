@@ -14,9 +14,11 @@ import com.ravisharma.playbackmusic.data.db.model.ArtistWithSongCount
 import com.ravisharma.playbackmusic.databinding.FragmentArtistBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.ArtistsAdapter
 import com.ravisharma.playbackmusic.new_work.ui.fragments.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ArtistsFragment : Fragment(R.layout.fragment_artist) {
 
     private var _binding: FragmentArtistBinding? = null
