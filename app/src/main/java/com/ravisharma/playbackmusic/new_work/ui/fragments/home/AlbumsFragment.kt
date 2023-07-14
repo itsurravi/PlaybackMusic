@@ -13,6 +13,7 @@ import com.ravisharma.playbackmusic.data.db.model.tables.Album
 import com.ravisharma.playbackmusic.databinding.FragmentAlbumsBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.AlbumsAdapter
 import com.ravisharma.playbackmusic.new_work.ui.fragments.HomeViewModel
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -40,7 +41,6 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     private fun initViews() {
         binding.apply {
             albumList.apply {
-                setHasFixedSize(true)
                 layoutManager = GridLayoutManager(context, 2, RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
                 adapter = AlbumsAdapter(onItemClick = ::onAlbumClick)
@@ -65,6 +65,6 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     }
 
     private fun onAlbumClick(album: Album) {
-        // TODO
+        requireContext().showToast("album click")
     }
 }

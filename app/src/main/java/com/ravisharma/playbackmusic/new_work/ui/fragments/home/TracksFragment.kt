@@ -14,6 +14,7 @@ import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.fragments.HomeViewModel
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -69,10 +70,10 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
     }
 
     private fun songClicked(song: Song) {
-        // TODO
+        requireContext().showToast("song click")
     }
 
     private fun songLongClicked(song: Song) {
-        // TODO
+        requireContext().showToast("song long click")
     }
 }

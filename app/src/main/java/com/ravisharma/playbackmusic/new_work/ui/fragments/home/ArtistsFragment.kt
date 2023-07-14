@@ -14,6 +14,7 @@ import com.ravisharma.playbackmusic.data.db.model.ArtistWithSongCount
 import com.ravisharma.playbackmusic.databinding.FragmentArtistBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.ArtistsAdapter
 import com.ravisharma.playbackmusic.new_work.ui.fragments.HomeViewModel
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -71,6 +72,6 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
     }
 
     private fun onArtistClick(artist: ArtistWithSongCount) {
-        // TODO
+        requireContext().showToast("artist click")
     }
 }
