@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.new_work.ui.fragments
+package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
 import androidx.lifecycle.ViewModel
 import com.ravisharma.playbackmusic.data.provider.DataProvider

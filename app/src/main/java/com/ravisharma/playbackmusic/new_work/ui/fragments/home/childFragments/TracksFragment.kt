@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.new_work.ui.fragments.home
+package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
 import android.os.Bundle
 import android.view.View
@@ -13,7 +13,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
-import com.ravisharma.playbackmusic.new_work.ui.fragments.HomeViewModel
+import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

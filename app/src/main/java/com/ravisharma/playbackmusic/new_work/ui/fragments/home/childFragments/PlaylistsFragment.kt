@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.new_work.ui.fragments.home
+package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
 import android.os.Bundle
 import android.view.View

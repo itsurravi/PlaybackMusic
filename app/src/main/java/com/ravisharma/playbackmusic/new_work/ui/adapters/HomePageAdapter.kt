@@ -3,10 +3,10 @@ package com.ravisharma.playbackmusic.new_work.ui.adapters
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.AlbumsFragment
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.ArtistsFragment
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.PlaylistsFragment
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.TracksFragment
+import com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.AlbumsFragment
+import com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.ArtistsFragment
+import com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.PlaylistsFragment
+import com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.TracksFragment
 
 class HomePageAdapter(
     fm: FragmentActivity
