@@ -74,4 +74,11 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
     private fun onArtistClick(artist: ArtistWithSongCount) {
         requireContext().showToast("artist click")
     }
+
+    companion object {
+        @JvmStatic
+        fun getInstance(): ArtistsFragment {
+            return ArtistsFragment()
+        }
+    }
 }

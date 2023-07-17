@@ -26,13 +26,14 @@ class NewPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        initObservers()
+
+        viewModel.scanForMusic()
+    }
+
+    private fun initObservers() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.allSongs.collect {
-                        Log.i("SongsInfo", "${it.size}")
-                    }
-                }
                 launch {
                     viewModel.scanStatus.collect {
                         when (it) {
@@ -56,7 +57,5 @@ class NewPlayerActivity : AppCompatActivity() {
                 }
             }
         }
-
-        viewModel.scanForMusic()
     }
 }

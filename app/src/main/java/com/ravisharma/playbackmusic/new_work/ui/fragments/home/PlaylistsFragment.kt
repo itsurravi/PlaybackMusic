@@ -21,4 +21,11 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
     private fun setupFragment() {
 
     }
+
+    companion object {
+        @JvmStatic
+        fun getInstance(): PlaylistsFragment {
+            return PlaylistsFragment()
+        }
+    }
 }

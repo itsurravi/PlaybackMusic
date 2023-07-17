@@ -63,7 +63,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun setupData(list: List<Song>) {
         binding.apply {
-            if(list.isNotEmpty()) {
+            if (list.isNotEmpty()) {
                 (songList.adapter as TracksAdapter).submitList(list)
             }
         }
@@ -75,5 +75,12 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun songLongClicked(song: Song) {
         requireContext().showToast("song long click")
+    }
+
+    companion object {
+        @JvmStatic
+        fun getInstance(): TracksFragment {
+            return TracksFragment()
+        }
     }
 }

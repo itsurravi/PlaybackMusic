@@ -67,4 +67,11 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     private fun onAlbumClick(album: Album) {
         requireContext().showToast("album click")
     }
+
+    companion object {
+        @JvmStatic
+        fun getInstance(): AlbumsFragment {
+            return AlbumsFragment()
+        }
+    }
 }
