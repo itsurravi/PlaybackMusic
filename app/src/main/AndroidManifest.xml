@@ -64,7 +64,7 @@
         <activity
             android:name=".new_work.ui.activity.NewPlayerActivity"
             android:exported="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
