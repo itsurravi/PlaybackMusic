@@ -16,7 +16,7 @@ class MusicScanViewModel @Inject constructor(
     private val dataProvider: DataProvider
 ) : ViewModel() {
 
-    val allSongs = dataProvider.allSongs
+    val allSongs = dataProvider.getAll.allSongs()
 
     val scanStatus = dataProvider.scanStatus.stateIn(
         viewModelScope,

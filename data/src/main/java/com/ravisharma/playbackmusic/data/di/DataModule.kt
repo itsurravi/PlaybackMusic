@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.ravisharma.playbackmusic.data.components.DaoCollection
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
 import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.data.utils.Constants
@@ -10,6 +11,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
@@ -30,20 +34,30 @@ object DataModule {
 
     @Singleton
     @Provides
+    fun providesCoroutineScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    }
+
+    @Singleton
+    @Provides
     fun providesDataProvider(
         @ApplicationContext context: Context,
         db: MusicDatabase,
+        scope: CoroutineScope
     ): DataProvider {
         return DataProvider(
             context = context,
-            songDao = db.songDao(),
-            albumDao = db.albumDao(),
-            artistDao = db.artistDao(),
-            albumArtistDao = db.albumArtistDao(),
-            composerDao = db.composerDao(),
-            lyricistDao = db.lyricistDao(),
-            genreDao = db.genreDao(),
-            playlistDao = db.playListDao()
+            daoCollection = DaoCollection(
+                songDao = db.songDao(),
+                albumDao = db.albumDao(),
+                artistDao = db.artistDao(),
+                albumArtistDao = db.albumArtistDao(),
+                composerDao = db.composerDao(),
+                lyricistDao = db.lyricistDao(),
+                genreDao = db.genreDao(),
+                playlistDao = db.playListDao()
+            ),
+            scope = scope
         )
     }
 }

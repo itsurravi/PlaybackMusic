@@ -27,9 +27,7 @@ class PlaybackNotificationManager(
     }
 
     companion object {
-        const val RUNNING_SCAN = "running_scan"
         const val PLAYER_SERVICE = "playback_player"
-        const val SCANNING_NOTIFICATION_ID = 10
         const val PLAYER_NOTIFICATION_ID = 12
     }
 

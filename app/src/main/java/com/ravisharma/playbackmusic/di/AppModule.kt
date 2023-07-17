@@ -1,13 +1,13 @@
 package com.ravisharma.playbackmusic.di
 
 import android.content.Context
-import com.google.android.gms.tasks.TaskExecutors
-import com.google.android.play.core.appupdate.AppUpdateManager
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.ravisharma.playbackmusic.PlaybackApp
+import androidx.media3.exoplayer.ExoPlayer
+import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationManager
+import com.ravisharma.playbackmusic.new_work.services.DataManager
 import com.ravisharma.playbackmusic.prefrences.PrefManager
 import com.ravisharma.playbackmusic.prefrences.TinyDB
 import dagger.Module
@@ -15,7 +15,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.util.concurrent.Executor
 import javax.inject.Singleton
 
 @Module
@@ -32,7 +31,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePlaylistDatabase(@ApplicationContext context: Context) = PlaylistDatabase.getInstance(context)
+    fun providePlaylistDatabase(@ApplicationContext context: Context) =
+        PlaylistDatabase.getInstance(context)
 
     @Provides
     @Singleton
@@ -49,4 +49,29 @@ object AppModule {
     @Provides
     @Singleton
     fun providePlaylistRepository(playlistDao: PlaylistDao) = PlaylistRepository(playlistDao)
+
+    @Provides
+    @Singleton
+    fun providerNotificationManager(
+        @ApplicationContext context: Context
+    ): PlaybackNotificationManager {
+        return PlaybackNotificationManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDataManger(
+        @ApplicationContext context: Context,
+        dataProvider: DataProvider
+    ): DataManager {
+        return DataManager(context, dataProvider)
+    }
+
+    @Singleton
+    @Provides
+    fun providesExoPlayer(
+        @ApplicationContext context: Context
+    ): ExoPlayer {
+        return ExoPlayer.Builder(context).build()
+    }
 }

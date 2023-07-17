@@ -83,6 +83,11 @@ dependencies {
     implementation libs.com.slidinguppanel
     implementation libs.com.verticalseekbar
 
+    implementation libs.exoplayer
+    implementation libs.exoPlayerUi
+    implementation libs.media3ExoPlayer
+    implementation libs.media3Transformer
+
     implementation libs.firebase.crashlytics
     implementation libs.firebase.analytics
     implementation libs.firebase.perf
