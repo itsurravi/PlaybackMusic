@@ -58,7 +58,9 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.allArtists.collectLatest { list ->
-                setupData(list)
+                list?.let {
+                    setupData(it)
+                }
             }
         }
     }

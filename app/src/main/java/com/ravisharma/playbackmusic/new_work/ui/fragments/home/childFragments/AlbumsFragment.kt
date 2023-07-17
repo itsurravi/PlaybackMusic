@@ -51,7 +51,9 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.allAlbums.collectLatest { list ->
-                setupData(list)
+                list?.let {
+                    setupData(it)
+                }
             }
         }
     }

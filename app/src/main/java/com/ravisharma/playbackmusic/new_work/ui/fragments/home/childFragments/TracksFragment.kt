@@ -56,7 +56,9 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             homeViewModel.allSongs.collectLatest { list ->
-                setupData(list)
+                list?.let {
+                    setupData(it)
+                }
             }
         }
     }
