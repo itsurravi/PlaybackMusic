@@ -78,7 +78,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" /> <!-- Receivers -->
+        <service android:name=".MusicService" />
+
+        <service
+            android:name=".new_work.services.PlaybackService"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Receivers -->
         <receiver
             android:name=".broadcast.NotificationHandler"
             android:exported="false">

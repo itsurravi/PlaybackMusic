@@ -18,6 +18,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceiver.Callback {
 
     @Inject

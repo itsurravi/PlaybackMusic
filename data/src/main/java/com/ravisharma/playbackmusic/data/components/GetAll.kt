@@ -3,19 +3,19 @@ package com.ravisharma.playbackmusic.data.components
 class GetAll(
     private val daoCollection: DaoCollection
 ) {
-    fun allSongs() = daoCollection.songDao.getAllSongs()
+    fun songs() = daoCollection.songDao.getAllSongs()
 
-    fun allAlbums() = daoCollection.albumDao.getAllAlbums()
+    fun albums() = daoCollection.albumDao.getAllAlbums()
 
-    fun allArtistWithSongCount() = daoCollection.songDao.getAllArtistsWithSongCount()
+    fun artists() = daoCollection.songDao.getAllArtistsWithSongCount()
 
-    fun allAlbumArtistWithSongCount() = daoCollection.songDao.getAllAlbumArtistsWithSongCount()
+    fun albumArtists() = daoCollection.songDao.getAllAlbumArtistsWithSongCount()
 
-    fun allComposerWithSongCount() = daoCollection.songDao.getAllComposersWithSongCount()
+    fun playlists() = daoCollection.playlistDao.getAllPlaylistWithSongCount()
 
-    fun allLyricistWithSongCount() = daoCollection.songDao.getAllLyricistsWithSongCount()
+    fun composers() = daoCollection.songDao.getAllComposersWithSongCount()
 
-    fun allPlaylistsWithSongCount() = daoCollection.playlistDao.getAllPlaylistWithSongCount()
+    fun lyricists() = daoCollection.songDao.getAllLyricistsWithSongCount()
 
-    fun allGenresWithSongCount() = daoCollection.songDao.getAllGenresWithSongCount()
+    fun genres() = daoCollection.songDao.getAllGenresWithSongCount()
 }
