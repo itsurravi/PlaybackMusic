@@ -306,7 +306,7 @@ class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceive
      */
     override fun onBroadcastCancel() {
         // Deprecated in api level 33
-//        stopForeground(true)
+        stopForeground(true)
         stopSelf()
     }
 }

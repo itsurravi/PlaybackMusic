@@ -27,7 +27,7 @@ class PlaybackNotificationManager(
     }
 
     companion object {
-        const val PLAYER_SERVICE = "playback_player"
+        const val PLAYER_SERVICE = "MusicService"
         const val PLAYER_NOTIFICATION_ID = 12
     }
 
@@ -35,7 +35,7 @@ class PlaybackNotificationManager(
     private fun createNotificationChannels() {
         val requiredChannels = listOf(
             NotificationChannel(
-                context.getString(R.string.music_Service),
+                PLAYER_SERVICE,
                 "Player",
                 NotificationManager.IMPORTANCE_HIGH
             )

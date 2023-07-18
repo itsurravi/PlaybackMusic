@@ -12,8 +12,8 @@ class TrackViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(bi
 
     fun bind(
         song: Song,
-        onItemClick: ((Song) -> Unit)? = null,
-        onItemLongClick: ((Song) -> Unit)? = null
+        onItemClick: ((Song, Int) -> Unit)? = null,
+        onItemLongClick: ((Song, Int) -> Unit)? = null
     ) {
         binding.apply {
             songTitle.text = song.title
@@ -28,12 +28,12 @@ class TrackViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(bi
             songBox.apply {
                 setOnClickListener {
                     onItemClick?.let {
-                        it(song)
+                        it(song, bindingAdapterPosition)
                     }
                 }
                 setOnLongClickListener {
                     onItemLongClick?.let {
-                        it(song)
+                        it(song, bindingAdapterPosition)
                     }
                     return@setOnLongClickListener true
                 }

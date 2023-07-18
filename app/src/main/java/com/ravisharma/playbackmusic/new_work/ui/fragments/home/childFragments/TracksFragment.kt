@@ -71,11 +71,13 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
         }
     }
 
-    private fun songClicked(song: Song) {
-        requireContext().showToast("song click")
+    private fun songClicked(song: Song, position: Int) {
+        val currentList = (binding.songList.adapter as TracksAdapter).getCurrentList()
+        homeViewModel.setQueue(currentList, position)
+//        requireContext().showToast("song click")
     }
 
-    private fun songLongClicked(song: Song) {
+    private fun songLongClicked(song: Song, position: Int) {
         requireContext().showToast("song long click")
     }
 

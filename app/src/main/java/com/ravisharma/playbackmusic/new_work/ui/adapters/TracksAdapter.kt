@@ -11,8 +11,8 @@ import com.ravisharma.playbackmusic.new_work.ui.adapters.viewholder.TrackViewHol
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
 class TracksAdapter(
-    private val onItemClick: ((Song) -> Unit)? = null,
-    private val onItemLongClick: ((Song) -> Unit)? = null
+    private val onItemClick: ((Song, Int) -> Unit)? = null,
+    private val onItemLongClick: ((Song, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<TrackViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song>() {
