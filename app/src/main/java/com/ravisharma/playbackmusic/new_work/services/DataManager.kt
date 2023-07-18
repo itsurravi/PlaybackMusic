@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.provider.DataProvider
+import com.ravisharma.playbackmusic.new_work.ui.fragments.now.RepeatMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,6 +23,13 @@ class DataManager @Inject constructor(
 
     private val _currentSong = MutableStateFlow<Song?>(null)
     val currentSong = _currentSong.asStateFlow()
+
+    private val _repeatMode = MutableStateFlow<RepeatMode>(RepeatMode.NO_REPEAT)
+    val repeatMode = _repeatMode.asStateFlow()
+
+    fun updateRepeatMode(newRepeatMode: RepeatMode){
+        _repeatMode.update { newRepeatMode }
+    }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
         _queue.apply { add(toIndex, removeAt(fromIndex)) }
