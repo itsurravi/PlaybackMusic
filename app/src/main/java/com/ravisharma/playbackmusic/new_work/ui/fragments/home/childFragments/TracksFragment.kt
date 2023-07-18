@@ -13,6 +13,10 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
+import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
+import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
+import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,10 +78,34 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
     private fun songClicked(song: Song, position: Int) {
         val currentList = (binding.songList.adapter as TracksAdapter).getCurrentList()
         homeViewModel.setQueue(currentList, position)
-//        requireContext().showToast("song click")
     }
 
     private fun songLongClicked(song: Song, position: Int) {
+        requireContext().onSongLongPress(song) { longItemClick ->
+            when(longItemClick) {
+                LongItemClick.Play -> {
+                    songClicked(song, position)
+                }
+                LongItemClick.SinglePlay -> {
+                    homeViewModel.setQueue(listOf(song), 0)
+                }
+                LongItemClick.PlayNext -> {
+                    // TODO
+                }
+                LongItemClick.AddToQueue -> {
+                    homeViewModel.addToQueue(song)
+                }
+                LongItemClick.AddToPlaylist -> {
+                    // TODO
+                }
+                LongItemClick.Share -> {
+                    requireContext().shareSong(song.location)
+                }
+                LongItemClick.Details -> {
+                    requireContext().showSongInfo(song)
+                }
+            }
+        }
         requireContext().showToast("song long click")
     }
 
