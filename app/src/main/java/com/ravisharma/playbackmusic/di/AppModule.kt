@@ -1,6 +1,8 @@
 package com.ravisharma.playbackmusic.di
 
 import android.content.Context
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
@@ -72,6 +74,18 @@ object AppModule {
     fun providesExoPlayer(
         @ApplicationContext context: Context
     ): ExoPlayer {
-        return ExoPlayer.Builder(context).build()
+//        val extractorsFactory = DefaultExtractorsFactory().apply {
+//            setMp3ExtractorFlags(Mp3Extractor.FLAG_DISABLE_ID3_METADATA)
+//        }
+        val audioAttributes = AudioAttributes.Builder().apply {
+            setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+            setUsage(C.USAGE_MEDIA)
+        }.build()
+
+        return ExoPlayer.Builder(context).apply {
+//            setMediaSourceFactory(DefaultMediaSourceFactory(context,extractorsFactory))
+            setAudioAttributes(audioAttributes, true)
+            setHandleAudioBecomingNoisy(true)
+        }.build()
     }
 }

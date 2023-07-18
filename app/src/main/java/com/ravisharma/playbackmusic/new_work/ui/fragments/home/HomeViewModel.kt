@@ -168,6 +168,20 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
+     * Adds a song to the next of current playing in queue
+     */
+    fun addNextInQueue(song: Song) {
+        if (queue.isEmpty()) {
+            showToast("No song in queue")
+        } else {
+            val result = manager.addNextInQueue(song)
+            if (result) {
+                showToast("Added ${song.title} to queue")
+            }
+        }
+    }
+
+    /**
      * Create and set a new queue in exoplayer.
      * Old queue is discarded.
      * Playing starts immediately

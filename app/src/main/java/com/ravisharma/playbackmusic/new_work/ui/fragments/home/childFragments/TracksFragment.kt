@@ -90,7 +90,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
                     homeViewModel.setQueue(listOf(song), 0)
                 }
                 LongItemClick.PlayNext -> {
-                    // TODO
+                    homeViewModel.addNextInQueue(song)
                 }
                 LongItemClick.AddToQueue -> {
                     homeViewModel.addToQueue(song)

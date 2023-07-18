@@ -75,6 +75,17 @@ class DataManager @Inject constructor(
         return true
     }
 
+    @Synchronized
+    fun addNextInQueue(song: Song): Boolean {
+        val index = callback?.addNextInQueue(song)
+        return if (index != null) {
+            _queue.add(index, song)
+            true
+        } else {
+            false
+        }
+    }
+
     fun setPlayerRunning(callback: Callback) {
         this.callback = callback
         this.callback?.setQueue(_queue, remIdx)
@@ -99,6 +110,7 @@ class DataManager @Inject constructor(
     interface Callback {
         fun setQueue(newQueue: List<Song>, startPlayingFromIndex: Int)
         fun addToQueue(song: Song)
+        fun addNextInQueue(song: Song): Int
         fun updateNotification()
     }
 }

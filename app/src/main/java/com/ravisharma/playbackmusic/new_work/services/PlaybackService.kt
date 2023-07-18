@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceiver.Callback {
+class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiver.Callback {
 
     @Inject
     lateinit var notificationManager: PlaybackNotificationManager
@@ -63,7 +63,7 @@ class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceive
             try {
                 dataManager.updateCurrentSong(exoPlayer.currentMediaItemIndex)
             } catch (e: Exception) {
-                Log.e("exoPlayerListener","${e.message}")
+                Log.e("exoPlayerListener", "${e.message}")
             }
             updateMediaSessionState()
             updateMediaSessionMetadata()
@@ -128,8 +128,8 @@ class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceive
             )
         )
 
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.isSpeakerphoneOn = true
+//        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+//        audioManager.isSpeakerphoneOn = true
 
         return START_NOT_STICKY
     }
@@ -236,7 +236,7 @@ class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceive
         }
         exoPlayer.addMediaItems(mediaItems)
         exoPlayer.prepare()
-        exoPlayer.seekTo(startPlayingFromIndex,0)
+        exoPlayer.seekTo(startPlayingFromIndex, 0)
         exoPlayer.play()
         updateMediaSessionState()
         updateMediaSessionMetadata()
@@ -245,6 +245,13 @@ class PlaybackService: Service(), DataManager.Callback, PlaybackBroadcastReceive
     @Synchronized
     override fun addToQueue(song: Song) {
         exoPlayer.addMediaItem(MediaItem.fromUri(song.location))
+    }
+
+    @Synchronized
+    override fun addNextInQueue(song: Song): Int {
+        val index = exoPlayer.currentMediaItemIndex + 1
+        exoPlayer.addMediaItem(index, MediaItem.fromUri(song.location))
+        return index
     }
 
     @Synchronized
