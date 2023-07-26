@@ -9,14 +9,10 @@
         android:id="@+id/homeFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeFragment"
         android:label="HomeFragment"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_playerFragment"
-            app:destination="@id/playerFragment"
-            app:enterAnim="@anim/anim_frag_slide_up"
-            app:exitAnim="@anim/anim_frag_slide_down"
-            app:popEnterAnim="@anim/anim_frag_slide_up"
-            app:popExitAnim="@anim/anim_frag_slide_down" />
+            app:destination="@id/playerFragment" />
     </fragment>
     <fragment
         android:id="@+id/playerFragment"

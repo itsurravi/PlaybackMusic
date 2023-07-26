@@ -8,6 +8,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -36,9 +38,26 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun setupFragment() {
+        initViews()
+        initObservers()
+    }
+
+    private fun initViews() {
         initToolbar()
         initPager()
-        initObservers()
+        initClickListeners()
+        binding.bottomPanel.isVisible = true
+    }
+
+    private fun initClickListeners() {
+        binding.apply {
+            bottomPanel.setOnClickListener {
+                findNavController().navigate(R.id.action_homeFragment_to_playerFragment)
+            }
+            btnPlayPauseSlide.setOnClickListener {
+
+            }
+        }
     }
 
     private fun initToolbar() {
@@ -97,7 +116,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.apply {
             currentSong?.let {
                 if (!bottomPanel.isVisible) {
-                    bottomPanel.isVisible = true
+//                    bottomPanel.isVisible = true
                 }
                 slideImage.load(Uri.parse(it.artUri)) {
                     error(R.drawable.logo)
