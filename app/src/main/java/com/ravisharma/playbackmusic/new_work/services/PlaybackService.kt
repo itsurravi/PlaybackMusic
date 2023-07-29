@@ -128,6 +128,12 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
             )
         )
 
+        scope.launch {
+            dataManager.repeatMode.collect {
+                withContext(Dispatchers.Main) { exoPlayer.repeatMode = it.toExoPlayerRepeatMode() }
+            }
+        }
+
 //        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 //        audioManager.isSpeakerphoneOn = true
 
