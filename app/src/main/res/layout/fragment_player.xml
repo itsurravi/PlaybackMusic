@@ -126,12 +126,12 @@
                 android:layout_marginBottom="40dp"
                 android:elevation="10dp"
                 android:scaleType="centerCrop"
+                android:src="@drawable/logo"
                 app:layout_constraintBottom_toTopOf="@id/imgFav"
                 app:layout_constraintDimensionRatio="1:1"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@drawable/logo" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imgEq"

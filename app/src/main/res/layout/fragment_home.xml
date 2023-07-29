@@ -76,6 +76,7 @@
             android:layout_height="50dp"
             android:layout_marginHorizontal="10dp"
             android:src="@drawable/logo"
+            android:transitionName="currentImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"

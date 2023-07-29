@@ -1,5 +1,7 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
+import android.app.PendingIntent
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -8,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import coil.load
@@ -18,6 +19,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
+import com.ravisharma.playbackmusic.new_work.Constants
+import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.ui.adapters.HomePageAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -29,6 +32,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val binding get() = _binding!!
 
     private val homeViewModel: HomeViewModel by activityViewModels()
+
+    private val pendingPausePlayIntent by lazy {
+        PendingIntent.getBroadcast(
+            context, PlaybackBroadcastReceiver.PAUSE_PLAY_ACTION_REQUEST_CODE,
+            Intent(Constants.PACKAGE_NAME).putExtra(
+                PlaybackBroadcastReceiver.AUDIO_CONTROL,
+                PlaybackBroadcastReceiver.PLAYER_PAUSE_PLAY
+            ),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,7 +60,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initPager()
         initClickListeners()
-        binding.bottomPanel.isVisible = true
     }
 
     private fun initClickListeners() {
@@ -55,7 +68,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 findNavController().navigate(R.id.action_homeFragment_to_playerFragment)
             }
             btnPlayPauseSlide.setOnClickListener {
-
+                try {
+                    pendingPausePlayIntent.send()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -116,7 +133,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.apply {
             currentSong?.let {
                 if (!bottomPanel.isVisible) {
-//                    bottomPanel.isVisible = true
+                    bottomPanel.isVisible = true
                 }
                 slideImage.load(Uri.parse(it.artUri)) {
                     error(R.drawable.logo)
