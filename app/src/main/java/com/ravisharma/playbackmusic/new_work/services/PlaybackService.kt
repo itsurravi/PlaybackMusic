@@ -5,7 +5,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.media.AudioManager
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -108,7 +107,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         broadcastReceiver = PlaybackBroadcastReceiver()
         mediaSession = MediaSessionCompat(this, MEDIA_SESSION)
-        systemNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        systemNotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         dataManager.setPlayerRunning(this)
         IntentFilter(Constants.PACKAGE_NAME).also {
@@ -124,7 +124,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
             notificationManager.getPlayerNotification(
                 session = mediaSession,
                 showPlayButton = false,
-                isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite ?: false
+                isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
+                    ?: false
             )
         )
 
@@ -226,7 +227,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                     notificationManager.getPlayerNotification(
                         session = mediaSession,
                         showPlayButton = !exoPlayer.isPlaying,
-                        isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite ?: false
+                        isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
+                            ?: false
                     )
                 )
             }
@@ -271,7 +273,14 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
      * Player.Listener onIsPlayingChanged gets called.
      */
     override fun onBroadcastPausePlay() {
-        if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
+        if (exoPlayer.isPlaying) {
+            exoPlayer.pause()
+        } else {
+            if (!exoPlayer.hasNextMediaItem()) {
+                exoPlayer.seekTo(0, 0)
+            }
+            exoPlayer.play()
+        }
     }
 
     /**
