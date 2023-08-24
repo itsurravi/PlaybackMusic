@@ -6,6 +6,7 @@ import com.ravisharma.playbackmusic.data.components.DaoCollection
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
 import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.data.utils.Constants
+import com.ravisharma.playbackmusic.data.utils.TinyDb
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,5 +60,13 @@ object DataModule {
             ),
             scope = scope
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideTinyDB(
+        @ApplicationContext context: Context,
+    ): TinyDb {
+        return TinyDb(context)
     }
 }

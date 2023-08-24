@@ -60,7 +60,9 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
             super.onMediaItemTransition(mediaItem, reason)
 
             try {
-                dataManager.updateCurrentSong(exoPlayer.currentMediaItemIndex)
+                if (mediaItem != null) {
+                    dataManager.updateCurrentSong(exoPlayer.currentMediaItemIndex)
+                }
             } catch (e: Exception) {
                 Log.e("exoPlayerListener", "${e.message}")
             }
@@ -153,13 +155,15 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
     private fun stopService() {
         unregisterReceiver(broadcastReceiver)
 
+        val index = exoPlayer.currentMediaItemIndex
+
         exoPlayer.stop()
         exoPlayer.clearMediaItems()
         exoPlayer.removeListener(exoPlayerListener)
 
         mediaSession.release()
 
-        dataManager.stopPlayerRunning()
+        dataManager.stopPlayerRunning(index)
         broadcastReceiver?.stopListening()
         systemNotificationManager?.cancel(PlaybackNotificationManager.PLAYER_NOTIFICATION_ID)
 
@@ -248,6 +252,48 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
         exoPlayer.play()
         updateMediaSessionState()
         updateMediaSessionMetadata()
+    }
+
+    @Synchronized
+    override fun updateExoList(shuffled: Boolean, list: List<Song>) {
+        if (shuffled) {
+            val count = exoPlayer.mediaItemCount
+            for (i in count downTo 0) {
+                if (i != exoPlayer.currentMediaItemIndex) {
+                    exoPlayer.removeMediaItem(i)
+                }
+            }
+            val mediaItems = list.map {
+                MediaItem.fromUri(it.location)
+            }
+            exoPlayer.addMediaItems(mediaItems)
+        } else {
+            val count = exoPlayer.mediaItemCount
+            val currentUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
+
+            val index = list.indexOfFirst { it.location == currentUri.toString() }
+
+            val mList = list.subList(0, index)
+            val nList = list.subList(index, list.size)
+
+            for (i in count downTo 0) {
+                if (i != exoPlayer.currentMediaItemIndex) {
+                    exoPlayer.removeMediaItem(i)
+                }
+            }
+
+            if(mList.isNotEmpty()) {
+                mList.forEachIndexed { index, song ->
+                    exoPlayer.addMediaItem(index, MediaItem.fromUri(song.location))
+                }
+            }
+
+            if(nList.isNotEmpty() && nList.size > 1) {
+                exoPlayer.addMediaItems(nList.subList(1, nList.size).map {
+                    MediaItem.fromUri(it.location)
+                })
+            }
+        }
     }
 
     @Synchronized

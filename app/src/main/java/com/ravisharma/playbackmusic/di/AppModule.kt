@@ -1,13 +1,16 @@
 package com.ravisharma.playbackmusic.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.provider.DataProvider
+import com.ravisharma.playbackmusic.data.utils.TinyDb
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationManager
 import com.ravisharma.playbackmusic.new_work.services.DataManager
 import com.ravisharma.playbackmusic.prefrences.PrefManager
@@ -17,6 +20,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -64,9 +68,12 @@ object AppModule {
     @Singleton
     fun provideDataManger(
         @ApplicationContext context: Context,
-        dataProvider: DataProvider
+        dataProvider: DataProvider,
+        tinyDb: TinyDb,
+        @Named(value = "lastPlayedInfo")
+        pref: SharedPreferences
     ): DataManager {
-        return DataManager(context, dataProvider)
+        return DataManager(context, dataProvider, tinyDb, pref)
     }
 
     @Singleton
@@ -88,4 +95,11 @@ object AppModule {
             setHandleAudioBecomingNoisy(true)
         }.build()
     }
+
+    @Singleton
+    @Provides
+    @Named(value = "lastPlayedInfo")
+    fun provideSharedPref(
+        @ApplicationContext context: Context
+    ): SharedPreferences = context.getSharedPreferences(Constants.LocalPref, Context.MODE_PRIVATE)
 }

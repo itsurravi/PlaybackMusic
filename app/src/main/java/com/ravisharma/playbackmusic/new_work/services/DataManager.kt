@@ -2,18 +2,25 @@ package com.ravisharma.playbackmusic.new_work.services
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
+import android.util.Log
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.provider.DataProvider
+import com.ravisharma.playbackmusic.data.utils.TinyDb
+import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.ui.fragments.now.RepeatMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import javax.inject.Named
 
 class DataManager @Inject constructor(
     private val context: Context,
-    private val dataProvider: DataProvider
+    private val dataProvider: DataProvider,
+    private val tinyDb: TinyDb,
+    @Named(value = "lastPlayedInfo") private val pref: SharedPreferences
 ) {
 
     private var callback: Callback? = null
@@ -21,14 +28,25 @@ class DataManager @Inject constructor(
     private val _queue = mutableListOf<Song>()
     val queue: List<Song> = _queue
 
+    private val _nonShuffleList = mutableListOf<Song>()
+    val nonShuffleList = _nonShuffleList.toList()
+
     private val _currentSong = MutableStateFlow<Song?>(null)
     val currentSong = _currentSong.asStateFlow()
 
     private val _repeatMode = MutableStateFlow<RepeatMode>(RepeatMode.NO_REPEAT)
     val repeatMode = _repeatMode.asStateFlow()
 
-    fun updateRepeatMode(newRepeatMode: RepeatMode){
+    private val _shuffleMode = MutableStateFlow<Boolean>(false)
+    val shuffleMode = _shuffleMode.asStateFlow()
+
+    fun updateRepeatMode(newRepeatMode: RepeatMode) {
         _repeatMode.update { newRepeatMode }
+    }
+
+    fun updateShuffleMode(newShuffleMode: Boolean) {
+        _shuffleMode.update { newShuffleMode }
+        shuffleCurrentQueue(newShuffleMode)
     }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
@@ -50,6 +68,72 @@ class DataManager @Inject constructor(
     }
 
     private var remIdx = 0
+
+    @Synchronized
+    fun shuffleCurrentQueue(shuffle: Boolean) {
+        if (shuffle) {
+            _nonShuffleList.apply {
+                clear()
+                addAll(_queue)
+            }
+            val list = _queue.shuffled().filter {
+                it.location != _currentSong.value?.location
+            }.toMutableList()
+
+            callback?.updateExoList(true, list)
+
+            _currentSong.value?.let {
+                list.add(0, it)
+            }
+            _queue.apply {
+                clear()
+                addAll(list)
+            }
+        } else {
+            callback?.updateExoList(false, _nonShuffleList)
+
+            _queue.apply {
+                clear()
+                addAll(_nonShuffleList)
+            }
+        }
+
+        Log.i("shuffled", "nonShuffle ${_nonShuffleList.map { it.title }}")
+        Log.i("shuffled", "queue ${_queue.map { it.title }}")
+    }
+
+    fun startPlayingLastList() {
+        val index = pref.getInt(Constants.SongIndex, -1)
+        if (index != -1 && index < _queue.size) {
+            setQueue(_queue.map {
+                it.copy()
+            }, index)
+        }
+    }
+
+    fun isServiceInitialized(): Boolean {
+        return callback != null
+    }
+
+    @Synchronized
+    fun setLastPlayedList() {
+        if (_queue.isEmpty()) {
+            _queue.apply {
+                val list = tinyDb.getListObject(Constants.PlayingList, Song::class.java)
+                clear()
+                addAll(list)
+            }
+            val index = pref.getInt(Constants.SongIndex, -1)
+            if (index != -1 && index < _queue.size) {
+                _currentSong.value = _queue[index]
+            }
+            _nonShuffleList.apply {
+                val list = tinyDb.getListObject(Constants.NonShuffleList, Song::class.java)
+                clear()
+                addAll(list)
+            }
+        }
+    }
 
     @Synchronized
     fun setQueue(newQueue: List<Song>, startPlayingFromIndex: Int) {
@@ -109,10 +193,13 @@ class DataManager @Inject constructor(
         return _queue[index]
     }
 
-    fun stopPlayerRunning() {
+    fun stopPlayerRunning(index: Int) {
+        pref.edit().putInt(Constants.SongIndex, index).commit()
+        tinyDb.putListObject(Constants.PlayingList, _queue.toList())
+
         this.callback = null
-        _currentSong.update { null }
-        _queue.clear()
+//        _currentSong.update { null }
+//        _queue.clear()
     }
 
     interface Callback {
@@ -120,5 +207,6 @@ class DataManager @Inject constructor(
         fun addToQueue(song: Song)
         fun addNextInQueue(song: Song): Int
         fun updateNotification()
+        fun updateExoList(shuffled: Boolean, list: List<Song>)
     }
 }

@@ -111,6 +111,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     updateRepeatMode(it)
                 }
             }
+            launch {
+                homeViewModel.shuffleMode.collect {
+                    updateShuffleMode(it)
+                }
+            }
         }
     }
 
@@ -207,6 +212,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
+    private fun updateShuffleMode(shuffle: Boolean) {
+        binding.apply {
+            if (shuffle) {
+                btnShuffle.setImageResource(R.drawable.ic_shuffle)
+            } else {
+                btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
+            }
+        }
+    }
+
     private fun initClickListeners() {
         binding.apply {
             btnPrev.setOnClickListener {
@@ -219,7 +234,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 pendingPausePlayIntent.send()
             }
             btnShuffle.setOnClickListener {
-
+                homeViewModel.toggleShuffleMode()
             }
             btnRepeat.setOnClickListener {
                 homeViewModel.toggleRepeatMode()

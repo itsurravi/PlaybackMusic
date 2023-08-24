@@ -33,6 +33,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private val homeViewModel: HomeViewModel by activityViewModels()
 
+    private var isLastPlayedListSet = false
+
     private val pendingPausePlayIntent by lazy {
         PendingIntent.getBroadcast(
             context, PlaybackBroadcastReceiver.PAUSE_PLAY_ACTION_REQUEST_CODE,
@@ -54,6 +56,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun setupFragment() {
         initViews()
         initObservers()
+        initDefaultData()
+    }
+
+    private fun initDefaultData() {
+        if(!isLastPlayedListSet) {
+            isLastPlayedListSet = true
+            homeViewModel.setLastPlayedList()
+        }
     }
 
     private fun initViews() {
@@ -69,7 +79,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             btnPlayPauseSlide.setOnClickListener {
                 try {
-                    pendingPausePlayIntent.send()
+                    if(homeViewModel.isServiceInitialized()) {
+                        pendingPausePlayIntent.send()
+                    } else {
+                        homeViewModel.startPlaying()
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

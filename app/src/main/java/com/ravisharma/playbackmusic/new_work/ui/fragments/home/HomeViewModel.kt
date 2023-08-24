@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
@@ -22,14 +23,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val context: Application,
     private val manager: DataManager,
     private val dataProvider: DataProvider,
-    private val exoPlayer: ExoPlayer,
+    private val exoPlayer: ExoPlayer
 ) : ViewModel() {
+
+    val currentSong = manager.currentSong
+    val queue = manager.queue
+    val repeatMode = manager.repeatMode
+    val shuffleMode = manager.shuffleMode
 
     val allSongs = dataProvider.getAll.songs()
         .catch { exception ->
@@ -76,13 +83,7 @@ class HomeViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    val currentSong = manager.currentSong
-
-    val queue = manager.queue
-
-    val repeatMode = manager.repeatMode
-
-    fun toggleRepeatMode(){
+    fun toggleRepeatMode() {
         manager.updateRepeatMode(repeatMode.value.next())
     }
 
@@ -134,7 +135,7 @@ class HomeViewModel @Inject constructor(
                 dataProvider.deletePlaylist(playlist)
                 showToast("Done")
             } catch (e: Exception) {
-                Log.e("deletePlaylist","$e")
+                Log.e("deletePlaylist", "$e")
                 showToast("Some error occurred")
             }
         }
@@ -209,5 +210,19 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             manager.updateSong(updatedSong)
         }
+    }
+
+    fun setLastPlayedList() {
+        manager.setLastPlayedList()
+    }
+
+    fun isServiceInitialized() = manager.isServiceInitialized()
+
+    fun startPlaying() {
+        manager.startPlayingLastList()
+    }
+
+    fun toggleShuffleMode() {
+        manager.updateShuffleMode(!shuffleMode.value)
     }
 }
