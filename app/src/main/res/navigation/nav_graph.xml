@@ -22,5 +22,18 @@
         android:id="@+id/playerFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.now.PlayerFragment"
         android:label="PlayerFragment"
-        tools:layout="@layout/fragment_player" />
+        tools:layout="@layout/fragment_player">
+        <action
+            android:id="@+id/action_playerFragment_to_currentQueueFragment"
+            app:destination="@id/currentQueueFragment"
+            app:enterAnim="@anim/anim_frag_slide_left"
+            app:exitAnim="@anim/anim_frag_slide_right_to_left"
+            app:popEnterAnim="@anim/anim_frag_slide_right"
+            app:popExitAnim="@anim/anim_frag_slide_left_to_right"  />
+    </fragment>
+    <fragment
+        android:id="@+id/currentQueueFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.now.CurrentQueueFragment"
+        android:label="CurrentQueueFragment"
+        tools:layout="@layout/fragment_current_queue" />
 </navigation>

@@ -5,7 +5,9 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -26,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiver.Callback {
@@ -46,6 +49,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
     private val job = SupervisorJob()
 
     private val scope = CoroutineScope(job + Dispatchers.Default)
+
+    private var playerState: Int = Player.STATE_IDLE
 
     companion object {
         const val MEDIA_SESSION = "media_session"
@@ -74,6 +79,11 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
             super.onIsPlayingChanged(isPlaying)
             updateMediaSessionState()
             updateMediaSessionMetadata()
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            playerState = playbackState
         }
     }
 
@@ -282,13 +292,13 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                 }
             }
 
-            if(mList.isNotEmpty()) {
+            if (mList.isNotEmpty()) {
                 mList.forEachIndexed { index, song ->
                     exoPlayer.addMediaItem(index, MediaItem.fromUri(song.location))
                 }
             }
 
-            if(nList.isNotEmpty() && nList.size > 1) {
+            if (nList.isNotEmpty() && nList.size > 1) {
                 exoPlayer.addMediaItems(nList.subList(1, nList.size).map {
                     MediaItem.fromUri(it.location)
                 })
@@ -322,11 +332,16 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
         if (exoPlayer.isPlaying) {
             exoPlayer.pause()
         } else {
-            if (!exoPlayer.hasNextMediaItem()) {
+            if (playerState == Player.STATE_ENDED) {
                 exoPlayer.seekTo(0, 0)
             }
             exoPlayer.play()
         }
+    }
+
+    override fun playOnPosition(position: Int) {
+        exoPlayer.seekTo(position, 0)
+        exoPlayer.play()
     }
 
     /**
@@ -376,5 +391,12 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
         // Deprecated in api level 33
         stopForeground(true)
         stopSelf()
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+//        stopService()
+        onBroadcastCancel()
+        Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, 800)
+        super.onTaskRemoved(rootIntent)
     }
 }

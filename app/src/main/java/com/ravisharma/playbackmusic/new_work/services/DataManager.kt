@@ -97,9 +97,6 @@ class DataManager @Inject constructor(
                 addAll(_nonShuffleList)
             }
         }
-
-        Log.i("shuffled", "nonShuffle ${_nonShuffleList.map { it.title }}")
-        Log.i("shuffled", "queue ${_queue.map { it.title }}")
     }
 
     fun startPlayingLastList() {
@@ -178,6 +175,10 @@ class DataManager @Inject constructor(
         }
     }
 
+    fun playOnPosition(position: Int) {
+        callback?.playOnPosition(position)
+    }
+
     fun setPlayerRunning(callback: Callback) {
         this.callback = callback
         this.callback?.setQueue(_queue, remIdx)
@@ -196,6 +197,7 @@ class DataManager @Inject constructor(
     fun stopPlayerRunning(index: Int) {
         pref.edit().putInt(Constants.SongIndex, index).commit()
         tinyDb.putListObject(Constants.PlayingList, _queue.toList())
+        tinyDb.putListObject(Constants.NonShuffleList, _nonShuffleList.toList())
 
         this.callback = null
 //        _currentSong.update { null }
@@ -208,5 +210,6 @@ class DataManager @Inject constructor(
         fun addNextInQueue(song: Song): Int
         fun updateNotification()
         fun updateExoList(shuffled: Boolean, list: List<Song>)
+        fun playOnPosition(position: Int)
     }
 }

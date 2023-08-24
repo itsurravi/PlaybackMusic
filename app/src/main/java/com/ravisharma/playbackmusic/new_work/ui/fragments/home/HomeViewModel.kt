@@ -1,7 +1,6 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
 import android.app.Application
-import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -32,11 +30,6 @@ class HomeViewModel @Inject constructor(
     private val dataProvider: DataProvider,
     private val exoPlayer: ExoPlayer
 ) : ViewModel() {
-
-    val currentSong = manager.currentSong
-    val queue = manager.queue
-    val repeatMode = manager.repeatMode
-    val shuffleMode = manager.shuffleMode
 
     val allSongs = dataProvider.getAll.songs()
         .catch { exception ->
@@ -83,9 +76,10 @@ class HomeViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun toggleRepeatMode() {
-        manager.updateRepeatMode(repeatMode.value.next())
-    }
+    val currentSong = manager.currentSong
+    val queue = manager.queue
+    val repeatMode = manager.repeatMode
+    val shuffleMode = manager.shuffleMode
 
     private val _currentSongPlaying = MutableStateFlow<Boolean?>(null)
     val currentSongPlaying = _currentSongPlaying.asStateFlow()
@@ -116,7 +110,7 @@ class HomeViewModel @Inject constructor(
      */
     fun shufflePlay(songs: List<Song>?) = setQueue(songs?.shuffled(), 0)
 
-    fun onPlaylistCreate(playlistName: String) {
+    fun createPlaylist(playlistName: String) {
         viewModelScope.launch {
             dataProvider.createPlaylist(playlistName) {
                 showToast(it)
@@ -222,7 +216,15 @@ class HomeViewModel @Inject constructor(
         manager.startPlayingLastList()
     }
 
+    fun toggleRepeatMode() {
+        manager.updateRepeatMode(repeatMode.value.next())
+    }
+
     fun toggleShuffleMode() {
         manager.updateShuffleMode(!shuffleMode.value)
+    }
+
+    fun playOnPosition(position: Int) {
+        manager.playOnPosition(position)
     }
 }

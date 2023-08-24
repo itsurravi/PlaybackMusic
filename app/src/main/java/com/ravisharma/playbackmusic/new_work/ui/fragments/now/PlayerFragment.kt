@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
@@ -196,7 +197,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                    // TODO("Not yet implemented")
+
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
@@ -240,7 +241,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 homeViewModel.toggleRepeatMode()
             }
             imgPlaylist.setOnClickListener {
-
+                findNavController().navigate(R.id.action_playerFragment_to_currentQueueFragment)
             }
             imgFav.setOnClickListener {
                 homeViewModel.changeFavouriteValue()
@@ -252,7 +253,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
             }
             ivBack.setOnClickListener {
-
+                findNavController().popBackStack()
             }
         }
     }
