@@ -9,3 +9,7 @@ object Constants {
     const val NonShuffleList = "NonShuffleList"
     const val LocalPref = "local_pref"
 }
+
+object NavigationConstant {
+    const val AddToPlaylistSongs = "addToPlaylistSongs"
+}

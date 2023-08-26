@@ -69,6 +69,10 @@ class DataManager @Inject constructor(
 
     private var remIdx = 0
 
+    fun cleanData() {
+        dataProvider.cleanData()
+    }
+
     @Synchronized
     fun shuffleCurrentQueue(shuffle: Boolean) {
         if (shuffle) {

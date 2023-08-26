@@ -10,6 +10,7 @@ import com.ravisharma.playbackmusic.new_work.services.DataManager
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -30,8 +31,19 @@ class CollectionViewModel @Inject constructor(
 
     private val _collectionType = MutableStateFlow<CollectionType?>(null)
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val collectionUi = _collectionType.flatMapLatest { type ->
         when (type?.type) {
+            CollectionType.RecentAddedType -> {
+                dataProvider.findCollection.getRecentAdded().map {
+                    CollectionUi(
+                        songs = it,
+                        topBarTitle = "Recent Added",
+                        topBarBackgroundImageUri = it[0].artUri ?: ""
+                    )
+                }
+            }
+
             CollectionType.AlbumType -> {
                 dataProvider.findCollection.getAlbumWithSongsByName(type.id).map {
                     if (it == null) CollectionUi()

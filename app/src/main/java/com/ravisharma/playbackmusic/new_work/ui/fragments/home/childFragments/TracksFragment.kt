@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
+import com.ravisharma.playbackmusic.new_work.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
@@ -96,7 +98,10 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
                     mainViewModel.addToQueue(song)
                 }
                 LongItemClick.AddToPlaylist -> {
-                    // TODO
+                    val bundle = Bundle().apply {
+                        putStringArrayList(NavigationConstant.AddToPlaylistSongs, arrayListOf(song.location))
+                    }
+                    findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
                 }
                 LongItemClick.Share -> {
                     requireContext().shareSong(song.location)

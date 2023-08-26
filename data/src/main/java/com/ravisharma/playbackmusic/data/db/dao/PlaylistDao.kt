@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.data.db.model.embedded.PlaylistWithSongs
 import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
@@ -23,8 +24,11 @@ interface PlaylistDao {
     @Delete(entity = Playlist::class)
     suspend fun deletePlaylist(playlist: Playlist)
 
+    @Update(entity = Playlist::class)
+    suspend fun updatePlaylistName(playlist: Playlist)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertPlaylistSongCrossRef(playlistSongCrossRefs: List<PlaylistSongCrossRef>)
+    suspend fun insertPlaylistSongCrossRef(playlistSongCrossRefs: List<PlaylistSongCrossRef>): List<Long>
 
     @Delete
     suspend fun deletePlaylistSongCrossRef(playlistSongCrossRef: PlaylistSongCrossRef)

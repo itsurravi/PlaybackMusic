@@ -57,8 +57,8 @@ class DataProvider(
                     if(!File(it.location).exists()){
                         launch { daoCollection.songDao.deleteSong(it) }
                     }
-                } catch (_: Exception){
-
+                } catch (e: Exception){
+                    Log.e("DeleteError", e.toString())
                 }
             }
         }
@@ -75,6 +75,8 @@ class DataProvider(
     }
 
     suspend fun deletePlaylist(playlist: Playlist) = daoCollection.playlistDao.deletePlaylist(playlist)
+
+    suspend fun updatePlaylistName(playlist: Playlist) = daoCollection.playlistDao.updatePlaylistName(playlist)
 
     suspend fun deleteSong(song: Song) {
         daoCollection.songDao.deleteSong(song)

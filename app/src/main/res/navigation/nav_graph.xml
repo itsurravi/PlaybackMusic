@@ -48,4 +48,17 @@
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionListingFragment"
         android:label="CategoryListingFragment"
         tools:layout="@layout/activity_category_song" />
+
+    <action
+        android:id="@+id/action_to_addToPlaylistFragment"
+        app:destination="@id/addToPlaylistFragment"
+        app:enterAnim="@anim/anim_frag_slide_left"
+        app:exitAnim="@anim/anim_frag_slide_right_to_left"
+        app:popEnterAnim="@anim/anim_frag_slide_right"
+        app:popExitAnim="@anim/anim_frag_slide_left_to_right" />
+    <fragment
+        android:id="@+id/addToPlaylistFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.AddToPlaylistFragment"
+        android:label="AddToPlaylistFragment"
+        tools:layout="@layout/activity_add_to_playlist" />
 </navigation>

@@ -11,5 +11,8 @@ class CollectionType(val type: Int, val id: String = "") : Parcelable {
         const val ArtistType = 1
         const val PlaylistType = 2
         const val FavouritesType = 3
+        const val RecentAddedType = 4
+        const val MostPlayedType = 5
+        const val LastPlayedType = 6
     }
 }

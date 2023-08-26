@@ -67,4 +67,7 @@ interface SongDao {
 
     @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE favourite = 1")
     fun getAllFavourites(): Flow<List<Song>>
+
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} ORDER BY modifiedDate DESC")
+    fun getRecentAdded(): Flow<List<Song>>
 }

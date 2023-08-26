@@ -18,4 +18,6 @@ class FindCollection(
     fun getGenreWithSongs(genreName: String) = daoCollection.genreDao.getGenreWithSongs(genreName)
 
     fun getFavourites() = daoCollection.songDao.getAllFavourites()
+
+    fun getRecentAdded() = daoCollection.songDao.getRecentAdded()
 }

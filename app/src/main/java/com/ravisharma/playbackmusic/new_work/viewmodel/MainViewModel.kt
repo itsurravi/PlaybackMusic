@@ -2,13 +2,13 @@ package com.ravisharma.playbackmusic.new_work.viewmodel
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
+import com.ravisharma.playbackmusic.data.db.model.tables.PlaylistSongCrossRef
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.new_work.services.DataManager
@@ -119,6 +119,23 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun updatePlaylistName(playlistWithSongCount: PlaylistWithSongCount) {
+        viewModelScope.launch {
+            try {
+                val playlist = Playlist(
+                    playlistId = playlistWithSongCount.playlistId,
+                    playlistName = playlistWithSongCount.playlistName,
+                    createdAt = playlistWithSongCount.createdAt
+                )
+                dataProvider.updatePlaylistName(playlist)
+                context.showToast("Done")
+            } catch (e: Exception) {
+                Log.e("updatePlaylistName", "$e")
+                context.showToast("Some error occurred")
+            }
+        }
+    }
+
     fun deletePlaylist(playlistWithSongCount: PlaylistWithSongCount) {
         viewModelScope.launch {
             try {
@@ -131,6 +148,48 @@ class MainViewModel @Inject constructor(
                 context.showToast("Done")
             } catch (e: Exception) {
                 Log.e("deletePlaylist", "$e")
+                context.showToast("Some error occurred")
+            }
+        }
+    }
+
+    fun addSongToPlaylist(playListId: Long, location: String) {
+        viewModelScope.launch {
+            try {
+                val playlistSongCrossRef = PlaylistSongCrossRef(playListId, location)
+                val l = dataProvider.insertPlaylistSongCrossRefs(listOf(playlistSongCrossRef))
+                if(l.isNotEmpty()) {
+                    if(l[0] > 0) {
+                        context.showToast("Song Added")
+                    } else {
+                        context.showToast("Already Added")
+                    }
+                } else {
+                    context.showToast("Some error occurred")
+                }
+            } catch (e: Exception) {
+                context.showToast("Some error occurred")
+            }
+        }
+    }
+
+    fun addSongsToPlaylist(playListId: Long, songLocations: List<String>) {
+        viewModelScope.launch {
+            try {
+                val list = songLocations.map { location ->
+                    PlaylistSongCrossRef(playListId, location)
+                }
+                val l = dataProvider.insertPlaylistSongCrossRefs(list)
+                if(l.isNotEmpty()) {
+                    if(l[0] > 0) {
+                        context.showToast("Songs Added")
+                    } else {
+                        context.showToast("Already Added")
+                    }
+                } else {
+                    context.showToast("Some error occurred")
+                }
+            } catch (e: Exception) {
                 context.showToast("Some error occurred")
             }
         }

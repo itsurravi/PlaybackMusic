@@ -27,6 +27,12 @@ class MusicScanViewModel @Inject constructor(
         initialValue = ScanStatus.ScanNotRunning
     )
 
+    fun cleanData() {
+        viewModelScope.launch {
+            dataProvider.cleanData()
+        }
+    }
+
     fun scanForMusic() {
         viewModelScope.launch(Dispatchers.IO) {
             dataProvider.performMusicScan()

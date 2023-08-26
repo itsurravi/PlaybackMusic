@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.widget.Toast
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
@@ -84,6 +85,15 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
             playerState = playbackState
+        }
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
+                dataManager.cleanData()
+                showToast("Could not find the song ${dataManager.currentSong.value?.title ?: ""} at the specified path")
+                onBroadcastCancel()
+            }
         }
     }
 
