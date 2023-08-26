@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.new_work.ui.fragments.home
+package com.ravisharma.playbackmusic.new_work.viewmodel
 
 import android.app.Application
 import android.util.Log
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val context: Application,
     private val manager: DataManager,
     private val dataProvider: DataProvider,

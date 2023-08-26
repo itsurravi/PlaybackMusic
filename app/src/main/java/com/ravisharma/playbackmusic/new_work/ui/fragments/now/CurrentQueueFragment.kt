@@ -17,7 +17,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCurrentQueueBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
+import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
     private var _binding: FragmentCurrentQueueBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,8 +58,8 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
                     )
                 )
             }.also {
-                currentQueueAdapter.submitList(homeViewModel.queue) {
-                    it.scrollToPosition(homeViewModel.queue.indexOf(homeViewModel.currentSong.value))
+                currentQueueAdapter.submitList(mainViewModel.queue) {
+                    it.scrollToPosition(mainViewModel.queue.indexOf(mainViewModel.currentSong.value))
                 }
             }
         }
@@ -80,7 +80,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                homeViewModel.currentSong.collect {
+                mainViewModel.currentSong.collect {
                     updateCurrentSongInfo(it)
                 }
             }
@@ -106,6 +106,6 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
     private fun songClicked(song: Song, position: Int) {
 //        val currentList = (binding.rvSongList.adapter as NowPlayingAdapter).getCurrentList()
 //        homeViewModel.setQueue(currentList, position)
-        homeViewModel.playOnPosition(position)
+        mainViewModel.playOnPosition(position)
     }
 }

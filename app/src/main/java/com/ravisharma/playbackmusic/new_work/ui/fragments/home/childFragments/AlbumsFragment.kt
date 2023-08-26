@@ -12,7 +12,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Album
 import com.ravisharma.playbackmusic.databinding.FragmentAlbumsBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.AlbumsAdapter
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
+import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -24,7 +24,7 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     private var _binding: FragmentAlbumsBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,7 +50,7 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
 
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.allAlbums.collectLatest { list ->
+            mainViewModel.allAlbums.collectLatest { list ->
                 list?.let {
                     setupData(it)
                 }

@@ -17,7 +17,7 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
+import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -29,7 +29,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
     private var _binding: FragmentNameWiseBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -59,7 +59,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            homeViewModel.allSongs.collectLatest { list ->
+            mainViewModel.allSongs.collectLatest { list ->
                 list?.let {
                     setupData(it)
                 }
@@ -77,7 +77,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun songClicked(song: Song, position: Int) {
         val currentList = (binding.songList.adapter as TracksAdapter).getCurrentList()
-        homeViewModel.setQueue(currentList, position)
+        mainViewModel.setQueue(currentList, position)
     }
 
     private fun songLongClicked(song: Song, position: Int) {
@@ -87,13 +87,13 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
                     songClicked(song, position)
                 }
                 LongItemClick.SinglePlay -> {
-                    homeViewModel.setQueue(listOf(song), 0)
+                    mainViewModel.setQueue(listOf(song), 0)
                 }
                 LongItemClick.PlayNext -> {
-                    homeViewModel.addNextInQueue(song)
+                    mainViewModel.addNextInQueue(song)
                 }
                 LongItemClick.AddToQueue -> {
-                    homeViewModel.addToQueue(song)
+                    mainViewModel.addToQueue(song)
                 }
                 LongItemClick.AddToPlaylist -> {
                     // TODO

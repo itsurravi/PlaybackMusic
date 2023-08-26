@@ -19,7 +19,7 @@ import com.ravisharma.playbackmusic.data.utils.toMS
 import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
-import com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeViewModel
+import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -36,7 +36,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var currentSong: Song? = null
 
@@ -93,12 +93,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                homeViewModel.currentSong.collect {
+                mainViewModel.currentSong.collect {
                     setCurrentPlayingSong(it)
                 }
             }
             launch {
-                homeViewModel.currentSongPlaying.collectLatest {
+                mainViewModel.currentSongPlaying.collectLatest {
                     togglePlaying(it)
                 }
             }
@@ -108,12 +108,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
             launch {
-                homeViewModel.repeatMode.collect {
+                mainViewModel.repeatMode.collect {
                     updateRepeatMode(it)
                 }
             }
             launch {
-                homeViewModel.shuffleMode.collect {
+                mainViewModel.shuffleMode.collect {
                     updateShuffleMode(it)
                 }
             }
@@ -235,16 +235,16 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 pendingPausePlayIntent.send()
             }
             btnShuffle.setOnClickListener {
-                homeViewModel.toggleShuffleMode()
+                mainViewModel.toggleShuffleMode()
             }
             btnRepeat.setOnClickListener {
-                homeViewModel.toggleRepeatMode()
+                mainViewModel.toggleRepeatMode()
             }
             imgPlaylist.setOnClickListener {
                 findNavController().navigate(R.id.action_playerFragment_to_currentQueueFragment)
             }
             imgFav.setOnClickListener {
-                homeViewModel.changeFavouriteValue()
+                mainViewModel.changeFavouriteValue()
             }
             imgEq.setOnClickListener {
 

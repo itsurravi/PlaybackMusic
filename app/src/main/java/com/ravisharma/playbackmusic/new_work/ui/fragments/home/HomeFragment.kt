@@ -22,6 +22,7 @@ import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.ui.adapters.HomePageAdapter
+import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,7 +32,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private var isLastPlayedListSet = false
 
@@ -62,7 +63,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun initDefaultData() {
         if(!isLastPlayedListSet) {
             isLastPlayedListSet = true
-            homeViewModel.setLastPlayedList()
+            mainViewModel.setLastPlayedList()
         }
     }
 
@@ -79,10 +80,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             btnPlayPauseSlide.setOnClickListener {
                 try {
-                    if(homeViewModel.isServiceInitialized()) {
+                    if(mainViewModel.isServiceInitialized()) {
                         pendingPausePlayIntent.send()
                     } else {
-                        homeViewModel.startPlaying()
+                        mainViewModel.startPlaying()
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -131,12 +132,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
-                homeViewModel.currentSong.collect { currentSong ->
+                mainViewModel.currentSong.collect { currentSong ->
                     updateBottomPanel(currentSong)
                 }
             }
             launch {
-                homeViewModel.currentSongPlaying.collect { playing ->
+                mainViewModel.currentSongPlaying.collect { playing ->
                     updateBottomPanel(playing)
                 }
             }
