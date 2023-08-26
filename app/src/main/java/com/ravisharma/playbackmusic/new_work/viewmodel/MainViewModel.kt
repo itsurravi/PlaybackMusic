@@ -12,6 +12,7 @@ import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.new_work.services.DataManager
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -96,9 +97,9 @@ class MainViewModel @Inject constructor(
         exoPlayer.addListener(exoPlayerListener)
     }
 
-    private fun showToast(message: String) {
+    /*private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-    }
+    }*/
 
     override fun onCleared() {
         super.onCleared()
@@ -113,7 +114,7 @@ class MainViewModel @Inject constructor(
     fun createPlaylist(playlistName: String) {
         viewModelScope.launch {
             dataProvider.createPlaylist(playlistName) {
-                showToast(it)
+                context.showToast(it)
             }
         }
     }
@@ -127,10 +128,10 @@ class MainViewModel @Inject constructor(
                     createdAt = playlistWithSongCount.createdAt
                 )
                 dataProvider.deletePlaylist(playlist)
-                showToast("Done")
+                context.showToast("Done")
             } catch (e: Exception) {
                 Log.e("deletePlaylist", "$e")
-                showToast("Some error occurred")
+                context.showToast("Some error occurred")
             }
         }
     }
@@ -144,9 +145,9 @@ class MainViewModel @Inject constructor(
         } else {
             val result = manager.addToQueue(song)
             if (result) {
-                showToast("Added ${song.title} to queue")
+                context.showToast("Added ${song.title} to queue")
             } else {
-                showToast("Song already in queue")
+                context.showToast("Song already in queue")
             }
         }
     }
@@ -161,9 +162,9 @@ class MainViewModel @Inject constructor(
             var result = false
             songs.forEach { result = result or manager.addToQueue(it) }
             if (result) {
-                showToast("Done")
+                context.showToast("Done")
             } else {
-                showToast("Songs already in queue")
+                context.showToast("Songs already in queue")
             }
         }
     }
@@ -173,11 +174,11 @@ class MainViewModel @Inject constructor(
      */
     fun addNextInQueue(song: Song) {
         if (queue.isEmpty()) {
-            showToast("No song in queue")
+            context.showToast("No song in queue")
         } else {
             val result = manager.addNextInQueue(song)
             if (result) {
-                showToast("Added ${song.title} to queue")
+                context.showToast("Added ${song.title} to queue")
             }
         }
     }
@@ -192,7 +193,7 @@ class MainViewModel @Inject constructor(
     fun setQueue(songs: List<Song>?, startPlayingFromIndex: Int = 0) {
         if (songs == null) return
         manager.setQueue(songs, startPlayingFromIndex)
-        showToast("Playing")
+        context.showToast("Playing")
     }
 
     /**

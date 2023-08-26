@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.ArtistWithSongCount
 import com.ravisharma.playbackmusic.databinding.FragmentArtistBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.ArtistsAdapter
+import com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +76,11 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
     }
 
     private fun onArtistClick(artist: ArtistWithSongCount) {
-        requireContext().showToast("artist click")
+        val collectionType = CollectionType(CollectionType.ArtistType, artist.name)
+        val bundle = Bundle().apply {
+            putParcelable(CollectionType.Category, collectionType)
+        }
+        findNavController().navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
     }
 
     companion object {

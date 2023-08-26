@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,8 +13,8 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Album
 import com.ravisharma.playbackmusic.databinding.FragmentAlbumsBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.AlbumsAdapter
+import com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
-import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -67,7 +68,11 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
     }
 
     private fun onAlbumClick(album: Album) {
-        requireContext().showToast("album click")
+        val collectionType = CollectionType(CollectionType.AlbumType, album.name)
+        val bundle = Bundle().apply {
+            putParcelable(CollectionType.Category, collectionType)
+        }
+        findNavController().navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
     }
 
     companion object {

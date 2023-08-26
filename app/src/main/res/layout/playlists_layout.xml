@@ -79,7 +79,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        tools:visibility="gone">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/imageBack2"
