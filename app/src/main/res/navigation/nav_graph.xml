@@ -3,8 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/onBoardingFragment">
 
+    <fragment
+        android:id="@+id/onBoardingFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.onboarding.OnBoardingFragment"
+        android:label="OnBoardingFragment"
+        tools:layout="@layout/fragment_onboarding" />
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeFragment"

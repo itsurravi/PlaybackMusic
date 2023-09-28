@@ -3,10 +3,15 @@ package com.ravisharma.playbackmusic.prefrences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import com.ravisharma.playbackmusic.R
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore(
     name = "playback_info",
@@ -26,7 +32,7 @@ private val Context.dataStore by preferencesDataStore(
 private fun sharedPreferencesMigration(context: Context) =
     listOf(SharedPreferencesMigration(context, context.getString(R.string.playback_info)))
 
-class PrefManager(c: Context) {
+class PrefManager @Inject constructor(c: Context) {
 
     private val Playlist: String = c.getString(R.string.playLists)
 

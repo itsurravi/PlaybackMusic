@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
@@ -26,36 +27,9 @@ class NewPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        initObservers()
-
-        viewModel.scanForMusic()
-    }
-
-    private fun initObservers() {
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.scanStatus.collect {
-                        when (it) {
-                            ScanStatus.ScanComplete -> {
-                                Log.i("ScanStatus", "ScanComplete")
-                            }
-
-                            ScanStatus.ScanNotRunning -> {
-                                Log.i("ScanStatus", "ScanNotRunning")
-                            }
-
-                            is ScanStatus.ScanProgress -> {
-                                Log.i("ScanStatus", "ScanProgress ${it.parsed} ${it.total}")
-                            }
-
-                            ScanStatus.ScanStarted -> {
-                                Log.i("ScanStatus", "ScanStarted")
-                            }
-                        }
-                    }
-                }
-            }
+        val isOnBoardingCompleted = viewModel.isOnBoardingCompleted()
+        if(isOnBoardingCompleted) {
+            // change home fragment of navigation
         }
     }
 }

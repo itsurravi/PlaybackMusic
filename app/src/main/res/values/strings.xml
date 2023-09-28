@@ -75,7 +75,7 @@
     <string name="dont">Don\'t</string>
     <string name="packageName">package</string>
     <string name="about">About Playback</string>
-    <string name="permissionAlert">You have forcefully denied Read storage permission.\n\nThis is Necessary and Important for the working of this APP.\n\nClick on \'Grant\' to grant permission</string>
+    <string name="permissionAlert">You have forcefully denied permissions.\n\nThis is Necessary and Important for the working of this APP.\n\nClick on \'Grant\' to grant permission</string>
 
     <!--Layouts-->
     <string name="select_Playlist">Select Playlist</string>
