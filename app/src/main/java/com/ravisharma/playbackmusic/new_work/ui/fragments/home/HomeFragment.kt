@@ -13,17 +13,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
-import com.ravisharma.playbackmusic.new_work.ui.adapters.HomePageAdapter
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -63,7 +59,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initDefaultData() {
-        if(!isLastPlayedListSet) {
+        if (!isLastPlayedListSet) {
             isLastPlayedListSet = true
             mainViewModel.setLastPlayedList()
         }
@@ -77,7 +73,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun setupBottomNavigation() {
         binding.apply {
-            val navController = (childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+            val navController =
+                (childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
 
             bottomNavigationView.setupWithNavController(navController = navController)
         }
@@ -90,7 +87,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
             btnPlayPauseSlide.setOnClickListener {
                 try {
-                    if(mainViewModel.isServiceInitialized()) {
+                    if (mainViewModel.isServiceInitialized()) {
                         pendingPausePlayIntent.send()
                     } else {
                         mainViewModel.startPlaying()
@@ -151,6 +148,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     updateBottomPanel(playing)
                 }
             }
+            launch {
+                mainViewModel.currentAudioProgress().collect { progress ->
+                    updateSeekbarValue(progress)
+                }
+            }
+        }
+    }
+
+    private fun updateSeekbarValue(progress: Long) {
+        binding.apply {
+            progressSong.progress = progress.toInt()
         }
     }
 
@@ -167,6 +175,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 }
                 txtSongName.text = it.title
                 txtSongArtist.text = it.artist
+                progressSong.max = it.durationMillis.toInt()
             }
         }
     }

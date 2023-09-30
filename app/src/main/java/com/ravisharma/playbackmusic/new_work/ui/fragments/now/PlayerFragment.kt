@@ -103,7 +103,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
             launch {
-                currentAudioProgress(exoPlayer).collect { progress ->
+                mainViewModel.currentAudioProgress().collect { progress ->
                     updateSeekbarValue(progress)
                 }
             }
@@ -163,7 +163,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         initClickListeners()
     }
 
-    private fun currentAudioProgress(exoPlayer: ExoPlayer) = flow {
+    /*private fun currentAudioProgress(exoPlayer: ExoPlayer) = flow {
         while (true) {
             emit(
                 withContext(Dispatchers.Main) {
@@ -172,7 +172,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             )
             delay(100)
         }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.IO)*/
 
     private fun updateSeekbarValue(value: Long) {
         binding.apply {

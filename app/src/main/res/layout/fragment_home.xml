@@ -41,25 +41,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_margin="8dp"
             android:visibility="gone"
             app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
             tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp">
+                android:layout_height="wrap_content">
 
                 <ImageView
                     android:id="@+id/slideImage"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginStart="10dp"
                     android:src="@drawable/logo"
                     android:transitionName="currentImage"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/progress_song"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -103,7 +103,7 @@
                     android:textColor="@color/textColor"
                     android:textSize="12sp"
                     app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/progress_song"
                     app:layout_constraintEnd_toStartOf="@id/btn_PlayPause_slide"
                     app:layout_constraintHorizontal_bias="0"
                     app:layout_constraintStart_toStartOf="@id/txtSongName"
@@ -114,13 +114,30 @@
                     android:id="@+id/btn_PlayPause_slide"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_marginEnd="10dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/uamp_ic_play_arrow_white_48dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/progress_song"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progress_song"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    app:indicatorColor="@color/scrollThumb"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1"
+                    app:trackColor="@color/contentBGclr"
+                    app:trackCornerRadius="4dp"
+                    app:trackThickness="1dp" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
