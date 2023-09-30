@@ -159,6 +159,8 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
         binding.apply {
             pbScan.max = total
             pbScan.progress = parsed
+            val noOfSongs = resources.getQuantityString(R.plurals.numberOfSongs, total, total)
+            tvSongCount.text = "$noOfSongs Found"
         }
     }
 

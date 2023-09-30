@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    tools:background="@color/contentBGclr">
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/grp_permission"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:constraint_referenced_ids="tv_info, btn_grant" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/grp_scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:visibility="visible"
         app:constraint_referenced_ids="tv_scan_info, pb_scan, btn_scan" />
 
     <ImageView
@@ -88,11 +90,25 @@
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/bg_custom_progress"
-        app:layout_constraintBottom_toTopOf="@id/btn_scan"
+        app:layout_constraintBottom_toTopOf="@id/tv_song_count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_scan_info"
         app:trackCornerRadius="4dp" />
+
+    <TextView
+        android:id="@+id/tv_song_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="24dp"
+        android:gravity="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/btn_scan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pb_scan"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Song Count: " />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_scan"
