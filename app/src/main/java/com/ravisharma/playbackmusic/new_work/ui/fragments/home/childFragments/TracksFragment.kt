@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -101,7 +102,7 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
                     val bundle = Bundle().apply {
                         putStringArrayList(NavigationConstant.AddToPlaylistSongs, arrayListOf(song.location))
                     }
-                    findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                    requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_to_addToPlaylistFragment, bundle)
                 }
                 LongItemClick.Share -> {
                     requireContext().shareSong(song.location)

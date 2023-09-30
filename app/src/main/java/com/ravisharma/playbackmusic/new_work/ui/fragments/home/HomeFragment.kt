@@ -10,7 +10,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -69,8 +71,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun initViews() {
         initToolbar()
-        initPager()
         initClickListeners()
+        setupBottomNavigation()
+    }
+
+    private fun setupBottomNavigation() {
+        binding.apply {
+            val navController = (childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
+
+            bottomNavigationView.setupWithNavController(navController = navController)
+        }
     }
 
     private fun initClickListeners() {
@@ -100,7 +110,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initPager() {
-        binding.apply {
+        /*binding.apply {
             val pagerAdapter = HomePageAdapter(requireActivity())
             viewPager.apply {
                 offscreenPageLimit = 4
@@ -126,7 +136,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     fabShuffle.isVisible = position == 1
                 }
             })
-        }
+        }*/
     }
 
     private fun initObservers() {

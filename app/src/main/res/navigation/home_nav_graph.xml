@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_nav_graph"
+    app:startDestination="@id/tracksFragment">
+    <fragment
+        android:id="@+id/tracksFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.TracksFragment"
+        android:label="TracksFragment"
+        tools:layout="@layout/fragment_name_wise" />
+    <fragment
+        android:id="@+id/albumsFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.AlbumsFragment"
+        android:label="AlbumsFragment"
+        tools:layout="@layout/fragment_albums" />
+    <fragment
+        android:id="@+id/artistsFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.ArtistsFragment"
+        android:label="ArtistsFragment"
+        tools:layout="@layout/fragment_artist" />
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.PlaylistsFragment"
+        android:label="PlaylistsFragment"
+        tools:layout="@layout/fragment_playlist" />
+</navigation>

@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -58,7 +59,7 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 val bundle = Bundle().apply {
                     putParcelable(CollectionType.Category, collectionType)
                 }
-                findNavController().navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
             }
 
             playlistRecycler.apply {
@@ -101,7 +102,7 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
         val bundle = Bundle().apply {
             putParcelable(CollectionType.Category, collectionType)
         }
-        findNavController().navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+        requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
     }
 
     private fun onPlaylistLongClick(playlistWithSongCount: PlaylistWithSongCount) {
