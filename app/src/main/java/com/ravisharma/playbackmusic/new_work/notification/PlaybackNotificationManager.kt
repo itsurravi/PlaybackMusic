@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.annotation.RequiresApi
@@ -148,6 +149,7 @@ class PlaybackNotificationManager(
         session: MediaSessionCompat,
         showPlayButton: Boolean,
         isLiked: Boolean,
+        artBitmap: Bitmap,
     ): Notification {
         val mediaStyle = androidx.media.app.NotificationCompat.MediaStyle()
             .setShowActionsInCompactView(1, 2, 3)
@@ -157,6 +159,7 @@ class PlaybackNotificationManager(
             setContentTitle("Now Playing")
             setContentText("")
             setOngoing(true)
+            setLargeIcon(artBitmap)
             priority = NotificationCompat.PRIORITY_MAX
             setSilent(true)
             setStyle(mediaStyle)

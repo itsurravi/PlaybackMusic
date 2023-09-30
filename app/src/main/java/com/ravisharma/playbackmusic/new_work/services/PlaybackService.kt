@@ -5,6 +5,9 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -13,10 +16,12 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.Dimension
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationManager
@@ -126,6 +131,26 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
         }
     }
 
+    private fun getCurrentArtBitmap(song: Song?): Bitmap {
+        return try {
+            song?.let {
+                val mmr = MediaMetadataRetriever()
+                mmr.setDataSource(it.location)
+                val embeddedPicture = mmr.embeddedPicture
+                mmr.release()
+                if (embeddedPicture != null) {
+                    BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
+                } else {
+                    BitmapFactory.decodeResource(this.resources, R.drawable.logo)
+                }
+            } ?: kotlin.run {
+                BitmapFactory.decodeResource(this.resources, R.drawable.logo)
+            }
+        } catch (e: Exception) {
+            BitmapFactory.decodeResource(this.resources, R.drawable.logo)
+        }
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         broadcastReceiver = PlaybackBroadcastReceiver()
         mediaSession = MediaSessionCompat(this, MEDIA_SESSION)
@@ -147,7 +172,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                 session = mediaSession,
                 showPlayButton = false,
                 isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
-                    ?: false
+                    ?: false,
+                artBitmap = getCurrentArtBitmap(song = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex))
             )
         )
 
@@ -235,7 +261,7 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                         currentSong!!.artist
                     )
                     putString(
-                        MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
+                        MediaMetadataCompat.METADATA_KEY_ART_URI,
                         currentSong!!.artUri
                     )
                     putLong(
@@ -252,7 +278,8 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                         session = mediaSession,
                         showPlayButton = !exoPlayer.isPlaying,
                         isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
-                            ?: false
+                            ?: false,
+                        artBitmap = getCurrentArtBitmap(song = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex))
                     )
                 )
             }
