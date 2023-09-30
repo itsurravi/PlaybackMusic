@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
@@ -27,9 +29,20 @@ class NewPlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        val navController = (supportFragmentManager.findFragmentById(R.id.nav_container) as NavHostFragment).navController
+        val graphInflater = navController.navInflater
+        val navGraph = graphInflater.inflate(R.navigation.nav_graph)
+
         val isOnBoardingCompleted = viewModel.isOnBoardingCompleted()
-        if(isOnBoardingCompleted) {
-            // change home fragment of navigation
+
+        val startDestination = if(isOnBoardingCompleted) {
+            R.id.homeFragment
+        } else {
+            R.id.onBoardingFragment
         }
+
+        navGraph.setStartDestination(startDestination)
+        navController.graph = navGraph
+
     }
 }

@@ -19,10 +19,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.FragmentOnboardingBinding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,7 +36,7 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
     private var _binding: FragmentOnboardingBinding? = null
     private val binding get() = _binding!!
 
-    private var isScanCompleted: Boolean = false
+    private var scanStatus: ScanningStatus = ScanningStatus.NOT_STARTED
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val permissionToRequest33 = arrayOf(
@@ -91,11 +93,20 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                 checkForMultiplePermissions(getPermissionList())
             }
             btnScan.setOnClickListener {
-                if (isScanCompleted) {
-                    // MOVE TO NEXT SCREEN
-                    viewModel.setOnBoardingCompleted()
-                } else {
-                    viewModel.scanForMusic()
+                when (scanStatus) {
+                    ScanningStatus.NOT_STARTED -> {
+                        viewModel.scanForMusic()
+                        scanStatus = ScanningStatus.STARTED
+                    }
+
+                    ScanningStatus.COMPLETED -> {
+                        viewModel.setOnBoardingCompleted()
+                        findNavController().navigate(R.id.action_onBoardingFragment_to_homeFragment)
+                    }
+
+                    else -> {
+                        requireContext().showToast("Music Scanning")
+                    }
                 }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -129,22 +140,15 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
             viewModel.scanStatus.collect {
                 when (it) {
                     ScanStatus.ScanComplete -> {
-                        Log.i("ScanStatus", "ScanComplete")
-                        isScanCompleted = true
+                        scanStatus = ScanningStatus.COMPLETED
                         binding.btnScan.text = "Finish"
                     }
 
-                    ScanStatus.ScanNotRunning -> {
-                        Log.i("ScanStatus", "ScanNotRunning")
-                    }
-
-                    is ScanStatus.ScanProgress -> {
-                        updateProgress(it.parsed, it.total)
-                        Log.i("ScanStatus", "ScanProgress ${it.parsed} ${it.total}")
-                    }
-
+                    ScanStatus.ScanNotRunning -> {}
+                    is ScanStatus.ScanProgress -> updateProgress(it.parsed, it.total)
                     ScanStatus.ScanStarted -> {
-                        Log.i("ScanStatus", "ScanStarted")
+                        scanStatus = ScanningStatus.STARTED
+                        binding.btnScan.text = "Scanning"
                     }
                 }
             }

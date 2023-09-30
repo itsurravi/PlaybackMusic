@@ -2,14 +2,19 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/onBoardingFragment">
+    android:id="@+id/nav_graph">
 
     <fragment
         android:id="@+id/onBoardingFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.onboarding.OnBoardingFragment"
         android:label="OnBoardingFragment"
-        tools:layout="@layout/fragment_onboarding" />
+        tools:layout="@layout/fragment_onboarding" >
+        <action
+            android:id="@+id/action_onBoardingFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/onBoardingFragment"/>
+    </fragment>
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.HomeFragment"

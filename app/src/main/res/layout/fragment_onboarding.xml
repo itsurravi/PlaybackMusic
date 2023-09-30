@@ -16,7 +16,7 @@
         android:id="@+id/grp_scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:constraint_referenced_ids="tv_scan_info, pb_scan, btn_scan" />
 
     <ImageView
@@ -86,7 +86,7 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:max="100"
-        android:progress="10"
+        android:progress="0"
         android:progressDrawable="@drawable/bg_custom_progress"
         app:layout_constraintBottom_toTopOf="@id/btn_scan"
         app:layout_constraintEnd_toEndOf="parent"
