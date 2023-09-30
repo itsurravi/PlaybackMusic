@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -430,41 +431,53 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private val permissions33 = listOf(
+        Manifest.permission.READ_MEDIA_AUDIO,
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+    )
+
+    private val permissions = listOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+    )
+
     /*
      *  Permissions Checking
      * */
     private fun checkPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WAKE_LOCK
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.FOREGROUND_SERVICE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        var isPermissionGranted = false
+        val permissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions33
+        } else {
+            permissions
+        }
+        for (permission in permissionList) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                isPermissionGranted = false
+                break
+            }
+            isPermissionGranted = true
+        }
+        if(isPermissionGranted) {
             runTask()
         } else {
             ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.WAKE_LOCK,
-                    Manifest.permission.FOREGROUND_SERVICE,
-                    Manifest.permission.MODIFY_AUDIO_SETTINGS
-                ), 1
+                this, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissions33.toTypedArray()
+                } else {
+                    permissions.toTypedArray()
+                }, 1
             )
         }
     }
@@ -479,9 +492,14 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 runTask()
             } else {
+                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.READ_MEDIA_AUDIO
+                } else {
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                }
                 if (ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        permission
                     )
                 ) {
                     finish()

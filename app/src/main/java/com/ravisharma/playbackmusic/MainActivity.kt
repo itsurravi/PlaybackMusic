@@ -36,6 +36,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -78,17 +79,13 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
-import com.ravisharma.playbackmusic.utils.UpdateManager.FlexibleUpdateDownloadListener
-import com.ravisharma.playbackmusic.utils.UpdateManager.UpdateInfoListener
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -221,11 +218,50 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private val permissions33 = listOf(
+        Manifest.permission.READ_MEDIA_AUDIO,
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+    )
+
+    private val permissions = listOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WAKE_LOCK,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.MODIFY_AUDIO_SETTINGS,
+    )
+
     /*
      *  Permissions Checking
      * */
     private fun checkPermission() {
-        if ((ContextCompat.checkSelfPermission(
+        var isPermissionGranted = false
+        val permissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions33
+        } else {
+            permissions
+        }
+        for (permission in permissionList) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                isPermissionGranted = false
+                break
+            }
+            isPermissionGranted = true
+        }
+        if(isPermissionGranted) {
+            runTask()
+        } else {
+            showPermissionReasonDialog()
+        }
+        /*if ((ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED &&
@@ -249,7 +285,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             runTask()
         } else {
             showPermissionReasonDialog()
-        }
+        }*/
     }
 
     private fun showPermissionReasonDialog() {
@@ -269,13 +305,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         dialogBinding.txtSave.setOnClickListener {
             alertDialog.dismiss()
             ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.WAKE_LOCK,
-                    Manifest.permission.FOREGROUND_SERVICE,
-                    Manifest.permission.MODIFY_AUDIO_SETTINGS
-                ), 1
+                this, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissions33.toTypedArray()
+                } else {
+                    permissions.toTypedArray()
+                }, 1
             )
         }
         alertDialog.show()
@@ -291,9 +325,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 runTask()
             } else {
+                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.READ_MEDIA_AUDIO
+                } else {
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                }
                 if (ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+                        permission
                     )
                 ) {
                     finish()
@@ -480,10 +519,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     songList.size == 0 -> {
                         start = false
                     }
+
                     songList.size <= position.toInt() -> {
                         songPosn = 0
                         setSongPosition(songPosn)
                     }
+
                     else -> {
                         songPosn = position.toInt()
                         setSongPosition(songPosn)
@@ -592,7 +633,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 onFragmentItemClick(position, songsArrayList, false)
             }
 
-            if (requestCode != SEARCH_RESULT) {
+            /*if (requestCode != SEARCH_RESULT) {
                 if (DELETE_URI != null) {
                     val file = File(DELETE_URI!!.path!!)
                     if (file.exists()) {
@@ -611,7 +652,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         fragment.onActivityResult(requestCode, resultCode, data)
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -929,10 +970,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 val eq = Intent(this@MainActivity, EqualizerActivity::class.java)
                 startActivity(eq)
             }
+
             R.id.search -> {
                 val i = Intent(this@MainActivity, SearchActivity::class.java)
                 startActivityForResult(i, SEARCH_RESULT)
             }
+
             R.id.rescan -> {
                 val scan = SongsProvider()
                 scan.fetchAllData(contentResolver).observe(this) { aBoolean ->
@@ -941,6 +984,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     }
                 }
             }
+
             R.id.share -> try {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
@@ -953,6 +997,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             } catch (e: Exception) {
                 //e.toString();
             }
+
             R.id.rateUs -> launchMarket()
             R.id.suggestion -> {
                 val email = Intent(Intent.ACTION_SEND)
@@ -962,6 +1007,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 email.type = "message/rfc822"
                 startActivity(Intent.createChooser(email, "Choose an Email client :"))
             }
+
             R.id.about -> startActivity(Intent(this@MainActivity, AboutActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
@@ -1063,22 +1109,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         setTimer(15 * 60 * 1000)
                         showSnackBar(getString(R.string.mins15))
                     }
+
                     1 -> {
                         setTimer(30 * 60 * 1000)
                         showSnackBar(getString(R.string.mins30))
                     }
+
                     2 -> {
                         setTimer(45 * 60 * 1000)
                         showSnackBar(getString(R.string.mins45))
                     }
+
                     3 -> {
                         setTimer(60 * 60 * 1000)
                         showSnackBar(getString(R.string.mins60))
                     }
+
                     4 -> {
                         setTimer(90 * 60 * 1000)
                         showSnackBar(getString(R.string.mins90))
                     }
+
                     5 -> {
                         setTimer(120 * 60 * 1000)
                         showSnackBar(getString(R.string.mins120))
@@ -1755,9 +1806,17 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 started = true
                 setPauseIcons()
             } else {
-                Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.noSongFoundToPlay),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-        } ?: Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
+        } ?: Toast.makeText(
+            this@MainActivity,
+            getString(R.string.noSongFoundToPlay),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     companion object {

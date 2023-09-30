@@ -1,11 +1,11 @@
 plugins {
-    alias libs.plugins.android.application
-    alias libs.plugins.kotlin.android
-    alias libs.plugins.kapt
-    alias libs.plugins.google.sevices
-    alias libs.plugins.firebase.crashlytics
-    alias libs.plugins.firebase.perf
-    alias libs.plugins.hilt
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.google.sevices)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.firebase.perf)
+    alias(libs.plugins.hilt)
 }
 android {
     namespace "com.ravisharma.playbackmusic"
@@ -17,6 +17,7 @@ android {
         targetSdk libs.versions.compileSdk.get().toInteger()
         versionCode libs.versions.versionCode.get().toInteger()
         versionName libs.versions.versionName.get()
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
@@ -49,6 +50,7 @@ dependencies {
     implementation libs.androidx.constraintlayout
 
     //Added Dependencies
+    implementation libs.androidx.recyclerview
     implementation files('libs/jsoup.jar')
 
     implementation libs.androidx.activity
