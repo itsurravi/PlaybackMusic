@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/playlistsFragment"
+        android:icon="@drawable/ic_library_music_24"
+        android:title="Playlist" />
+    <item
         android:id="@+id/tracksFragment"
         android:icon="@drawable/ic_title"
         android:title="Songs" />
@@ -13,8 +17,4 @@
         android:id="@+id/artistsFragment"
         android:icon="@drawable/ic_artist"
         android:title="Artists" />
-    <item
-        android:id="@+id/playlistsFragment"
-        android:icon="@drawable/ic_library_music_24"
-        android:title="Playlist" />
 </menu>

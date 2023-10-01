@@ -3,7 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_nav_graph"
-    app:startDestination="@id/tracksFragment">
+    app:startDestination="@id/playlistsFragment">
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.PlaylistsFragment"
+        android:label="PlaylistsFragment"
+        tools:layout="@layout/fragment_playlist" />
     <fragment
         android:id="@+id/tracksFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.TracksFragment"
@@ -19,9 +24,4 @@
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.ArtistsFragment"
         android:label="ArtistsFragment"
         tools:layout="@layout/fragment_artist" />
-    <fragment
-        android:id="@+id/playlistsFragment"
-        android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.PlaylistsFragment"
-        android:label="PlaylistsFragment"
-        tools:layout="@layout/fragment_playlist" />
 </navigation>
