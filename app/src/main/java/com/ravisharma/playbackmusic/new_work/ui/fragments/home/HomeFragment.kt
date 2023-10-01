@@ -1,11 +1,12 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
 import android.app.PendingIntent
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,12 +16,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import coil.load
 import coil.transform.RoundedCornersTransformation
+import com.ravisharma.playbackmusic.BuildConfig
 import com.ravisharma.playbackmusic.R
+import com.ravisharma.playbackmusic.activities.AboutActivity
+import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
+import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,6 +37,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private val binding get() = _binding!!
 
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val musicViewModel: MusicScanViewModel by activityViewModels()
 
     private var isLastPlayedListSet = false
 
@@ -82,6 +89,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun initClickListeners() {
         binding.apply {
+            ivSearch.setOnClickListener {
+
+            }
+            ivEqualizer.setOnClickListener {
+
+            }
+            ivMoreOptions.setOnClickListener {
+                showMoreOptionsPopup(it)
+            }
             bottomPanel.setOnClickListener {
                 findNavController().navigate(R.id.action_homeFragment_to_playerFragment)
             }
@@ -99,10 +115,79 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private fun showMoreOptionsPopup(it: View) {
+        PopupMenu(requireContext(), it).apply {
+            menuInflater.inflate(R.menu.main, menu)
+
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.timer -> {
+                        // TODO timer work pending
+                        true
+                    }
+
+                    R.id.rescan -> {
+                        musicViewModel.scanForMusic()
+                        true
+                    }
+
+                    R.id.share -> {
+                        try {
+                            val shareIntent = Intent(Intent.ACTION_SEND)
+                            shareIntent.type = "text/plain"
+                            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Playback Music Player")
+                            var shareMessage =
+                                "\nDownload the light weight Playback Music Player app\n"
+                            shareMessage =
+                                "${shareMessage}https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}"
+                            shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage)
+                            startActivity(Intent.createChooser(shareIntent, "choose one"))
+                        } catch (e: Exception) {
+
+                        }
+                        true
+                    }
+
+                    R.id.rateUs -> {
+                        try {
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            )
+                        } catch (e: ActivityNotFoundException) {
+                            requireContext().showToast(getString(R.string.unableToFindMarketApp))
+                        }
+                        true
+                    }
+
+                    R.id.suggestion -> {
+                        val email = Intent(Intent.ACTION_SEND)
+                        email.putExtra(Intent.EXTRA_EMAIL, arrayOf("sharmaravi.23960@gmail.com"))
+                        email.putExtra(Intent.EXTRA_SUBJECT, "Playback Music Player Suggestion")
+                        email.putExtra(Intent.EXTRA_TEXT, "")
+                        email.type = "message/rfc822"
+                        startActivity(Intent.createChooser(email, "Choose an Email client :"))
+                        true
+                    }
+
+                    R.id.about -> {
+                        startActivity(Intent(requireContext(), AboutActivity::class.java))
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }.also {
+            it.show()
+        }
+    }
+
     private fun initToolbar() {
         binding.apply {
-            toolbar.title = getString(R.string.app_name)
-            toolbar.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.titleColor))
+//            toolbar.title = getString(R.string.app_name)
+//            toolbar.setTitleTextColor(ContextCompat.getColor(requireContext(), R.color.titleColor))
+
         }
     }
 

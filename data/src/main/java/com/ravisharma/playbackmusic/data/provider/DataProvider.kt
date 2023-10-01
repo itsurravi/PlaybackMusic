@@ -30,8 +30,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.ArrayList
-import java.util.HashMap
 import java.util.TreeSet
 
 class DataProvider(
@@ -54,10 +52,10 @@ class DataProvider(
         scope.launch {
             daoCollection.songDao.getSongs().forEach {
                 try {
-                    if(!File(it.location).exists()){
+                    if (!File(it.location).exists()) {
                         launch { daoCollection.songDao.deleteSong(it) }
                     }
-                } catch (e: Exception){
+                } catch (e: Exception) {
                     Log.e("DeleteError", e.toString())
                 }
             }
@@ -74,9 +72,11 @@ class DataProvider(
         showToast("Playlist $playlistName created")
     }
 
-    suspend fun deletePlaylist(playlist: Playlist) = daoCollection.playlistDao.deletePlaylist(playlist)
+    suspend fun deletePlaylist(playlist: Playlist) =
+        daoCollection.playlistDao.deletePlaylist(playlist)
 
-    suspend fun updatePlaylistName(playlist: Playlist) = daoCollection.playlistDao.updatePlaylistName(playlist)
+    suspend fun updatePlaylistName(playlist: Playlist) =
+        daoCollection.playlistDao.updatePlaylistName(playlist)
 
     suspend fun deleteSong(song: Song) {
         daoCollection.songDao.deleteSong(song)
@@ -115,7 +115,7 @@ class DataProvider(
             projection,
             selection,
             null,
-            MediaStore.Audio.Media.DATE_MODIFIED + " DESC",
+            "upper(" + MediaStore.Audio.Media.TITLE + ") ASC",
             null
         ) ?: return
         val totalSongs = cursor.count
@@ -163,6 +163,7 @@ class DataProvider(
                     mimeType = songMetadata.mimeType,
                     artUri = "content://media/external/audio/media/${cursor.getLong(songIdIndex)}/albumart"
                 )
+                Log.i("SongsInfo", "$parsedSongs ${song.location}")
                 songs.add(song)
                 artistSet.add(song.artist)
                 albumArtistSet.add(song.albumArtist)

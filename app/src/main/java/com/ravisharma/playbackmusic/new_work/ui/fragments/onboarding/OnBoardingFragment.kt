@@ -105,7 +105,7 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                     }
 
                     else -> {
-                        requireContext().showToast("Music Scanning")
+                        requireContext().showToast("Under Scanning")
                     }
                 }
             }
@@ -147,8 +147,8 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                     ScanStatus.ScanNotRunning -> {}
                     is ScanStatus.ScanProgress -> updateProgress(it.parsed, it.total)
                     ScanStatus.ScanStarted -> {
-                        scanStatus = ScanningStatus.STARTED
                         binding.btnScan.text = "Scanning"
+                        scanStatus = ScanningStatus.STARTED
                     }
                 }
             }

@@ -94,7 +94,8 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
     private fun updateUi(data: CollectionUi) {
         binding.playlistLayout.apply {
             txtPlaylistName1.text = data.topBarTitle
-            noOfSongs.text = "${data.songs.size}"
+            val songCount = data.songs.size
+            noOfSongs.text = resources.getQuantityString(R.plurals.numberOfSongs, songCount, songCount)
 
             albumArt.load(data.topBarBackgroundImageUri) {
                 error(R.drawable.logo)

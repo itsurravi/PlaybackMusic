@@ -18,8 +18,6 @@ class MusicScanViewModel @Inject constructor(
     private val prefManager: PrefManager
 ) : ViewModel() {
 
-    val allSongs = dataProvider.getAll.songs()
-
     val scanStatus = dataProvider.scanStatus.stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(

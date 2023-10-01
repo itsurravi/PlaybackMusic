@@ -21,7 +21,7 @@ interface SongDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllSongs(data: List<Song>)
 
-    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} ORDER BY title ASC")
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE location COLLATE NOCASE NOT LIKE '%record%' ORDER BY title COLLATE NOCASE ASC")
     fun getAllSongs(): Flow<List<Song>>
 
     @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE}")
@@ -68,6 +68,6 @@ interface SongDao {
     @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE favourite = 1")
     fun getAllFavourites(): Flow<List<Song>>
 
-    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} ORDER BY modifiedDate DESC")
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE location COLLATE NOCASE NOT LIKE '%record%' ORDER BY modifiedDate DESC")
     fun getRecentAdded(): Flow<List<Song>>
 }

@@ -925,14 +925,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         //menu item selected
         when (item.itemId) {
             R.id.timer -> showTimer()
-            R.id.equalizer -> {
+            /*R.id.equalizer -> {
                 val eq = Intent(this@MainActivity, EqualizerActivity::class.java)
                 startActivity(eq)
             }
             R.id.search -> {
                 val i = Intent(this@MainActivity, SearchActivity::class.java)
                 startActivityForResult(i, SEARCH_RESULT)
-            }
+            }*/
             R.id.rescan -> {
                 val scan = SongsProvider()
                 scan.fetchAllData(contentResolver).observe(this) { aBoolean ->
@@ -1586,8 +1586,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         } catch (exp: Exception) {
             menu?.let { menu ->
-                val menuItem = menu.findItem(R.id.equalizer)
-                menuItem.isVisible = false
+//                val menuItem = menu.findItem(R.id.equalizer)
+//                menuItem.isVisible = false
             }
         }
     }
