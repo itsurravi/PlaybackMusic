@@ -90,10 +90,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun initClickListeners() {
         binding.apply {
             ivSearch.setOnClickListener {
-
+                // TODO navigate to search screen
             }
             ivEqualizer.setOnClickListener {
-
+                // TODO navigate to equalizer screen
             }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)
