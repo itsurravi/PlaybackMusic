@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,8 +9,9 @@
     <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="90dp"
         app:fastScrollAutoHide="true"
         app:fastScrollAutoHideDelay="2000"
         app:fastScrollEnableThumbInactiveColor="true"
@@ -22,6 +23,12 @@
         app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
         app:fastScrollThumbColor="@color/scrollThumb"
         app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="@color/scrollThumb" />
+        app:fastScrollThumbInactiveColor="@color/scrollThumb"
+        app:layout_constrainedHeight="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
