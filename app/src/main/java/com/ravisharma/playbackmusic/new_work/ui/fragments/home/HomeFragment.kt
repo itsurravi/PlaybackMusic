@@ -90,7 +90,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun initClickListeners() {
         binding.apply {
             ivSearch.setOnClickListener {
-                // TODO navigate to search screen
+                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
             }
             ivEqualizer.setOnClickListener {
                 // TODO navigate to equalizer screen

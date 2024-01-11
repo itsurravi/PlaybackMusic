@@ -70,22 +70,10 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/song_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="2000"
-        app:fastScrollEnableThumbInactiveColor="true"
-        app:fastScrollPopupBackgroundSize="@dimen/scrollPopupBackgroundSize"
-        app:fastScrollPopupBgColor="@color/scrollThumb"
-        app:fastScrollPopupPosition="adjacent"
-        app:fastScrollPopupTextColor="@color/white"
-        app:fastScrollPopupTextSize="@dimen/scrollPopupTextSize"
-        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
-        app:fastScrollThumbColor="@color/scrollThumb"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="@color/scrollThumb"
         app:layout_constrainedHeight="true"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
