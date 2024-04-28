@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +24,6 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.SearchViewModel
-import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -47,6 +47,11 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private fun setupFragment() {
         initViews()
         initObserver()
+        binding.apply {
+            imgBack.setOnClickListener {
+                findNavController().popBackStack()
+            }
+        }
     }
 
     private fun initViews() {
@@ -77,36 +82,19 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private fun setupData(list: List<Song>) {
         binding.apply {
-            if (list.isNotEmpty()) {
-                (songList.adapter as TracksAdapter).submitList(list)
-            }
+            (songList.adapter as TracksAdapter).submitList(list)
         }
     }
 
     private fun songClicked(song: Song, position: Int) {
         val currentList = (binding.songList.adapter as TracksAdapter).getCurrentList()
         mainViewModel.setQueue(currentList, position)
+        findNavController().popBackStack()
     }
 
     private fun songLongClicked(song: Song, position: Int) {
         requireContext().onSongLongPress(song) { longItemClick ->
             when (longItemClick) {
-                LongItemClick.Play -> {
-                    songClicked(song, position)
-                }
-
-                LongItemClick.SinglePlay -> {
-                    mainViewModel.setQueue(listOf(song), 0)
-                }
-
-                LongItemClick.PlayNext -> {
-                    mainViewModel.addNextInQueue(song)
-                }
-
-                LongItemClick.AddToQueue -> {
-                    mainViewModel.addToQueue(song)
-                }
-
                 LongItemClick.AddToPlaylist -> {
                     val bundle = Bundle().apply {
                         putStringArrayList(
@@ -118,13 +106,12 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                         .navigate(R.id.action_to_addToPlaylistFragment, bundle)
                 }
 
-                LongItemClick.Share -> {
-                    requireContext().shareSong(song.location)
-                }
-
-                LongItemClick.Details -> {
-                    requireContext().showSongInfo(song)
-                }
+                LongItemClick.Play -> songClicked(song, position)
+                LongItemClick.SinglePlay -> mainViewModel.setQueue(listOf(song), 0)
+                LongItemClick.PlayNext -> mainViewModel.addNextInQueue(song)
+                LongItemClick.AddToQueue -> mainViewModel.addToQueue(song)
+                LongItemClick.Share -> requireContext().shareSong(song.location)
+                LongItemClick.Details -> requireContext().showSongInfo(song)
             }
         }
     }

@@ -28,9 +28,6 @@ class DataManager @Inject constructor(
     private val _queue = mutableListOf<Song>()
     val queue: List<Song> = _queue
 
-    private val _nonShuffleList = mutableListOf<Song>()
-    val nonShuffleList = _nonShuffleList.toList()
-
     private val _currentSong = MutableStateFlow<Song?>(null)
     val currentSong = _currentSong.asStateFlow()
 
@@ -46,7 +43,6 @@ class DataManager @Inject constructor(
 
     fun updateShuffleMode(newShuffleMode: Boolean) {
         _shuffleMode.update { newShuffleMode }
-        shuffleCurrentQueue(newShuffleMode)
     }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
@@ -73,36 +69,6 @@ class DataManager @Inject constructor(
         dataProvider.cleanData()
     }
 
-    @Synchronized
-    fun shuffleCurrentQueue(shuffle: Boolean) {
-        if (shuffle) {
-            _nonShuffleList.apply {
-                clear()
-                addAll(_queue)
-            }
-            val list = _queue.shuffled().filter {
-                it.location != _currentSong.value?.location
-            }.toMutableList()
-
-            callback?.updateExoList(true, list)
-
-            _currentSong.value?.let {
-                list.add(0, it)
-            }
-            _queue.apply {
-                clear()
-                addAll(list)
-            }
-        } else {
-            callback?.updateExoList(false, _nonShuffleList)
-
-            _queue.apply {
-                clear()
-                addAll(_nonShuffleList)
-            }
-        }
-    }
-
     fun startPlayingLastList() {
         val index = pref.getInt(Constants.SongIndex, -1)
         if (index != -1 && index < _queue.size) {
@@ -127,11 +93,6 @@ class DataManager @Inject constructor(
             val index = pref.getInt(Constants.SongIndex, -1)
             if (index != -1 && index < _queue.size) {
                 _currentSong.value = _queue[index]
-            }
-            _nonShuffleList.apply {
-                val list = tinyDb.getListObject(Constants.NonShuffleList, Song::class.java)
-                clear()
-                addAll(list)
             }
         }
     }
@@ -201,7 +162,6 @@ class DataManager @Inject constructor(
     fun stopPlayerRunning(index: Int) {
         pref.edit().putInt(Constants.SongIndex, index).commit()
         tinyDb.putListObject(Constants.PlayingList, _queue.toList())
-        tinyDb.putListObject(Constants.NonShuffleList, _nonShuffleList.toList())
 
         this.callback = null
 //        _currentSong.update { null }

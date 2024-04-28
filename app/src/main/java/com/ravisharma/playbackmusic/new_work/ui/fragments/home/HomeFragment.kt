@@ -191,36 +191,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-    private fun initPager() {
-        /*binding.apply {
-            val pagerAdapter = HomePageAdapter(requireActivity())
-            viewPager.apply {
-                offscreenPageLimit = 4
-                adapter = pagerAdapter
-            }
-
-            TabLayoutMediator(tabs, viewPager) { tab: TabLayout.Tab, position: Int ->
-                when (position) {
-                    0 -> tab.text = getString(R.string.playlist)
-                    1 -> tab.text = getString(R.string.Tracks)
-                    2 -> tab.text = getString(R.string.Albums)
-                    3 -> tab.text = getString(R.string.Artists)
-                }
-            }.attach()
-
-            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageScrolled(
-                    position: Int,
-                    positionOffset: Float,
-                    positionOffsetPixels: Int
-                ) {
-                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                    fabShuffle.isVisible = position == 1
-                }
-            })
-        }*/
-    }
-
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
