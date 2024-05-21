@@ -134,17 +134,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/imgEq"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="20dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/eq"
-                android:src="@drawable/ic_equalizer2"
-                app:layout_constraintEnd_toStartOf="@id/imgFav"
-                app:layout_constraintTop_toTopOf="@id/imgFav" />
-
-            <ImageView
                 android:id="@+id/imgFav"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,7 +141,7 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/fav"
                 android:src="@drawable/ic_fav_not"
-                app:layout_constraintBottom_toTopOf="@id/pipe"
+                app:layout_constraintBottom_toTopOf="@id/seekBar"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
 
@@ -164,6 +153,7 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/playlist"
                 android:src="@drawable/ic_playlist"
+                android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@id/imgFav"
                 app:layout_constraintTop_toTopOf="@id/imgFav" />
 
@@ -171,39 +161,26 @@
                 android:id="@+id/currentPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="12dp"
                 android:paddingEnd="5dp"
                 android:text="@string/time0"
                 android:textColor="@color/textColor"
-                app:layout_constraintBottom_toBottomOf="@id/pipe"
-                app:layout_constraintEnd_toStartOf="@id/pipe"
-                app:layout_constraintTop_toTopOf="@id/pipe"
-                tools:ignore="RtlSymmetry" />
-
-            <TextView
-                android:id="@+id/pipe"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="@string/pipe"
-                android:textColor="@color/textColor"
                 app:layout_constraintBottom_toTopOf="@id/seekBar"
-                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
+                app:layout_constraintStart_toStartOf="@id/seekBar"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/totalDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
                 android:layout_marginEnd="5dp"
+                android:layout_marginBottom="12dp"
                 android:paddingStart="5dp"
                 android:text="@string/time0"
                 android:textAlignment="textEnd"
                 android:textColor="@color/textColor"
-                app:layout_constraintBottom_toBottomOf="@id/pipe"
-                app:layout_constraintStart_toEndOf="@id/pipe"
-                app:layout_constraintTop_toTopOf="@id/pipe"
+                app:layout_constraintBottom_toTopOf="@id/seekBar"
+                app:layout_constraintEnd_toEndOf="@id/seekBar"
                 tools:ignore="RtlSymmetry" />
 
             <SeekBar

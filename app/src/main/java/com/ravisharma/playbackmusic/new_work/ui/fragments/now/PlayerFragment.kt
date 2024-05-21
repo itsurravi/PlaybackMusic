@@ -246,9 +246,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
-            imgEq.setOnClickListener {
-
-            }
             ivInfo.setOnClickListener {
 
             }
