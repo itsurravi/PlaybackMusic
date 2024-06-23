@@ -169,8 +169,8 @@ class MainViewModel @Inject constructor(
             try {
                 val playlistSongCrossRef = PlaylistSongCrossRef(playListId, location)
                 val l = dataProvider.insertPlaylistSongCrossRefs(listOf(playlistSongCrossRef))
-                if(l.isNotEmpty()) {
-                    if(l[0] > 0) {
+                if (l.isNotEmpty()) {
+                    if (l[0] > 0) {
                         context.showToast("Song Added")
                     } else {
                         context.showToast("Already Added")
@@ -191,8 +191,8 @@ class MainViewModel @Inject constructor(
                     PlaylistSongCrossRef(playListId, location)
                 }
                 val l = dataProvider.insertPlaylistSongCrossRefs(list)
-                if(l.isNotEmpty()) {
-                    if(l[0] > 0) {
+                if (l.isNotEmpty()) {
+                    if (l[0] > 0) {
                         context.showToast("Songs Added")
                     } else {
                         context.showToast("Already Added")

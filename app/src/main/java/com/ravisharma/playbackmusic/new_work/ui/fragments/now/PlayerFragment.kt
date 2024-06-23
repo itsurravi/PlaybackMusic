@@ -21,13 +21,8 @@ import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
