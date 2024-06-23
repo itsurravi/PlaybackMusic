@@ -5,6 +5,7 @@ versionCode = "61"
 versionName = "2.8.4"
 jvm = "1.8"
 
+appUpdate = "2.1.0"
 androidGradlePlugin = "7.3.1"
 firebaseCrashlyticsPlugin = "2.9.2"
 firebasePerfPlugin = "1.4.2"
@@ -63,6 +64,8 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 
+app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
+app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
@@ -84,7 +87,6 @@ firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "f
 google-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playAds" }
 google-material = { module = "com.google.android.material:material", version.ref = "material" }
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-google-play-core = { module = "com.google.android.play:core", version.ref = "playCore" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltVersion" }

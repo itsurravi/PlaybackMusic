@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Lifecycle.Event;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
@@ -17,8 +20,6 @@ import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
-import com.google.android.play.core.tasks.OnSuccessListener;
-import com.google.android.play.core.tasks.Task;
 import java.lang.ref.WeakReference;
 
 public class UpdateManager  implements LifecycleObserver {
@@ -75,17 +76,14 @@ public class UpdateManager  implements LifecycleObserver {
     private void checkUpdate() {
         // Checks that the platform will allow the specified type of update.
         Log.d(TAG, "Checking for updates");
-        appUpdateInfoTask.addOnSuccessListener(new OnSuccessListener<AppUpdateInfo>() {
-            @Override
-            public void onSuccess(AppUpdateInfo appUpdateInfo) {
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                        && appUpdateInfo.isUpdateTypeAllowed(mode)) {
-                    // Request the update.
-                    Log.d(TAG, "Update available");
-                    startUpdate(appUpdateInfo);
-                } else {
-                    Log.d(TAG, "No Update available");
-                }
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(mode)) {
+                // Request the update.
+                Log.d(TAG, "Update available");
+                startUpdate(appUpdateInfo);
+            } else {
+                Log.d(TAG, "No Update available");
             }
         });
     }

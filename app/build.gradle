@@ -98,9 +98,12 @@ dependencies {
     implementation libs.google.ads
     implementation libs.google.material
     implementation libs.google.gson
-    implementation libs.google.play.core
 
     implementation libs.hilt.android
     kapt libs.hilt.compiler
+
+    implementation libs.app.update
+    implementation libs.app.update.ktx
+
 }
 
