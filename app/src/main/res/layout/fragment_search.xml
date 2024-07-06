@@ -50,7 +50,7 @@
                 android:maxLines="1"
                 android:selectAllOnFocus="false"
                 android:singleLine="true"
-                android:textColor="@color/listitemTitle"
+                android:textColor="@color/textPrimary"
                 android:textColorHint="#BDBDBD"
                 android:textCursorDrawable="@null" />
 
@@ -64,7 +64,7 @@
                 android:padding="15dp"
                 android:src="@drawable/ic_search"
                 android:text="@string/search"
-                android:textColor="@color/listitemTitle" />
+                android:textColor="@color/textPrimary" />
 
         </LinearLayout>
 

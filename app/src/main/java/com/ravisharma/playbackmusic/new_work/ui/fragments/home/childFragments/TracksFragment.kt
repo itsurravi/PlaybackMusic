@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -57,6 +58,11 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
                     onItemLongClick = ::songLongClicked
                 )
             }
+            fabShuffle.setOnClickListener {
+                val list = (binding.songList.adapter as TracksAdapter).getCurrentList()
+                val newList = list.shuffled()
+                mainViewModel.setQueue(newList, 0)
+            }
         }
     }
 
@@ -74,6 +80,9 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
         binding.apply {
             if (list.isNotEmpty()) {
                 (songList.adapter as TracksAdapter).submitList(list)
+                fabShuffle.isVisible = true
+            } else {
+                fabShuffle.isVisible = false
             }
         }
     }

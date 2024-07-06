@@ -38,7 +38,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/about"
-            android:textColor="@color/listitemTitle" />
+            android:textColor="@color/textPrimary" />
 
     </LinearLayout>
 
@@ -49,7 +49,7 @@
         android:layout_marginTop="96dp"
         android:text="@string/app_name"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/listitemTitle"
+        android:textColor="@color/textPrimary"
         app:layout_constraintBottom_toTopOf="@+id/imageView2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
         android:layout_marginTop="48dp"
         android:text="@string/appVersion"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/listitemTitle"
+        android:textColor="@color/textPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -93,7 +93,7 @@
         android:gravity="center"
         android:text="@string/support"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/listitemTitle"
+        android:textColor="@color/textPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"

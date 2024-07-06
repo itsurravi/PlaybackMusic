@@ -102,7 +102,7 @@
     <string name="composer">Composer:</string>
     <string name="album">Album:</string>
     <string name="artist">Artist:</string>
-    <string name="savePlaylist">Save as Playlist</string>
+    <string name="saveInPlaylist">Add to Playlist</string>
     <string name="noSong">No Song for This Category</string>
     <string name="save_as_playlist">Save as Playlist</string>
     <string name="timer">Timer</string>

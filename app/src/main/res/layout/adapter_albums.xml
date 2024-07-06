@@ -31,7 +31,7 @@
             android:layout_marginEnd="4dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/listitemTitle" />
+            android:textColor="@color/textPrimary" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="@color/listitemArtist"
+                android:textColor="@color/textSecondary"
                 android:textSize="12sp" />
         </LinearLayout>
 

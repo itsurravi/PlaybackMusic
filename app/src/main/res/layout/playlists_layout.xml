@@ -47,7 +47,7 @@
             android:maxLines="1"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:textColor="@color/listitemTitle"
+            android:textColor="@color/textPrimary"
             tools:text="@string/favTracks" />
 
         <TextView
@@ -61,7 +61,7 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="20dp"
-            android:textColor="@color/listitemTitle"
+            android:textColor="@color/textPrimary"
             tools:text="@string/album_SongNumbers" />
 
         <View
@@ -98,7 +98,7 @@
             android:layout_gravity="center"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/listitemTitle"
+            android:textColor="@color/textPrimary"
             tools:text="@string/favTracks" />
 
     </LinearLayout>

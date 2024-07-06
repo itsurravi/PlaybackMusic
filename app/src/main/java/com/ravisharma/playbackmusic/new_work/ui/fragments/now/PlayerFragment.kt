@@ -2,10 +2,13 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.now
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +21,9 @@ import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.utils.toMS
 import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
 import com.ravisharma.playbackmusic.new_work.Constants
+import com.ravisharma.playbackmusic.new_work.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -108,9 +113,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
             launch {
-                mainViewModel.shuffleMode.collect {
+                /*mainViewModel.shuffleMode.collect {
                     updateShuffleMode(it)
-                }
+                }*/
             }
         }
     }
@@ -138,14 +143,18 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     transformations(RoundedCornersTransformation(20f))
                     crossfade(true)
                 }
-
-                imgFav.setImageResource(
-                    if (it.favourite) {
-                        R.drawable.ic_fav
-                    } else {
-                        R.drawable.ic_fav_not
-                    }
-                )
+                if (it.favourite) {
+                    imgFav.setImageResource(R.drawable.ic_favorite_24)
+                    imgFav.imageTintList = ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.fav_on
+                        )
+                    )
+                } else {
+                    imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+                    imgFav.imageTintList = ColorStateList.valueOf(Color.WHITE)
+                }
 
                 seekBar.max = it.durationMillis.toInt()
                 seekBar.progress = exoPlayer.currentPosition.toInt()
@@ -208,16 +217,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun updateShuffleMode(shuffle: Boolean) {
-        binding.apply {
-            if (shuffle) {
-                btnShuffle.setImageResource(R.drawable.ic_shuffle)
-            } else {
-                btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
-            }
-        }
-    }
-
     private fun initClickListeners() {
         binding.apply {
             btnPrev.setOnClickListener {
@@ -230,7 +229,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 pendingPausePlayIntent.send()
             }
             btnShuffle.setOnClickListener {
-                mainViewModel.toggleShuffleMode()
+//                mainViewModel.toggleShuffleMode()
             }
             btnRepeat.setOnClickListener {
                 mainViewModel.toggleRepeatMode()
@@ -241,8 +240,19 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
+            imgAdd.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putStringArrayList(
+                        NavigationConstant.AddToPlaylistSongs,
+                        arrayListOf(currentSong?.location)
+                    )
+                }
+                findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+            }
             ivInfo.setOnClickListener {
-
+                currentSong?.let {
+                    requireContext().showSongInfo(it)
+                }
             }
             ivBack.setOnClickListener {
                 findNavController().popBackStack()

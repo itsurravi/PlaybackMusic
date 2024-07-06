@@ -34,15 +34,8 @@ class DataManager @Inject constructor(
     private val _repeatMode = MutableStateFlow<RepeatMode>(RepeatMode.NO_REPEAT)
     val repeatMode = _repeatMode.asStateFlow()
 
-    private val _shuffleMode = MutableStateFlow<Boolean>(false)
-    val shuffleMode = _shuffleMode.asStateFlow()
-
     fun updateRepeatMode(newRepeatMode: RepeatMode) {
         _repeatMode.update { newRepeatMode }
-    }
-
-    fun updateShuffleMode(newShuffleMode: Boolean) {
-        _shuffleMode.update { newShuffleMode }
     }
 
     fun moveItem(fromIndex: Int, toIndex: Int) {
@@ -164,8 +157,6 @@ class DataManager @Inject constructor(
         tinyDb.putListObject(Constants.PlayingList, _queue.toList())
 
         this.callback = null
-//        _currentSong.update { null }
-//        _queue.clear()
     }
 
     interface Callback {

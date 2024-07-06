@@ -37,7 +37,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/now_Playing"
-                android:textColor="@color/listitemTitle" />
+                android:textColor="@color/textPrimary" />
 
             <ImageView
                 android:id="@+id/imgSave"
@@ -92,7 +92,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:text="@string/song_Title"
-                        android:textColor="@color/listitemTitle" />
+                        android:textColor="@color/textPrimary" />
 
                 </LinearLayout>
 
@@ -118,7 +118,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:text="@string/song_Artist"
-                        android:textColor="@color/listitemTitle" />
+                        android:textColor="@color/textPrimary" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -141,7 +141,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:text="@string/time0"
-                        android:textColor="@color/listitemTitle" />
+                        android:textColor="@color/textPrimary" />
                 </LinearLayout>
 
             </LinearLayout>

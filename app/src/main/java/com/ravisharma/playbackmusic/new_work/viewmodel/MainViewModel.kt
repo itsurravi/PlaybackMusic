@@ -84,7 +84,6 @@ class MainViewModel @Inject constructor(
     val currentSong = manager.currentSong
     val queue = manager.queue
     val repeatMode = manager.repeatMode
-    val shuffleMode = manager.shuffleMode
 
     private val _currentSongPlaying = MutableStateFlow<Boolean?>(null)
     val currentSongPlaying = _currentSongPlaying.asStateFlow()
@@ -289,10 +288,6 @@ class MainViewModel @Inject constructor(
 
     fun toggleRepeatMode() {
         manager.updateRepeatMode(repeatMode.value.next())
-    }
-
-    fun toggleShuffleMode() {
-        manager.updateShuffleMode(!shuffleMode.value)
     }
 
     fun playOnPosition(position: Int) {

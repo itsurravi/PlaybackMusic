@@ -33,7 +33,7 @@
             android:layout_marginHorizontal="8dp"
             android:maxLines="1"
             android:text="@string/select_Playlist"
-            android:textColor="@color/listitemTitle" />
+            android:textColor="@color/textPrimary" />
 
     </LinearLayout>
 

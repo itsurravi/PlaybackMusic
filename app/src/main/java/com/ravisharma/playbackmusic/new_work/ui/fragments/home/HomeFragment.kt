@@ -1,12 +1,21 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.SeekBar
+import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.ALARM_SERVICE
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,8 +28,9 @@ import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.BuildConfig
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AboutActivity
-import com.ravisharma.playbackmusic.data.db.model.ScanStatus
+import com.ravisharma.playbackmusic.broadcast.Timer
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
+import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
@@ -122,7 +132,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.timer -> {
-                        // TODO timer work pending
+                        showTimer()
                         true
                     }
 
@@ -242,6 +252,173 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
                 )
             }
+        }
+    }
+
+    private var alert_seek_max = 5
+    private var alert_seek_step = 1
+    private var alert_current_value = 0
+    private lateinit var seekValue: Array<String>
+    var timerSelectedValue = true
+    private var TIMER = false
+    private var am: AlarmManager? = null
+    private var pi: PendingIntent? = null
+
+    private fun showTimer() {
+        val timerArray: Array<String> = resources.getStringArray(R.array.timer)
+        val trackArray: Array<String> = resources.getStringArray(R.array.tracks)
+        val dialog = AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
+        val dialogBinding: AlertTimerBinding = AlertTimerBinding.inflate(layoutInflater)
+
+        dialog.setView(dialogBinding.root)
+        dialogBinding.alertSeekBar.max = alert_seek_max / alert_seek_step
+        val alertDialog = dialog.create()
+        alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        if (!TIMER) {
+            alertDialog.setCancelable(true)
+            dialogBinding.timerBlocker.visibility = View.VISIBLE
+            seekValue = timerArray
+            switchTimerAlertView(true, dialogBinding.txtTimer, dialogBinding.txtTracks)
+            dialogBinding.alertSeekBar.progress = 0
+            alert_current_value = 0
+        } else {
+            alertDialog.setCancelable(false)
+            dialogBinding.timerBlocker.visibility = View.GONE
+            seekValue = if (timerSelectedValue) {
+                timerArray
+            } else {
+                trackArray
+            }
+            switchTimerAlertView(
+                timerSelectedValue,
+                dialogBinding.txtTimer,
+                dialogBinding.txtTracks
+            )
+            dialogBinding.alertSeekBar.progress = alert_current_value
+            dialogBinding.txtOnOff.text = "On"
+        }
+        dialogBinding.timerSwitch.isChecked = TIMER
+        dialogBinding.txtSeekValue.text = seekValue[alert_current_value].toString()
+        alertDialog.show()
+        dialogBinding.alertSeekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                alert_current_value = progress * alert_seek_step
+                dialogBinding.txtSeekValue.text = seekValue[progress].toString()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+        dialogBinding.txtTimer.setOnClickListener {
+            seekValue = timerArray
+            switchTimerAlertView(true, dialogBinding.txtTimer, dialogBinding.txtTracks)
+            dialogBinding.alertSeekBar.progress = 0
+            dialogBinding.txtSeekValue.text = seekValue[0].toString()
+        }
+        dialogBinding.txtTracks.setOnClickListener {
+            seekValue = trackArray
+            switchTimerAlertView(false, dialogBinding.txtTimer, dialogBinding.txtTracks)
+            dialogBinding.alertSeekBar.progress = 0
+            dialogBinding.txtSeekValue.text = seekValue[0].toString()
+        }
+        dialogBinding.timerSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (!isChecked) {
+                TIMER = false
+                dialogBinding.txtOnOff.text = "Off"
+                dialogBinding.timerBlocker.visibility = View.VISIBLE
+                alertDialog.setCancelable(true)
+                if (am != null && pi != null) {
+                    am!!.cancel(pi)
+                    am = null
+                    pi = null
+                    requireContext().showToast(getString(R.string.timeOff))
+                }
+            } else {
+                TIMER = true
+                dialogBinding.txtOnOff.text = "On"
+                dialogBinding.timerBlocker.visibility = View.GONE
+                alertDialog.setCancelable(false)
+            }
+        }
+        dialogBinding.txtSave.setOnClickListener {
+            if (timerSelectedValue) {
+                when (alert_current_value) {
+                    0 -> {
+                        setTimer(15 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins15))
+                    }
+
+                    1 -> {
+                        setTimer(30 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins30))
+                    }
+
+                    2 -> {
+                        setTimer(45 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins45))
+                    }
+
+                    3 -> {
+                        setTimer(60 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins60))
+                    }
+
+                    4 -> {
+                        setTimer(90 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins90))
+                    }
+
+                    5 -> {
+                        setTimer(120 * 60 * 1000)
+                        requireContext().showToast(getString(R.string.mins120))
+                    }
+                }
+            }
+            alertDialog.dismiss()
+        }
+    }
+
+    private fun setTimer(time: Int) {
+        /*val i = Intent(requireContext(), Timer::class.java)
+        pi = PendingIntent.getBroadcast(requireContext(), 1234, i, PendingIntent.FLAG_IMMUTABLE)
+        am = requireContext().getSystemService(ALARM_SERVICE) as AlarmManager
+        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi*/
+    }
+
+    private fun switchTimerAlertView(timerSelected: Boolean, timer: TextView, tracks: TextView) {
+        timerSelectedValue = timerSelected
+        if (timerSelected) {
+            timer.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.popupItemBackground
+                )
+            )
+            tracks.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            timer.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.timer_alert_tab_selected_left
+            )
+            tracks.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.timer_alert_tab_unselected_right
+            )
+        } else {
+            tracks.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.popupItemBackground
+                )
+            )
+            timer.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            tracks.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.timer_alert_tab_selected_right
+            )
+            timer.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.timer_alert_tab_unselected_left
+            )
         }
     }
 }

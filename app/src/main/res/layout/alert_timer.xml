@@ -50,7 +50,7 @@
             android:layout_marginBottom="10dp"
             android:padding="7dp"
             android:progressTint="@color/seek_progress"
-            android:thumbTint="@color/textColor" />
+            android:thumbTint="@color/white" />
 
         <LinearLayout
             android:layout_width="wrap_content"

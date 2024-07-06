@@ -16,10 +16,13 @@ import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCurrentQueueBinding
+import com.ravisharma.playbackmusic.new_work.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
@@ -72,7 +75,18 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
                 findNavController().popBackStack()
             }
             ivSave.setOnClickListener {
-                // TODO
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Default) {
+                    val songLocations = arrayListOf<String>()
+                    mainViewModel.queue.forEach {
+                        songLocations.add(it.location)
+                    }
+                    withContext(Dispatchers.Main) {
+                        val bundle = Bundle().apply {
+                            putStringArrayList(NavigationConstant.AddToPlaylistSongs, songLocations)
+                        }
+                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                    }
+                }
             }
         }
     }
@@ -104,8 +118,6 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
     }
 
     private fun songClicked(song: Song, position: Int) {
-//        val currentList = (binding.rvSongList.adapter as NowPlayingAdapter).getCurrentList()
-//        homeViewModel.setQueue(currentList, position)
         mainViewModel.playOnPosition(position)
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.ravisharma.playbackmusic.MainActivity;
+import com.ravisharma.playbackmusic.new_work.ui.activity.NewPlayerActivity;
 
 /**
  * Created by Ravi Sharma on 02-Mar-18.

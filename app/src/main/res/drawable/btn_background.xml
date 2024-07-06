@@ -14,6 +14,6 @@
 
     <stroke
         android:width="2dp"
-        android:color="@color/scrollThumb" />
+        android:color="@color/tabIndicatorColor" />
 
 </shape>

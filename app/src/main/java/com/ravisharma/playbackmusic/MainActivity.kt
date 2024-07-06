@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         TAG = getString(R.string.app_name)
 
         binding.toolbar.title = getString(R.string.app_name)
-        binding.toolbar.setTitleTextColor(resources.getColor(R.color.titleColor))
+        binding.toolbar.setTitleTextColor(resources.getColor(R.color.textPrimary))
 
         setSupportActionBar(binding.toolbar)
     }

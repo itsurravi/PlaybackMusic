@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.databinding.AdapterPlaylistBinding
 
@@ -65,6 +66,11 @@ class PlaylistsAdapter(
         ) {
             binding.apply {
                 playlistTitle.text = playlistWithSongCount.playlistName
+                playlistSongCount.text = itemView.context.resources.getQuantityString(
+                    R.plurals.numberOfSongs,
+                    playlistWithSongCount.count,
+                    playlistWithSongCount.count
+                )
 
                 itemView.setOnClickListener {
                     onClick?.let { it1 -> it1(playlistWithSongCount) }

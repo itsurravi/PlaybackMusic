@@ -70,23 +70,11 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constrainedHeight="true"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintBottom_toTopOf="@id/bottom_panel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:navGraph="@navigation/home_nav_graph" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@drawable/bg_home_bottom"
-        app:layout_constrainedHeight="true"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toTopOf="@id/bottom_panel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/bottom_panel"
-        app:layout_constraintVertical_bias="1" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottom_panel"
@@ -100,7 +88,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appBar"
+        app:layout_constraintTop_toBottomOf="@id/nav_host_fragment"
         app:layout_constraintVertical_bias="1"
         tools:visibility="visible">
 
@@ -134,7 +122,7 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constrainedWidth="true"
@@ -157,7 +145,7 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textSecondary"
                 android:textSize="12sp"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toTopOf="@id/progress_song"
@@ -210,7 +198,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nav_host_fragment"
+        app:layout_constraintTop_toBottomOf="@id/bottom_panel"
         app:menu="@menu/bottom_navigation_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
