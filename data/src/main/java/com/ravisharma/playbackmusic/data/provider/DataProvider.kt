@@ -99,7 +99,7 @@ class DataProvider(
     suspend fun performMusicScan() {
         _scanStatus.send(ScanStatus.ScanStarted)
 
-        val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
+        val selection = MediaStore.Audio.Media.IS_MUSIC + "!=0 AND " + MediaStore.Audio.Media.DATA + " NOT LIKE '%Record%'"
         val projection = arrayOf(
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.TITLE,

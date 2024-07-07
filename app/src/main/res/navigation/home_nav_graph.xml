@@ -8,20 +8,24 @@
         android:id="@+id/playlistsFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.PlaylistsFragment"
         android:label="PlaylistsFragment"
+        app:launchSingleTop="true"
         tools:layout="@layout/fragment_playlist" />
     <fragment
         android:id="@+id/tracksFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.TracksFragment"
         android:label="TracksFragment"
+        app:launchSingleTop="true"
         tools:layout="@layout/fragment_name_wise" />
     <fragment
         android:id="@+id/albumsFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.AlbumsFragment"
         android:label="AlbumsFragment"
+        app:launchSingleTop="true"
         tools:layout="@layout/fragment_albums" />
     <fragment
         android:id="@+id/artistsFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments.ArtistsFragment"
         android:label="ArtistsFragment"
+        app:launchSingleTop="true"
         tools:layout="@layout/fragment_artist" />
 </navigation>

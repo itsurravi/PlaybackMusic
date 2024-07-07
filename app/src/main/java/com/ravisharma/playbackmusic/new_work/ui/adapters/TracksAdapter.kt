@@ -17,11 +17,11 @@ class TracksAdapter(
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song>() {
         override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return oldItem.location == newItem.location
         }
 
         override fun areContentsTheSame(oldItem: Song, newItem: Song): Boolean {
-            return oldItem.hashCode() == newItem.hashCode()
+            return oldItem == newItem
         }
     }
 

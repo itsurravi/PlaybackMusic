@@ -1,13 +1,17 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,23 +32,33 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class TracksFragment : Fragment(R.layout.fragment_name_wise) {
+class TracksFragment : Fragment() {
 
     private var _binding: FragmentNameWiseBinding? = null
     private val binding get() = _binding!!
 
     private val mainViewModel: MainViewModel by activityViewModels()
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        if (_binding == null) {
+            _binding = FragmentNameWiseBinding.inflate(inflater, container, false)
+            initViews()
+            initObserver()
+        }
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = FragmentNameWiseBinding.bind(view)
-
         setupFragment()
     }
 
     private fun setupFragment() {
-        initViews()
-        initObserver()
+
     }
 
     private fun initViews() {
@@ -68,9 +82,13 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.allSongs.collectLatest { list ->
-                list?.let {
-                    setupData(it)
+            Log.i("TracksFragment", "initObserver")
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.allSongs.collectLatest { list ->
+                    Log.i("TracksFragment", "Collected list")
+                    list?.let {
+                        setupData(it)
+                    }
                 }
             }
         }
@@ -94,28 +112,38 @@ class TracksFragment : Fragment(R.layout.fragment_name_wise) {
 
     private fun songLongClicked(song: Song, position: Int) {
         requireContext().onSongLongPress(song) { longItemClick ->
-            when(longItemClick) {
+            when (longItemClick) {
                 LongItemClick.Play -> {
                     songClicked(song, position)
                 }
+
                 LongItemClick.SinglePlay -> {
                     mainViewModel.setQueue(listOf(song), 0)
                 }
+
                 LongItemClick.PlayNext -> {
                     mainViewModel.addNextInQueue(song)
                 }
+
                 LongItemClick.AddToQueue -> {
                     mainViewModel.addToQueue(song)
                 }
+
                 LongItemClick.AddToPlaylist -> {
                     val bundle = Bundle().apply {
-                        putStringArrayList(NavigationConstant.AddToPlaylistSongs, arrayListOf(song.location))
+                        putStringArrayList(
+                            NavigationConstant.AddToPlaylistSongs,
+                            arrayListOf(song.location)
+                        )
                     }
-                    requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                    requireActivity().findNavController(R.id.nav_container)
+                        .navigate(R.id.action_to_addToPlaylistFragment, bundle)
                 }
+
                 LongItemClick.Share -> {
                     requireContext().shareSong(song.location)
                 }
+
                 LongItemClick.Details -> {
                     requireContext().showSongInfo(song)
                 }
