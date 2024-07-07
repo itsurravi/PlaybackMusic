@@ -61,8 +61,8 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
 
         binding.apply {
             cardRecentAdded.setOnClickListener(this@PlaylistFragment)
-            cardLastPlayed.setOnClickListener(this@PlaylistFragment)
-            cardMostPlayed.setOnClickListener(this@PlaylistFragment)
+//            cardLastPlayed.setOnClickListener(this@PlaylistFragment)
+//            cardMostPlayed.setOnClickListener(this@PlaylistFragment)
             btnAddNewPlaylist.setOnClickListener(this@PlaylistFragment)
         }
 
@@ -127,14 +127,14 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
                 bundle.putString("argType", "Recent Added")
                 bundle.putString("actName", "Recent Added")
             }
-            binding.cardLastPlayed -> {
+            /*binding.cardLastPlayed -> {
                 bundle.putString("argType", "Last Played")
                 bundle.putString("actName", "Last Played")
             }
             binding.cardMostPlayed -> {
                 bundle.putString("argType", "Most Played")
                 bundle.putString("actName", "Most Played")
-            }
+            }*/
         }
         openFragment(bundle)
     }

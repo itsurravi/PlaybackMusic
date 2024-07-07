@@ -47,12 +47,12 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
             btnAddNewPlaylist.setOnClickListener {
                 createPlaylistDialog()
             }
-            cardLastPlayed.setOnClickListener {
-                // TODO
-            }
-            cardMostPlayed.setOnClickListener {
-                // TODO
-            }
+//            cardLastPlayed.setOnClickListener {
+//                 TODO
+//            }
+//            cardMostPlayed.setOnClickListener {
+//                 TODO
+//            }
             cardRecentAdded.setOnClickListener {
                 val collectionType =
                     CollectionType(CollectionType.RecentAddedType, "")

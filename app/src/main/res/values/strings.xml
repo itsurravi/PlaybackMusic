@@ -94,7 +94,7 @@
     <string name="playlist_Name">Playlist Name</string>
     <string name="Cancel">Cancel</string>
     <string name="ok">Create</string>
-    <string name="createNewPlaylist">Create New Playlist</string>
+    <string name="createNewPlaylist">New Playlist</string>
     <string name="shuffleLibrary">Shuffle Library</string>
     <string name="location">Location:</string>
     <string name="duration">Duration:</string>
