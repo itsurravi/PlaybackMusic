@@ -328,7 +328,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 dialogBinding.timerBlocker.visibility = View.VISIBLE
                 alertDialog.setCancelable(true)
                 if (am != null && pi != null) {
-                    am!!.cancel(pi)
+                    am!!.cancel(pi!!)
                     am = null
                     pi = null
                     requireContext().showToast(getString(R.string.timeOff))

@@ -295,6 +295,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toEndOf="@id/btn_Next"
                 app:layout_constraintTop_toTopOf="@id/btn_Next"
+                app:tint="@color/white"
                 tools:targetApi="lollipop" />
 
             <androidx.constraintlayout.widget.Guideline

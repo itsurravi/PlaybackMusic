@@ -226,7 +226,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 pendingNextIntent.send()
             }
             btnPlayPause.setOnClickListener {
-                pendingPausePlayIntent.send()
+                try {
+                    if (mainViewModel.isServiceInitialized()) {
+                        pendingPausePlayIntent.send()
+                    } else {
+                        mainViewModel.startPlaying()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
             btnShuffle.setOnClickListener {
 //                mainViewModel.toggleShuffleMode()

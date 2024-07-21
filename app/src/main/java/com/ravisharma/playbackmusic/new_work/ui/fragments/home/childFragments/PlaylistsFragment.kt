@@ -61,6 +61,14 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 }
                 requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
             }
+            cardFavorites.setOnClickListener {
+                val collectionType =
+                    CollectionType(CollectionType.FavouritesType, "")
+                val bundle = Bundle().apply {
+                    putParcelable(CollectionType.Category, collectionType)
+                }
+                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+            }
 
             playlistRecycler.apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)

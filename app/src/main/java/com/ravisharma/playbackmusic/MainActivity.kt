@@ -357,7 +357,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun setUpView() {
         if (playIntent == null) {
             playIntent = Intent(this, MusicService::class.java)
-            bindService(playIntent, musicConnection, BIND_AUTO_CREATE)
+            bindService(playIntent!!, musicConnection, BIND_AUTO_CREATE)
         }
         musicSrv = MusicService()
         binding.playingPanel.playerController.alpha = 0f
@@ -1044,7 +1044,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 dialogBinding.timerBlocker.visibility = View.VISIBLE
                 alertDialog.setCancelable(true)
                 if (am != null && pi != null) {
-                    am!!.cancel(pi)
+                    am!!.cancel(pi!!)
                     am = null
                     pi = null
                     showSnackBar(getString(R.string.timeOff))
@@ -1120,7 +1120,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         val i = Intent(this, Timer::class.java)
         pi = PendingIntent.getBroadcast(this, 1234, i, PendingIntent.FLAG_IMMUTABLE)
         am = getSystemService(ALARM_SERVICE) as AlarmManager
-        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi
+        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi!!
     }
 
     //play next
@@ -1197,7 +1197,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
 
         if (TIMER && timerSelectedValue) {
-            am!!.cancel(pi)
+            am!!.cancel(pi!!)
         }
         if (mediaSession != null) {
             mediaSession!!.release()

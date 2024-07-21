@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -158,7 +159,11 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
 
         dataManager.setPlayerRunning(this)
         IntentFilter(Constants.PACKAGE_NAME).also {
-            registerReceiver(broadcastReceiver, it)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(broadcastReceiver, it, RECEIVER_EXPORTED)
+            } else {
+                registerReceiver(broadcastReceiver, it)
+            }
         }
 
         broadcastReceiver?.startListening(this)
