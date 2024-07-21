@@ -1,5 +1,6 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.category
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -12,6 +13,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.ActivityCategorySongBinding
@@ -33,10 +37,18 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
     private val collectionViewModel: CollectionViewModel by viewModels()
 
+    private var adView: AdView? = null
+    private var adUnitId: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            val collectionType: CollectionType? = it.getParcelable(CollectionType.Category)
+            val collectionType: CollectionType? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    it.getParcelable(CollectionType.Category, CollectionType::class.java)
+                } else {
+                    it.getParcelable(CollectionType.Category)
+                }
 
             collectionType?.let {
                 collectionViewModel.loadCollection(collectionType)
@@ -52,6 +64,8 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
     }
 
     private fun setupFragment() {
+        adView = AdView(requireContext())
+
         initViews()
         initObservers()
     }
@@ -89,20 +103,60 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
                 updateUi(it)
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            collectionViewModel.collectionType.collect {
+                when(it?.type) {
+                    CollectionType.AlbumType -> {
+                        adUnitId = getString(R.string.AlbumSongsActId)
+                    }
+                    CollectionType.ArtistType -> {
+                        adUnitId = getString(R.string.artistSongsActId)
+                    }
+                    CollectionType.PlaylistType -> {
+                        adUnitId = getString(R.string.playlistActId)
+                    }
+                    CollectionType.FavouritesType -> {
+                        adUnitId = getString(R.string.SingleSongActId)
+                    }
+                    CollectionType.RecentAddedType -> {
+                        adUnitId = getString(R.string.recentSongsActId)
+                    }
+                    else -> {
+                        adUnitId = getString(R.string.artistFragId)
+                    }
+                }
+                loadBanner()
+            }
+        }
+    }
+
+    private fun loadBanner() {
+        adUnitId?.let { unitId ->
+            val adRequest = AdRequest.Builder().build()
+            val adSize = AdSize.BANNER
+            adView!!.adUnitId = unitId
+            adView!!.setAdSize(adSize)
+
+            binding.bannerContainerRecentActivity.addView(adView)
+
+            adView!!.loadAd(adRequest)
+        }
     }
 
     private fun updateUi(data: CollectionUi) {
         binding.playlistLayout.apply {
             txtPlaylistName1.text = data.topBarTitle
             val songCount = data.songs.size
-            noOfSongs.text = resources.getQuantityString(R.plurals.numberOfSongs, songCount, songCount)
+            noOfSongs.text =
+                resources.getQuantityString(R.plurals.numberOfSongs, songCount, songCount)
 
             albumArt.load(data.topBarBackgroundImageUri) {
                 error(R.drawable.logo)
                 crossfade(true)
             }
 
-            if(data.songs.isEmpty()) {
+            if (data.songs.isEmpty()) {
                 noDataFound.noDataLayout.isVisible = true
             } else {
                 noDataFound.noDataLayout.isVisible = false
@@ -138,7 +192,10 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
                 LongItemClick.AddToPlaylist -> {
                     val bundle = Bundle().apply {
-                        putStringArrayList(NavigationConstant.AddToPlaylistSongs, arrayListOf(song.location))
+                        putStringArrayList(
+                            NavigationConstant.AddToPlaylistSongs,
+                            arrayListOf(song.location)
+                        )
                     }
                     findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
                 }

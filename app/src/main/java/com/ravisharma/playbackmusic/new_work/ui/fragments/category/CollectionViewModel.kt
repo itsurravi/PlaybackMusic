@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,7 @@ class CollectionViewModel @Inject constructor(
     val queue = manager.queue
 
     private val _collectionType = MutableStateFlow<CollectionType?>(null)
+    val collectionType = _collectionType.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val collectionUi = _collectionType.flatMapLatest { type ->

@@ -25,6 +25,9 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.work.WorkManager
 import coil.load
 import coil.transform.RoundedCornersTransformation
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.BuildConfig
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AboutActivity
@@ -51,6 +54,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var isLastPlayedListSet = false
 
+    private var adView: AdView? = null
+    private var adUnitId: String? = null
+
     private val pendingPausePlayIntent by lazy {
         PendingIntent.getBroadcast(
             context, PlaybackBroadcastReceiver.PAUSE_PLAY_ACTION_REQUEST_CODE,
@@ -70,9 +76,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun setupFragment() {
+        adView = AdView(requireContext())
+
         initViews()
         initObservers()
         initDefaultData()
+
+        adUnitId = getString(R.string.mainActId)
+        loadBanner()
+    }
+
+    private fun loadBanner() {
+        adUnitId?.let { unitId ->
+            val adRequest = AdRequest.Builder().build()
+            val adSize = AdSize.BANNER
+            adView!!.adUnitId = unitId
+            adView!!.setAdSize(adSize)
+
+            binding.bannerAd.addView(adView)
+
+            adView!!.loadAd(adRequest)
+        }
     }
 
     private fun initDefaultData() {

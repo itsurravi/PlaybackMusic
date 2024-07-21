@@ -265,7 +265,7 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                         currentSong!!.artist
                     )
                     putString(
-                        MediaMetadataCompat.METADATA_KEY_ART_URI,
+                        MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
                         currentSong!!.artUri
                     )
                     putLong(
