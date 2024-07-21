@@ -192,9 +192,5 @@ class DataProvider(
         daoCollection.genreDao.insertAllGenres(genreSet.map { Genre(it) })
         daoCollection.songDao.insertAllSongs(songs)
         _scanStatus.send(ScanStatus.ScanComplete)
-
-        songs.forEachIndexed { index, song ->
-            Log.e("Song", "$song")
-        }
     }
 }
