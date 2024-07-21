@@ -42,6 +42,8 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
     }
 
     private fun setupFragment() {
+        adView = AdView(requireContext())
+
         initViews()
         initObserver()
 
