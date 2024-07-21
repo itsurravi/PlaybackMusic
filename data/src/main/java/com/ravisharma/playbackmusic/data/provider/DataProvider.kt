@@ -149,7 +149,7 @@ class DataProvider(
                 Log.e("ModifiedDate", "${cursor.getString(dateModifiedIndex).toLong()}")
                 val song = Song(
                     location = file.path,
-                    title = cursor.getString(titleIndex),
+                    title = cursor.getString(titleIndex).trim(),
                     album = cursor.getString(albumIndex).trim(),
                     size = cursor.getFloat(sizeIndex).toMBfromB(),
                     addedDate = cursor.getString(dateAddedIndex).toLong().formatToDate(),
