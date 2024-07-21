@@ -13,7 +13,6 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity.ALARM_SERVICE
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -23,17 +22,18 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.work.WorkManager
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.BuildConfig
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AboutActivity
-import com.ravisharma.playbackmusic.broadcast.Timer
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
+import com.ravisharma.playbackmusic.new_work.services.TimerWorker
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
@@ -259,14 +259,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private var alert_seek_step = 1
     private var alert_current_value = 0
     private lateinit var seekValue: Array<String>
-    var timerSelectedValue = true
     private var TIMER = false
-    private var am: AlarmManager? = null
-    private var pi: PendingIntent? = null
 
     private fun showTimer() {
         val timerArray: Array<String> = resources.getStringArray(R.array.timer)
-        val trackArray: Array<String> = resources.getStringArray(R.array.tracks)
         val dialog = AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
         val dialogBinding: AlertTimerBinding = AlertTimerBinding.inflate(layoutInflater)
 
@@ -284,13 +280,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         } else {
             alertDialog.setCancelable(false)
             dialogBinding.timerBlocker.visibility = View.GONE
-            seekValue = if (timerSelectedValue) {
-                timerArray
-            } else {
-                trackArray
-            }
+            seekValue = timerArray
             switchTimerAlertView(
-                timerSelectedValue,
+                true,
                 dialogBinding.txtTimer,
                 dialogBinding.txtTracks
             )
@@ -315,24 +307,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             dialogBinding.alertSeekBar.progress = 0
             dialogBinding.txtSeekValue.text = seekValue[0].toString()
         }
-        dialogBinding.txtTracks.setOnClickListener {
-            seekValue = trackArray
-            switchTimerAlertView(false, dialogBinding.txtTimer, dialogBinding.txtTracks)
-            dialogBinding.alertSeekBar.progress = 0
-            dialogBinding.txtSeekValue.text = seekValue[0].toString()
-        }
         dialogBinding.timerSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             if (!isChecked) {
                 TIMER = false
                 dialogBinding.txtOnOff.text = "Off"
                 dialogBinding.timerBlocker.visibility = View.VISIBLE
                 alertDialog.setCancelable(true)
-                if (am != null && pi != null) {
+                /*if (am != null && pi != null) {
                     am!!.cancel(pi!!)
                     am = null
                     pi = null
                     requireContext().showToast(getString(R.string.timeOff))
-                }
+                }*/
+                TimerWorker.cancelSleepTimer(requireContext())
             } else {
                 TIMER = true
                 dialogBinding.txtOnOff.text = "On"
@@ -341,37 +328,35 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
         }
         dialogBinding.txtSave.setOnClickListener {
-            if (timerSelectedValue) {
-                when (alert_current_value) {
-                    0 -> {
-                        setTimer(15 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins15))
-                    }
+            when (alert_current_value) {
+                0 -> {
+                    setTimer(15 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins15))
+                }
 
-                    1 -> {
-                        setTimer(30 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins30))
-                    }
+                1 -> {
+                    setTimer(30 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins30))
+                }
 
-                    2 -> {
-                        setTimer(45 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins45))
-                    }
+                2 -> {
+                    setTimer(45 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins45))
+                }
 
-                    3 -> {
-                        setTimer(60 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins60))
-                    }
+                3 -> {
+                    setTimer(60 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins60))
+                }
 
-                    4 -> {
-                        setTimer(90 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins90))
-                    }
+                4 -> {
+                    setTimer(90 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins90))
+                }
 
-                    5 -> {
-                        setTimer(120 * 60 * 1000)
-                        requireContext().showToast(getString(R.string.mins120))
-                    }
+                5 -> {
+                    setTimer(120 * 60 * 1000)
+                    requireContext().showToast(getString(R.string.mins120))
                 }
             }
             alertDialog.dismiss()
@@ -383,10 +368,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         pi = PendingIntent.getBroadcast(requireContext(), 1234, i, PendingIntent.FLAG_IMMUTABLE)
         am = requireContext().getSystemService(ALARM_SERVICE) as AlarmManager
         am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi*/
+
+        try {
+            TimerWorker.scheduleSleepTimer(time.toLong(), requireContext())
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun switchTimerAlertView(timerSelected: Boolean, timer: TextView, tracks: TextView) {
-        timerSelectedValue = timerSelected
         if (timerSelected) {
             timer.setTextColor(
                 ContextCompat.getColor(
