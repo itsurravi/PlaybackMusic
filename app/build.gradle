@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.firebase.perf)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.protoPlugin)
 }
 android {
     namespace "com.ravisharma.playbackmusic"
@@ -40,8 +41,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = libs.versions.jvm.get()
@@ -62,6 +63,7 @@ dependencies {
     implementation libs.androidx.core.ktx
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.datastore
+    implementation libs.proto
     implementation libs.androidx.fragment
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.lifecycle.livedata.ktx
@@ -86,10 +88,15 @@ dependencies {
     implementation libs.com.slidinguppanel
     implementation libs.com.verticalseekbar
 
-    implementation libs.exoplayer
-    implementation libs.exoPlayerUi
+//    implementation libs.exoplayer
+//    implementation libs.exoPlayerUi
+
+    implementation libs.media3Ui
     implementation libs.media3ExoPlayer
-    implementation libs.media3Transformer
+    implementation libs.media3Session
+//    implementation libs.glide
+
+    implementation libs.androidx.legacy.supportV4
 
     implementation libs.firebase.crashlytics
     implementation libs.firebase.analytics
@@ -107,3 +114,20 @@ dependencies {
 
 }
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.18.0"
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option 'lite'
+                }
+                kotlin {
+                    option 'lite'
+                }
+            }
+        }
+    }
+}

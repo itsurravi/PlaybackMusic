@@ -90,6 +90,7 @@ class DataManager @Inject constructor(
         }
     }
 
+    @androidx.media3.common.util.UnstableApi
     @Synchronized
     fun setQueue(newQueue: List<Song>, startPlayingFromIndex: Int) {
         if (newQueue.isEmpty()) return

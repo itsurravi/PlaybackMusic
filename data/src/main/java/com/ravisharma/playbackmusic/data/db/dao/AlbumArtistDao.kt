@@ -1,10 +1,6 @@
 package com.ravisharma.playbackmusic.data.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.*
 import com.ravisharma.playbackmusic.data.db.model.embedded.AlbumArtistWithSongs
 import com.ravisharma.playbackmusic.data.db.model.tables.AlbumArtist
 import com.ravisharma.playbackmusic.data.utils.Constants
@@ -22,5 +18,12 @@ interface AlbumArtistDao {
     @Transaction
     @Query("SELECT * FROM ${Constants.Tables.ALBUM_ARTIST_TABLE} WHERE name = :name")
     fun getAlbumArtistWithSongs(name: String): Flow<AlbumArtistWithSongs?>
+
+    @Transaction
+    @Query("DELETE FROM ${Constants.Tables.ALBUM_ARTIST_TABLE} WHERE name IN " +
+            "(SELECT albumArtist.name as name FROM ${Constants.Tables.ALBUM_ARTIST_TABLE} as albumArtist LEFT JOIN " +
+            "${Constants.Tables.SONG_TABLE} as song ON albumArtist.name = song.albumArtist GROUP BY albumArtist.name " +
+            "HAVING COUNT(song.location) = 0)")
+    suspend fun cleanAlbumArtistTable()
 
 }

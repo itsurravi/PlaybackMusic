@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 sealed class LongItemClick(val title : String) {
     object Play : LongItemClick("Play")
     object SinglePlay : LongItemClick("Play This Only")
-    object PlayNext : LongItemClick("Play Next")
+//    object PlayNext : LongItemClick("Play Next")
     object AddToQueue : LongItemClick("Add To Queue")
     object AddToPlaylist : LongItemClick("Add To Playlist")
     //    object Delete : LongItemClick("Delete")
@@ -31,7 +31,7 @@ fun Context.onSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {
     val items = listOf(
         LongItemClick.Play.title,
         LongItemClick.SinglePlay.title,
-        LongItemClick.PlayNext.title,
+//        LongItemClick.PlayNext.title,
         LongItemClick.AddToQueue.title,
         LongItemClick.AddToPlaylist.title,
 //        LongItemClick.Delete.title,
@@ -64,7 +64,7 @@ fun Context.onSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {
             when (items[itemPosition]) {
                 LongItemClick.Play.title -> itemClick(LongItemClick.Play)
                 LongItemClick.SinglePlay.title -> itemClick(LongItemClick.SinglePlay)
-                LongItemClick.PlayNext.title -> itemClick(LongItemClick.PlayNext)
+//                LongItemClick.PlayNext.title -> itemClick(LongItemClick.PlayNext)
                 LongItemClick.AddToQueue.title -> itemClick(LongItemClick.AddToQueue)
                 LongItemClick.AddToPlaylist.title -> itemClick(LongItemClick.AddToPlaylist)
 //                LongItemClick.Delete.title -> itemClick(LongItemClick.Delete)

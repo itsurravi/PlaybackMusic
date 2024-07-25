@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.ravisharma.playbackmusic.data.db.model.tables.Thumbnail
 import com.ravisharma.playbackmusic.data.db.dao.AlbumArtistDao
 import com.ravisharma.playbackmusic.data.db.dao.AlbumDao
 import com.ravisharma.playbackmusic.data.db.dao.ArtistDao
@@ -10,6 +11,7 @@ import com.ravisharma.playbackmusic.data.db.dao.GenreDao
 import com.ravisharma.playbackmusic.data.db.dao.LyricistDao
 import com.ravisharma.playbackmusic.data.db.dao.PlaylistDao
 import com.ravisharma.playbackmusic.data.db.dao.SongDao
+import com.ravisharma.playbackmusic.data.db.dao.ThumbnailDao
 import com.ravisharma.playbackmusic.data.db.model.tables.*
 
 @Database(
@@ -23,6 +25,7 @@ import com.ravisharma.playbackmusic.data.db.model.tables.*
         AlbumArtist::class,
         Composer::class,
         Lyricist::class,
+        Thumbnail::class,
     ],
     version = 1,
     exportSchema = true
@@ -36,4 +39,5 @@ abstract class MusicDatabase : RoomDatabase() {
     abstract fun lyricistDao(): LyricistDao
     abstract fun genreDao(): GenreDao
     abstract fun playListDao(): PlaylistDao
+    abstract fun thumbnailDao(): ThumbnailDao
 }

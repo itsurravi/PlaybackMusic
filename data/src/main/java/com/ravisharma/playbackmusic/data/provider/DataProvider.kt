@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.TreeSet
-
+//TODO DELETE IT
 class DataProvider(
     private val context: Context,
     private val daoCollection: DaoCollection,
@@ -73,10 +73,10 @@ class DataProvider(
     }
 
     suspend fun deletePlaylist(playlist: Playlist) =
-        daoCollection.playlistDao.deletePlaylist(playlist)
+        daoCollection.playlistDao.deletePlaylist(playlist.playlistId)
 
     suspend fun updatePlaylistName(playlist: Playlist) =
-        daoCollection.playlistDao.updatePlaylistName(playlist)
+        daoCollection.playlistDao.updatePlaylist(playlist)
 
     suspend fun deleteSong(song: Song) {
         daoCollection.songDao.deleteSong(song)
@@ -163,7 +163,12 @@ class DataProvider(
                     durationMillis = songMetadata.duration,
                     durationFormatted = songMetadata.duration.toMS(),
                     mimeType = songMetadata.mimeType,
-                    artUri = "content://media/external/audio/media/${cursor.getLong(songIdIndex)}/albumart"
+                    artUri = "content://media/external/audio/media/${cursor.getLong(songIdIndex)}/albumart",
+                    playCount = 0,
+                    favourite = false,
+                    lastPlayed = null,
+                    sampleRate = 0f,
+                    bitrate = 0f
                 )
                 Log.i("SongsInfo", "$parsedSongs ${song.location}")
                 songs.add(song)

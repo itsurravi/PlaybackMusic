@@ -70,7 +70,7 @@ class AddToPlaylistFragment : Fragment(R.layout.activity_add_to_playlist) {
 
             binding.bannerAd.addView(adView)
 
-            adView!!.loadAd(adRequest)
+//            adView!!.loadAd(adRequest)
         }
     }
 
@@ -119,7 +119,7 @@ class AddToPlaylistFragment : Fragment(R.layout.activity_add_to_playlist) {
 
     private fun createPlaylistDialog() {
         val listener = AlertClickListener { newPlaylistName ->
-            mainViewModel.createPlaylist(newPlaylistName)
+            mainViewModel.onPlaylistCreate(newPlaylistName)
         }
         val alert = PlaylistAlert(context, listener)
         alert.showCreateListAlert()

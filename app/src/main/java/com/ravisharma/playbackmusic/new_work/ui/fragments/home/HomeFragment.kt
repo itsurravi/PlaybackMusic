@@ -36,7 +36,6 @@ import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
-import com.ravisharma.playbackmusic.new_work.services.TimerWorker
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
@@ -322,7 +321,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     pi = null
                     requireContext().showToast(getString(R.string.timeOff))
                 }*/
-                TimerWorker.cancelSleepTimer(requireContext())
+//                TimerWorker.cancelSleepTimer(requireContext())
             } else {
                 TIMER = true
                 dialogBinding.txtOnOff.text = "On"
@@ -373,7 +372,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi*/
 
         try {
-            TimerWorker.scheduleSleepTimer(time.toLong(), requireContext())
+//            TimerWorker.scheduleSleepTimer(time.toLong(), requireContext())
         } catch (e: Exception) {
             e.printStackTrace()
         }

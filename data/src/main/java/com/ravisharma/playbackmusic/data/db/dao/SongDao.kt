@@ -70,4 +70,7 @@ interface SongDao {
 
     @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE location COLLATE NOCASE NOT LIKE '%record%' ORDER BY modifiedDate DESC")
     fun getRecentAdded(): Flow<List<Song>>
+
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE location IN (:locations)")
+    suspend fun getSongsFromLocations(locations: List<String>): List<Song>
 }

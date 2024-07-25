@@ -1,163 +1,83 @@
 package com.ravisharma.playbackmusic.new_work.services
 
-import android.app.NotificationManager
-import android.app.Service
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.ravisharma.playbackmusic.R
+import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSessionService
+import com.ravisharma.playbackmusic.new_work.services.data.QueueService
+import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
+import com.ravisharma.playbackmusic.new_work.services.data.SongService
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
+import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.new_work.Constants
-import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationManager
+import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateProvider
+import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
-@AndroidEntryPoint
-class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiver.Callback {
+@UnstableApi @AndroidEntryPoint
+class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBroadcastReceiver.Callback {
 
-    @Inject
-    lateinit var notificationManager: PlaybackNotificationManager
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
+        mediaSession
 
-    @Inject
-    lateinit var dataManager: DataManager
-
-    @Inject
-    lateinit var exoPlayer: ExoPlayer
+    @Inject lateinit var songExtractor: SongExtractor
+    @Inject lateinit var queueService: QueueService
+    @Inject lateinit var songService: SongService
+    @Inject lateinit var sleepTimerService: SleepTimerService
+    @Inject lateinit var exoPlayer: ExoPlayer
+    @Inject lateinit var queueStateProvider: QueueStateProvider
+    @Inject lateinit var sessionCallback: SessionCallback
+    @Inject lateinit var notificationProvider: PlaybackNotificationProvider
 
     private var broadcastReceiver: PlaybackBroadcastReceiver? = null
 
-    private var systemNotificationManager: NotificationManager? = null
-
     private val job = SupervisorJob()
-
     private val scope = CoroutineScope(job + Dispatchers.Default)
-
-    private var playerState: Int = Player.STATE_IDLE
 
     companion object {
         const val MEDIA_SESSION = "media_session"
+        val isRunning = AtomicBoolean(false)
     }
 
-    private lateinit var mediaSession: MediaSessionCompat
+    private lateinit var mediaSession: MediaSession
 
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    private val exoPlayerListener = object : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            super.onMediaItemTransition(mediaItem, reason)
-
-            try {
-                if (mediaItem != null) {
-                    dataManager.updateCurrentSong(exoPlayer.currentMediaItemIndex)
-                }
-            } catch (e: Exception) {
-                Log.e("exoPlayerListener", "${e.message}")
-            }
-            updateMediaSessionState()
-            updateMediaSessionMetadata()
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            updateMediaSessionState()
-            updateMediaSessionMetadata()
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            super.onPlaybackStateChanged(playbackState)
-            playerState = playbackState
-        }
-
-        override fun onPlayerError(error: PlaybackException) {
-            super.onPlayerError(error)
-            if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
-                dataManager.cleanData()
-                showToast("Could not find the song ${dataManager.currentSong.value?.title ?: ""} at the specified path")
-                onBroadcastCancel()
-            }
-        }
-    }
-
-    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
-        override fun onPlay() {
-            super.onPlay()
-            onBroadcastPausePlay()
-        }
-
-        override fun onPause() {
-            super.onPause()
-            onBroadcastPausePlay()
-        }
-
-        override fun onSkipToNext() {
-            super.onSkipToNext()
-            onBroadcastNext()
-        }
-
-        override fun onSkipToPrevious() {
-            super.onSkipToPrevious()
-            onBroadcastPrevious()
-        }
-
-        override fun onSeekTo(pos: Long) {
-            super.onSeekTo(pos)
-            exoPlayer.seekTo(pos)
-            updateMediaSessionState()
-            updateMediaSessionMetadata()
-        }
-    }
-
-    private fun getCurrentArtBitmap(song: Song?): Bitmap {
-        return try {
-            song?.let {
-                val mmr = MediaMetadataRetriever()
-                mmr.setDataSource(it.location)
-                val embeddedPicture = mmr.embeddedPicture
-                mmr.release()
-                if (embeddedPicture != null) {
-                    BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
-                } else {
-                    BitmapFactory.decodeResource(this.resources, R.drawable.logo)
-                }
-            } ?: kotlin.run {
-                BitmapFactory.decodeResource(this.resources, R.drawable.logo)
-            }
-        } catch (e: Exception) {
-            BitmapFactory.decodeResource(this.resources, R.drawable.logo)
-        }
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
+    override fun onCreate() {
+        super.onCreate()
+        isRunning.set(true)
         broadcastReceiver = PlaybackBroadcastReceiver()
-        mediaSession = MediaSessionCompat(this, MEDIA_SESSION)
-        systemNotificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mediaSession = MediaSession.Builder(applicationContext, exoPlayer)
+            .setCallback(sessionCallback)
+            .setId(System.currentTimeMillis().toString())
+            .build()
 
-        dataManager.setPlayerRunning(this)
+        queueService.addListener(this)
+
         IntentFilter(Constants.PACKAGE_NAME).also {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(broadcastReceiver, it, RECEIVER_EXPORTED)
@@ -165,37 +85,69 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
                 registerReceiver(broadcastReceiver, it)
             }
         }
-
         broadcastReceiver?.startListening(this)
-        mediaSession.setCallback(mediaSessionCallback)
         exoPlayer.addListener(exoPlayerListener)
 
-        startForeground(
-            PlaybackNotificationManager.PLAYER_NOTIFICATION_ID,
-            notificationManager.getPlayerNotification(
-                session = mediaSession,
-                showPlayButton = false,
-                isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
-                    ?: false,
-                artBitmap = getCurrentArtBitmap(song = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex))
-            )
-        )
-
+        /*scope.launch {
+            preferencesProvider.playbackParams.collect {
+                val params = it.toCorrectedParams().toExoPlayerPlaybackParameters()
+                withContext(Dispatchers.Main) {
+                    exoPlayer.playbackParameters = params
+                }
+            }
+        }*/
         scope.launch {
-            dataManager.repeatMode.collect {
+            queueService.repeatMode.collect {
                 withContext(Dispatchers.Main) { exoPlayer.repeatMode = it.toExoPlayerRepeatMode() }
             }
         }
 
-//        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-//        audioManager.isSpeakerphoneOn = true
+        setMediaNotificationProvider(notificationProvider)
+    }
 
-        return START_NOT_STICKY
+    private val exoPlayerListener = object : Player.Listener {
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+
+            try {
+                queueService.setCurrentSong(exoPlayer.currentMediaItemIndex)
+                queueService.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.let { song ->
+                    updateNotification(song.favourite)
+                    /*val broadcast = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                        putExtra(WidgetBroadcast.WIDGET_BROADCAST, WidgetBroadcast.SONG_CHANGED)
+                        putExtra("imageUri", song.artUri)
+                        putExtra("title", song.title)
+                        putExtra("artist", song.artist)
+                        putExtra("album", song.album)
+                    }
+                    this@ZenPlayer.applicationContext.sendBroadcast(broadcast)*/
+                }
+            } catch (_: Exception) {
+                
+            }
+        }
+
+        /*override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            val broadcast = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                putExtra(WidgetBroadcast.WIDGET_BROADCAST, WidgetBroadcast.IS_PLAYING_CHANGED)
+                putExtra("isPlaying", isPlaying)
+            }
+            this@ZenPlayer.applicationContext.sendBroadcast(broadcast)
+        }*/
+
+        override fun onPlayerError(error: PlaybackException) {
+            super.onPlayerError(error)
+            if (error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) {
+                songExtractor.cleanData()
+                onBroadcastCancel()
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopService()
+//        stopService()
     }
 
     private fun showToast(message: String) {
@@ -203,166 +155,93 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
     }
 
     private fun stopService() {
-        unregisterReceiver(broadcastReceiver)
-
-        val index = exoPlayer.currentMediaItemIndex
-
-        exoPlayer.stop()
-        exoPlayer.clearMediaItems()
-        exoPlayer.removeListener(exoPlayerListener)
-
-        mediaSession.release()
-
-        dataManager.stopPlayerRunning(index)
-        broadcastReceiver?.stopListening()
-        systemNotificationManager?.cancel(PlaybackNotificationManager.PLAYER_NOTIFICATION_ID)
-
+        Log.i("Service", "Stopped")
+        isRunning.set(false)
+        queueStateProvider.saveState(
+            queue = queueService.queue.map { it.location },
+            startIndex = exoPlayer.currentMediaItemIndex,
+            startPosition = exoPlayer.currentPosition
+        )
+        with(queueService) {
+            clearQueue()
+            removeListener(this@PlaybackService)
+        }
+        with(exoPlayer) {
+            stop()
+            clearMediaItems()
+            removeListener(exoPlayerListener)
+        }
         scope.cancel()
         job.cancel()
 
-        systemNotificationManager = null
+        sleepTimerService.cancel()
+
+        broadcastReceiver?.let { unregisterReceiver(it) }
+        broadcastReceiver?.stopListening()
         broadcastReceiver = null
     }
 
-    private fun updateMediaSessionState() {
-        scope.launch {
-            delay(100)
-            withContext(Dispatchers.Main) {
-                mediaSession.setPlaybackState(
-                    PlaybackStateCompat.Builder().apply {
-                        setState(
-                            if (exoPlayer.isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED,
-                            exoPlayer.currentPosition,
-                            1f,
-                        )
-                        setActions(
-                            (if (exoPlayer.isPlaying) PlaybackStateCompat.ACTION_PAUSE else PlaybackStateCompat.ACTION_PLAY)
-                                    or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-                                    or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                                    or PlaybackStateCompat.ACTION_SEEK_TO
-                        )
-                    }.build()
-                )
-            }
-        }
-    }
-
-    private fun updateMediaSessionMetadata() {
-        scope.launch {
-            var currentSong: Song? = null
-            withContext(Dispatchers.Main) {
-                currentSong = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)
-            }
-            if (currentSong == null) return@launch
-            mediaSession.setMetadata(
-                MediaMetadataCompat.Builder().apply {
-                    putString(
-                        MediaMetadataCompat.METADATA_KEY_TITLE,
-                        currentSong!!.title
-                    )
-                    putString(
-                        MediaMetadataCompat.METADATA_KEY_ARTIST,
-                        currentSong!!.artist
-                    )
-                    putString(
-                        MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
-                        currentSong!!.artUri
-                    )
-                    putLong(
-                        MediaMetadataCompat.METADATA_KEY_DURATION,
-                        currentSong!!.durationMillis
-                    )
-                }.build()
+    private fun updateNotification(isLiked: Boolean) {
+        mediaSession.setCustomLayout(
+            listOf(
+                if (isLiked) PlaybackCommandButtons.liked else PlaybackCommandButtons.unliked,
+                PlaybackCommandButtons.previous,
+                PlaybackCommandButtons.playPause,
+                PlaybackCommandButtons.next,
+//                PlaybackCommandButtons.cancel
             )
-            delay(100)
+        )
+    }
+
+    private fun setQueue(mediaItems: List<MediaItem>, startPosition: Int) {
+        scope.launch {
+            val repeatMode = queueService.repeatMode.first()
             withContext(Dispatchers.Main) {
-                systemNotificationManager?.notify(
-                    PlaybackNotificationManager.PLAYER_NOTIFICATION_ID,
-                    notificationManager.getPlayerNotification(
-                        session = mediaSession,
-                        showPlayButton = !exoPlayer.isPlaying,
-                        isLiked = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.favourite
-                            ?: false,
-                        artBitmap = getCurrentArtBitmap(song = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex))
-                    )
-                )
+                exoPlayer.stop()
+                exoPlayer.clearMediaItems()
+                exoPlayer.addMediaItems(mediaItems)
+                exoPlayer.prepare()
+                exoPlayer.seekTo(startPosition, 0)
+                exoPlayer.repeatMode = repeatMode.toExoPlayerRepeatMode()
+                /*exoPlayer.playbackParameters = preferencesProvider.playbackParams.value
+                    .toCorrectedParams()
+                    .toExoPlayerPlaybackParameters()*/
+                exoPlayer.play()
             }
         }
     }
 
-    @Synchronized
-    override fun setQueue(newQueue: List<Song>, startPlayingFromIndex: Int) {
-        exoPlayer.stop()
-        exoPlayer.clearMediaItems()
-        val mediaItems = newQueue.map {
-            MediaItem.fromUri(it.location)
-        }
-        exoPlayer.addMediaItems(mediaItems)
-        exoPlayer.prepare()
-        exoPlayer.seekTo(startPlayingFromIndex, 0)
-        exoPlayer.play()
-        updateMediaSessionState()
-        updateMediaSessionMetadata()
+    override fun onAppend(song: Song) {
+        exoPlayer.addMediaItem(song.toMediaItem())
     }
 
-    @Synchronized
-    override fun updateExoList(shuffled: Boolean, list: List<Song>) {
-        if (shuffled) {
-            val count = exoPlayer.mediaItemCount
-            for (i in count downTo 0) {
-                if (i != exoPlayer.currentMediaItemIndex) {
-                    exoPlayer.removeMediaItem(i)
-                }
+    override fun onAppend(songs: List<Song>) {
+        exoPlayer.addMediaItems(
+            songs.map(Song::toMediaItem)
+        )
+    }
+
+    override fun onUpdate(updatedSong: Song, position: Int) {
+        scope.launch {
+            val performUpdate = withContext(Dispatchers.Main) {
+                exoPlayer.currentMediaItemIndex == position
             }
-            val mediaItems = list.map {
-                MediaItem.fromUri(it.location)
-            }
-            exoPlayer.addMediaItems(mediaItems)
-        } else {
-            val count = exoPlayer.mediaItemCount
-            val currentUri = exoPlayer.currentMediaItem?.localConfiguration?.uri
-
-            val index = list.indexOfFirst { it.location == currentUri.toString() }
-
-            val mList = list.subList(0, index)
-            val nList = list.subList(index, list.size)
-
-            for (i in count downTo 0) {
-                if (i != exoPlayer.currentMediaItemIndex) {
-                    exoPlayer.removeMediaItem(i)
-                }
-            }
-
-            if (mList.isNotEmpty()) {
-                mList.forEachIndexed { index, song ->
-                    exoPlayer.addMediaItem(index, MediaItem.fromUri(song.location))
-                }
-            }
-
-            if (nList.isNotEmpty() && nList.size > 1) {
-                exoPlayer.addMediaItems(nList.subList(1, nList.size).map {
-                    MediaItem.fromUri(it.location)
-                })
+            if (!performUpdate) return@launch
+            withContext(Dispatchers.Main) {
+                updateNotification(updatedSong.favourite)
             }
         }
     }
 
-    @Synchronized
-    override fun addToQueue(song: Song) {
-        exoPlayer.addMediaItem(MediaItem.fromUri(song.location))
+    override fun onMove(from: Int, to: Int) {
+        exoPlayer.moveMediaItem(from, to)
     }
 
-    @Synchronized
-    override fun addNextInQueue(song: Song): Int {
-        val index = exoPlayer.currentMediaItemIndex + 1
-        exoPlayer.addMediaItem(index, MediaItem.fromUri(song.location))
-        return index
-    }
+    override fun onClear() {}
 
-    @Synchronized
-    override fun updateNotification() {
-        updateMediaSessionState()
-        updateMediaSessionMetadata()
+    override fun onSetQueue(songs: List<Song>, startPlayingFromPosition: Int) {
+        val mediaItems = songs.map(Song::toMediaItem)
+        setQueue(mediaItems, startPlayingFromPosition)
     }
 
     /**
@@ -370,19 +249,7 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
      * Player.Listener onIsPlayingChanged gets called.
      */
     override fun onBroadcastPausePlay() {
-        if (exoPlayer.isPlaying) {
-            exoPlayer.pause()
-        } else {
-            if (playerState == Player.STATE_ENDED) {
-                exoPlayer.seekTo(0, 0)
-            }
-            exoPlayer.play()
-        }
-    }
-
-    override fun playOnPosition(position: Int) {
-        exoPlayer.seekTo(position, 0)
-        exoPlayer.play()
+        if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
     }
 
     /**
@@ -417,10 +284,11 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
      * DataManager then calls updateNotification of DataManager.Callback
      */
     override fun onBroadcastLike() {
-        val currentSong = dataManager.getSongAtIndex(exoPlayer.currentMediaItemIndex) ?: return
+        val currentSong = queueService.getSongAtIndex(exoPlayer.currentMediaItemIndex) ?: return
         val updatedSong = currentSong.copy(favourite = !currentSong.favourite)
         scope.launch {
-            dataManager.updateSong(updatedSong)
+            queueService.update(updatedSong)
+            songService.updateSong(updatedSong)
         }
     }
 
@@ -429,15 +297,34 @@ class PlaybackService : Service(), DataManager.Callback, PlaybackBroadcastReceiv
      * This stops the service and onDestroy is called
      */
     override fun onBroadcastCancel() {
-        // Deprecated in api level 33
-        stopForeground(true)
+        /**
+         * To close the media session, first call mediaSession.release followed by stopSelf()
+         * See issue: https://github.com/androidx/media/issues/389#issuecomment-1546611545
+         */
+        mediaSession.release()
+        stopService()
         stopSelf()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-//        stopService()
         onBroadcastCancel()
-        Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, 800)
         super.onTaskRemoved(rootIntent)
     }
+
+}
+
+fun Song.toMediaItem(): MediaItem {
+    return MediaItem.Builder().apply {
+        setUri(Uri.fromFile(File(this@toMediaItem.location)))
+        setMediaId(this@toMediaItem.location)
+        setMediaMetadata(
+            MediaMetadata.Builder().apply {
+                setArtworkUri(this@toMediaItem.artUri?.toUri())
+                setTitle(this@toMediaItem.title)
+                setArtist(this@toMediaItem.artist)
+                setIsBrowsable(false)
+                setIsPlayable(true)
+            }.build()
+        )
+    }.build()
 }

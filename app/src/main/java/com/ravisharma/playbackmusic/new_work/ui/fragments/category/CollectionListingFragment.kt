@@ -99,34 +99,47 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
-            collectionViewModel.collectionUi.collect {
-                updateUi(it)
+            launch {
+                collectionViewModel.collectionUi.collect {
+                    it?.let { it1 -> updateUi(it1) }
+                }
             }
-        }
+            launch {
+                collectionViewModel.collectionType.collect {
+                    when (it?.type) {
+                        CollectionType.AlbumType -> {
+                            adUnitId = getString(R.string.AlbumSongsActId)
+                        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            collectionViewModel.collectionType.collect {
-                when(it?.type) {
-                    CollectionType.AlbumType -> {
-                        adUnitId = getString(R.string.AlbumSongsActId)
+                        CollectionType.ArtistType -> {
+                            adUnitId = getString(R.string.artistSongsActId)
+                        }
+
+                        CollectionType.PlaylistType -> {
+                            adUnitId = getString(R.string.playlistActId)
+                        }
+
+                        CollectionType.FavouritesType -> {
+                            adUnitId = getString(R.string.SingleSongActId)
+                        }
+
+                        CollectionType.RecentAddedType -> {
+                            adUnitId = getString(R.string.recentSongsActId)
+                        }
+
+                        else -> {
+                            adUnitId = getString(R.string.artistFragId)
+                        }
                     }
-                    CollectionType.ArtistType -> {
-                        adUnitId = getString(R.string.artistSongsActId)
-                    }
-                    CollectionType.PlaylistType -> {
-                        adUnitId = getString(R.string.playlistActId)
-                    }
-                    CollectionType.FavouritesType -> {
-                        adUnitId = getString(R.string.SingleSongActId)
-                    }
-                    CollectionType.RecentAddedType -> {
-                        adUnitId = getString(R.string.recentSongsActId)
-                    }
-                    else -> {
-                        adUnitId = getString(R.string.artistFragId)
+                    loadBanner()
+                }
+            }
+            launch {
+                collectionViewModel.message.collect {
+                    if(it.isNotEmpty()) {
+                        requireContext().showToast(it)
                     }
                 }
-                loadBanner()
             }
         }
     }
@@ -140,7 +153,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
             binding.bannerContainerRecentActivity.addView(adView)
 
-            adView!!.loadAd(adRequest)
+//            adView!!.loadAd(adRequest)
         }
     }
 
@@ -180,10 +193,6 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
                 LongItemClick.SinglePlay -> {
                     collectionViewModel.setQueue(listOf(song), 0)
-                }
-
-                LongItemClick.PlayNext -> {
-                    collectionViewModel.addNextInQueue(song)
                 }
 
                 LongItemClick.AddToQueue -> {

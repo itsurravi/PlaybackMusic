@@ -5,10 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ravisharma.playbackmusic.data.db.model.ArtistWithSongCount
-import com.ravisharma.playbackmusic.data.db.model.embedded.AlbumWithSongs
 import com.ravisharma.playbackmusic.data.db.model.embedded.ArtistWithSongs
-import com.ravisharma.playbackmusic.data.db.model.tables.Album
 import com.ravisharma.playbackmusic.data.db.model.tables.Artist
 import com.ravisharma.playbackmusic.data.utils.Constants
 import kotlinx.coroutines.flow.Flow
@@ -33,10 +30,10 @@ interface ArtistDao {
     suspend fun searchArtists(query: String): List<Artist>
 
     @Transaction
-    @Query("SELECT ${Constants.Tables.ARTIST_TABLE}.name as name, COUNT(*) as count " +
-            "FROM ${Constants.Tables.ARTIST_TABLE} JOIN ${Constants.Tables.SONG_TABLE} ON " +
-            "${Constants.Tables.ARTIST_TABLE}.name = ${Constants.Tables.SONG_TABLE}.artist " +
-            "GROUP BY ${Constants.Tables.ARTIST_TABLE}.name")
-    fun getAllArtistsWithSongCount(): Flow<List<ArtistWithSongCount>>
+    @Query("DELETE FROM ${Constants.Tables.ARTIST_TABLE} WHERE name IN " +
+            "(SELECT artist.name as name FROM ${Constants.Tables.ARTIST_TABLE} as artist LEFT JOIN " +
+            "${Constants.Tables.SONG_TABLE} as song ON artist.name = song.artist GROUP BY artist.name " +
+            "HAVING COUNT(song.location) = 0)")
+    suspend fun cleanArtistTable()
 
 }

@@ -21,11 +21,14 @@ interface PlaylistDao {
     @Insert(entity = Playlist::class)
     suspend fun insertPlaylist(playlist: PlaylistExceptId): Long
 
-    @Delete(entity = Playlist::class)
-    suspend fun deletePlaylist(playlist: Playlist)
-
     @Update(entity = Playlist::class)
-    suspend fun updatePlaylistName(playlist: Playlist)
+    suspend fun updatePlaylist(playlist: Playlist)
+
+    @Query("DELETE FROM ${Constants.Tables.PLAYLIST_TABLE} WHERE playlistId = :playlistId")
+    suspend fun deletePlaylist(playlistId: Long)
+
+    @Query("SELECT * FROM ${Constants.Tables.PLAYLIST_TABLE} WHERE playlistId = :playlistId")
+    suspend fun getPlaylist(playlistId: Long): Playlist?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertPlaylistSongCrossRef(playlistSongCrossRefs: List<PlaylistSongCrossRef>): List<Long>
@@ -44,11 +47,9 @@ interface PlaylistDao {
     suspend fun searchPlaylists(query: String): List<Playlist>
 
     @Transaction
-    @Query(
-        "SELECT * FROM ${Constants.Tables.PLAYLIST_TABLE} NATURAL LEFT JOIN " +
-                "(SELECT playlistId, COUNT(*) AS count FROM " +
-                "${Constants.Tables.PLAYLIST_SONG_CROSS_REF_TABLE} GROUP BY playlistId)"
-    )
+    @Query("SELECT * FROM ${Constants.Tables.PLAYLIST_TABLE} NATURAL LEFT JOIN " +
+            "(SELECT playlistId, COUNT(*) AS count FROM " +
+            "${Constants.Tables.PLAYLIST_SONG_CROSS_REF_TABLE} GROUP BY playlistId)")
     fun getAllPlaylistWithSongCount(): Flow<List<PlaylistWithSongCount>>
 
 }

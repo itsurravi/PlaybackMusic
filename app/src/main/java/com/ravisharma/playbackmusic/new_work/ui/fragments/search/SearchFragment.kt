@@ -23,7 +23,6 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
-import com.ravisharma.playbackmusic.new_work.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -67,14 +66,14 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             }
             edSearch.doAfterTextChanged {
                 val title = it?.toString()
-                title?.let { it1 -> searchViewModel.searchSong(it1) }
+                title?.let { it1 -> searchViewModel.updateQuery(it1) }
             }
         }
     }
 
     private fun initObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            searchViewModel.searchResultList.collectLatest {
+            searchViewModel.searchResult.collectLatest {
                 setupData(it)
             }
         }
@@ -108,7 +107,6 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
 
                 LongItemClick.Play -> songClicked(song, position)
                 LongItemClick.SinglePlay -> mainViewModel.setQueue(listOf(song), 0)
-                LongItemClick.PlayNext -> mainViewModel.addNextInQueue(song)
                 LongItemClick.AddToQueue -> mainViewModel.addToQueue(song)
                 LongItemClick.Share -> requireContext().shareSong(song.location)
                 LongItemClick.Details -> requireContext().showSongInfo(song)

@@ -26,6 +26,7 @@ import com.ravisharma.playbackmusic.databinding.FragmentOnboardingBinding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -137,7 +138,7 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
 
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.scanStatus.collect {
+            viewModel.scanStatus.collectLatest {
                 when (it) {
                     ScanStatus.ScanComplete -> {
                         scanStatus = ScanningStatus.COMPLETED

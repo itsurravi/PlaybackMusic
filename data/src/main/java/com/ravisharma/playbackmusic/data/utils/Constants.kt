@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.data.utils
 
 object Constants {
+    const val QUEUE_STATE_FILE = "queue_state.pb"
     const val DATABASE_NAME = "playback_app_db"
     object Tables {
         const val SONG_TABLE = "new_song_table"
@@ -12,5 +13,8 @@ object Constants {
         const val ALBUM_ARTIST_TABLE = "new_album_artist_table"
         const val COMPOSER_TABLE = "new_composer_table"
         const val LYRICIST_TABLE = "new_lyricist_table"
+        const val THUMBNAIL_TABLE = "thumbnail_table"
     }
+
+    const val MESSAGE_DURATION = 2000L
 }

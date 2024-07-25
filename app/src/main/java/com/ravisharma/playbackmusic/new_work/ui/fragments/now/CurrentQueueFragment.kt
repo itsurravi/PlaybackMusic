@@ -118,6 +118,6 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
     }
 
     private fun songClicked(song: Song, position: Int) {
-        mainViewModel.playOnPosition(position)
+        mainViewModel.playerHelper.seekTo(position, 0)
     }
 }

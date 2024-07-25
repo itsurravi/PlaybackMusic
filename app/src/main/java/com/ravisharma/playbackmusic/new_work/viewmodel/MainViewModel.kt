@@ -1,18 +1,22 @@
 package com.ravisharma.playbackmusic.new_work.viewmodel
 
-import android.app.Application
 import android.util.Log
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
-import com.ravisharma.playbackmusic.data.db.model.tables.PlaylistSongCrossRef
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.data.provider.DataProvider
-import com.ravisharma.playbackmusic.new_work.services.DataManager
-import com.ravisharma.playbackmusic.utils.showToast
+import com.ravisharma.playbackmusic.data.provider.SongExtractor
+import com.ravisharma.playbackmusic.data.utils.Constants
+import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
+import com.ravisharma.playbackmusic.new_work.services.PlayerHelper
+import com.ravisharma.playbackmusic.new_work.services.data.PlayerService
+import com.ravisharma.playbackmusic.new_work.services.data.PlaylistService
+import com.ravisharma.playbackmusic.new_work.services.data.QueueService
+import com.ravisharma.playbackmusic.new_work.services.data.SongService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -20,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
@@ -30,13 +35,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val context: Application,
-    private val manager: DataManager,
-    private val dataProvider: DataProvider,
-    private val exoPlayer: ExoPlayer
+    private val exoPlayer: ExoPlayer,
+    private val songExtractor: SongExtractor,
+    private val playlistService: PlaylistService,
+    private val songService: SongService,
+    private val queueService: QueueService,
+    private val playerService: PlayerService,
+    private val queueState: DataStore<QueueState>
 ) : ViewModel() {
 
-    val allSongs = dataProvider.getAll.songs()
+    val playerHelper by lazy {
+        PlayerHelper(exoPlayer)
+    }
+
+    private val _message = MutableStateFlow("")
+    val message = _message.asStateFlow()
+
+    val allSongs = songService.songs
         .catch { exception ->
             Log.e("allSongs", "$exception")
         }.stateIn(
@@ -45,7 +60,7 @@ class MainViewModel @Inject constructor(
             initialValue = null
         )
 
-    val allAlbums = dataProvider.getAll.albums()
+    val allAlbums = songService.albums
         .catch { exception ->
             Log.e("allAlbums", "$exception")
         }.stateIn(
@@ -54,7 +69,7 @@ class MainViewModel @Inject constructor(
             initialValue = null
         )
 
-    val allArtists = dataProvider.getAll.artists()
+    val allArtists = songService.artists
         .catch { exception ->
             Log.e("allArtists", "$exception")
         }.stateIn(
@@ -63,7 +78,7 @@ class MainViewModel @Inject constructor(
             initialValue = null
         )
 
-    val personsWithSongCount = dataProvider.getAll.albumArtists()
+    val personsWithSongCount = songService.albumArtists
         .catch { exception ->
             Log.e("personsWithSongCount", "$exception")
         }.stateIn(
@@ -72,7 +87,7 @@ class MainViewModel @Inject constructor(
             initialValue = null
         )
 
-    val playlistsWithSongCount = dataProvider.getAll.playlists()
+    val playlistsWithSongCount = playlistService.playlists
         .catch { exception ->
             Log.e("playlistsWithSongCount", "$exception")
         }.stateIn(
@@ -81,12 +96,51 @@ class MainViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    val currentSong = manager.currentSong
-    val queue = manager.queue
-    val repeatMode = manager.repeatMode
+    val currentSong = queueService.currentSong
+
+    val queue = mutableListOf<Song>()
+
+    val repeatMode = queueService.repeatMode
+
+    fun toggleRepeatMode() {
+        queueService.updateRepeatMode(repeatMode.value.next())
+    }
 
     private val _currentSongPlaying = MutableStateFlow<Boolean?>(null)
     val currentSongPlaying = _currentSongPlaying.asStateFlow()
+
+    private val queueServiceListener = object : QueueService.Listener {
+        override fun onAppend(song: Song) {
+            viewModelScope.launch(Dispatchers.Default) { queue.add(song) }
+        }
+
+        override fun onAppend(songs: List<Song>) {
+            viewModelScope.launch(Dispatchers.Default) { queue.addAll(songs) }
+        }
+
+        override fun onUpdate(updatedSong: Song, position: Int) {
+            if (position < 0 || position >= queue.size) return
+            viewModelScope.launch(Dispatchers.Default) { queue[position] = updatedSong }
+        }
+
+        override fun onMove(from: Int, to: Int) {
+            if (from < 0 || to < 0 || from >= queue.size || to >= queue.size) return
+            viewModelScope.launch(Dispatchers.Default) { queue.apply { add(to, removeAt(from)) } }
+        }
+
+        override fun onClear() {
+            viewModelScope.launch(Dispatchers.Default) { queue.clear() }
+        }
+
+        override fun onSetQueue(songs: List<Song>, startPlayingFromPosition: Int) {
+            viewModelScope.launch(Dispatchers.Default) {
+                queue.apply {
+                    clear()
+                    addAll(songs)
+                }
+            }
+        }
+    }
 
     private val exoPlayerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -98,22 +152,34 @@ class MainViewModel @Inject constructor(
     init {
         _currentSongPlaying.update { exoPlayer.isPlaying }
         exoPlayer.addListener(exoPlayerListener)
+        queue.addAll(queueService.queue)
+        queueService.addListener(queueServiceListener)
+    }
+
+    private fun showMessage(message: String) {
+        viewModelScope.launch {
+            _message.update { message }
+            delay(Constants.MESSAGE_DURATION)
+            _message.update { "" }
+        }
     }
 
     fun currentAudioProgress() = flow {
         while (true) {
             emit(
                 withContext(Dispatchers.Main) {
-                    exoPlayer.currentPosition
+                    playerHelper.currentPosition.toLong()
                 }
             )
-            delay(100)
+            delay(33)
         }
     }.flowOn(Dispatchers.IO)
+
 
     override fun onCleared() {
         super.onCleared()
         exoPlayer.removeListener(exoPlayerListener)
+        queueService.removeListener(queueServiceListener)
     }
 
     /**
@@ -121,11 +187,9 @@ class MainViewModel @Inject constructor(
      */
     fun shufflePlay(songs: List<Song>?) = setQueue(songs?.shuffled(), 0)
 
-    fun createPlaylist(playlistName: String) {
+    fun onPlaylistCreate(playlistName: String) {
         viewModelScope.launch {
-            dataProvider.createPlaylist(playlistName) {
-                context.showToast(it)
-            }
+            playlistService.createPlaylist(playlistName)
         }
     }
 
@@ -137,11 +201,11 @@ class MainViewModel @Inject constructor(
                     playlistName = playlistWithSongCount.playlistName,
                     createdAt = playlistWithSongCount.createdAt
                 )
-                dataProvider.updatePlaylistName(playlist)
-                context.showToast("Done")
+                playlistService.updatePlaylist(playlist)
+                showMessage("Done")
             } catch (e: Exception) {
                 Log.e("updatePlaylistName", "$e")
-                context.showToast("Some error occurred")
+                showMessage("Some error occurred")
             }
         }
     }
@@ -149,16 +213,10 @@ class MainViewModel @Inject constructor(
     fun deletePlaylist(playlistWithSongCount: PlaylistWithSongCount) {
         viewModelScope.launch {
             try {
-                val playlist = Playlist(
-                    playlistId = playlistWithSongCount.playlistId,
-                    playlistName = playlistWithSongCount.playlistName,
-                    createdAt = playlistWithSongCount.createdAt
-                )
-                dataProvider.deletePlaylist(playlist)
-                context.showToast("Done")
+                playlistService.deletePlaylist(playlistWithSongCount.playlistId)
+                showMessage("Done")
             } catch (e: Exception) {
-                Log.e("deletePlaylist", "$e")
-                context.showToast("Some error occurred")
+                showMessage("Some error occurred")
             }
         }
     }
@@ -166,19 +224,18 @@ class MainViewModel @Inject constructor(
     fun addSongToPlaylist(playListId: Long, location: String) {
         viewModelScope.launch {
             try {
-                val playlistSongCrossRef = PlaylistSongCrossRef(playListId, location)
-                val l = dataProvider.insertPlaylistSongCrossRefs(listOf(playlistSongCrossRef))
+                val l = playlistService.addSongsToPlaylist(listOf(location), playListId)
                 if (l.isNotEmpty()) {
                     if (l[0] > 0) {
-                        context.showToast("Song Added")
+                        showMessage("Song Added")
                     } else {
-                        context.showToast("Already Added")
+                        showMessage("Already Added")
                     }
                 } else {
-                    context.showToast("Some error occurred")
+                    showMessage("Some error occurred")
                 }
             } catch (e: Exception) {
-                context.showToast("Some error occurred")
+                showMessage("Some error occurred")
             }
         }
     }
@@ -186,21 +243,18 @@ class MainViewModel @Inject constructor(
     fun addSongsToPlaylist(playListId: Long, songLocations: List<String>) {
         viewModelScope.launch {
             try {
-                val list = songLocations.map { location ->
-                    PlaylistSongCrossRef(playListId, location)
-                }
-                val l = dataProvider.insertPlaylistSongCrossRefs(list)
+                val l = playlistService.addSongsToPlaylist(songLocations, playListId)
                 if (l.isNotEmpty()) {
                     if (l[0] > 0) {
-                        context.showToast("Songs Added")
+                        showMessage("Songs Added")
                     } else {
-                        context.showToast("Already Added")
+                        showMessage("Already Added")
                     }
                 } else {
-                    context.showToast("Some error occurred")
+                    showMessage("Some error occurred")
                 }
             } catch (e: Exception) {
-                context.showToast("Some error occurred")
+                showMessage("Some error occurred")
             }
         }
     }
@@ -210,44 +264,15 @@ class MainViewModel @Inject constructor(
      */
     fun addToQueue(song: Song) {
         if (queue.isEmpty()) {
-            manager.setQueue(listOf(song), 0)
-        } else {
-            val result = manager.addToQueue(song)
-            if (result) {
-                context.showToast("Added ${song.title} to queue")
-            } else {
-                context.showToast("Song already in queue")
+            viewModelScope.launch {
+                playerService.startServiceIfNotRunning(listOf(song), 0)
             }
-        }
-    }
-
-    /**
-     * Adds a list of songs to the end queue
-     */
-    fun addToQueue(songs: List<Song>) {
-        if (queue.isEmpty()) {
-            manager.setQueue(songs, 0)
         } else {
-            var result = false
-            songs.forEach { result = result or manager.addToQueue(it) }
+            val result = queueService.append(song)
             if (result) {
-                context.showToast("Done")
+                showMessage("Added ${song.title} to queue")
             } else {
-                context.showToast("Songs already in queue")
-            }
-        }
-    }
-
-    /**
-     * Adds a song to the next of current playing in queue
-     */
-    fun addNextInQueue(song: Song) {
-        if (queue.isEmpty()) {
-            context.showToast("No song in queue")
-        } else {
-            val result = manager.addNextInQueue(song)
-            if (result) {
-                context.showToast("Added ${song.title} to queue")
+                showMessage("Song already in queue")
             }
         }
     }
@@ -261,8 +286,10 @@ class MainViewModel @Inject constructor(
      */
     fun setQueue(songs: List<Song>?, startPlayingFromIndex: Int = 0) {
         if (songs == null) return
-        manager.setQueue(songs, startPlayingFromIndex)
-        context.showToast("Playing")
+        viewModelScope.launch {
+            playerService.startServiceIfNotRunning(songs, startPlayingFromIndex)
+        }
+        showMessage("Playing")
     }
 
     /**
@@ -272,25 +299,45 @@ class MainViewModel @Inject constructor(
         if (song == null) return
         val updatedSong = song.copy(favourite = !song.favourite)
         viewModelScope.launch(Dispatchers.IO) {
-            manager.updateSong(updatedSong)
+            queueService.update(updatedSong)
+            songService.updateSong(updatedSong)
         }
     }
 
+    fun onSongDrag(fromIndex: Int, toIndex: Int) = queueService.moveSong(fromIndex, toIndex)
+
     fun setLastPlayedList() {
-        manager.setLastPlayedList()
+        viewModelScope.launch(Dispatchers.Default) {
+            val state = queueState.data.first()
+            val songs = songService.getSongsFromLocations(state.locationsList)
+            val locationMap = buildMap {
+                for (song in songs) {
+                    put(song.location, song)
+                }
+            }
+            val orderedSongs = buildList {
+                for (location in state.locationsList) {
+                    if (locationMap.containsKey(location)) {
+                        add(locationMap[location]!!)
+                    }
+                }
+            }
+            if (orderedSongs.isNotEmpty()) {
+                val pos = state.startIndex
+                queueService.setQueue(orderedSongs, pos)
+            }
+        }
     }
 
-    fun isServiceInitialized() = manager.isServiceInitialized()
+    fun isServiceInitialized(): Boolean {
+        return playerService.isServiceRunning()
+    }
 
     fun startPlaying() {
-        manager.startPlayingLastList()
-    }
-
-    fun toggleRepeatMode() {
-        manager.updateRepeatMode(repeatMode.value.next())
-    }
-
-    fun playOnPosition(position: Int) {
-        manager.playOnPosition(position)
+        viewModelScope.launch {
+            val state = queueState.data.first()
+            val pos = state.startIndex
+            playerService.startServiceIfNotRunning(queueService.queue, pos)
+        }
     }
 }

@@ -78,7 +78,7 @@ class TracksFragment : Fragment() {
 
             binding.bannerAd.addView(adView)
 
-            adView!!.loadAd(adRequest)
+//            adView!!.loadAd(adRequest)
         }
     }
 
@@ -95,8 +95,7 @@ class TracksFragment : Fragment() {
             }
             fabShuffle.setOnClickListener {
                 val list = (binding.songList.adapter as TracksAdapter).getCurrentList()
-                val newList = list.shuffled()
-                mainViewModel.setQueue(newList, 0)
+                mainViewModel.shufflePlay(list)
             }
         }
     }
@@ -142,9 +141,9 @@ class TracksFragment : Fragment() {
                     mainViewModel.setQueue(listOf(song), 0)
                 }
 
-                LongItemClick.PlayNext -> {
-                    mainViewModel.addNextInQueue(song)
-                }
+//                LongItemClick.PlayNext -> {
+//                    mainViewModel.addNextInQueue(song)
+//                }
 
                 LongItemClick.AddToQueue -> {
                     mainViewModel.addToQueue(song)
