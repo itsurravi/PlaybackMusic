@@ -56,7 +56,7 @@ class PlaybackNotificationProvider @Inject constructor(
             context,
             0,
             Intent(context, NewPlayerActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 
@@ -124,10 +124,10 @@ class PlaybackNotificationProvider @Inject constructor(
                     )
                 }
 
-                /*4 -> { // Close button
+                4 -> { // Close button
                     actionFactory
                         .createCustomActionFromCustomCommandButton(mediaSession, commandButton)
-                }*/
+                }
 
                 else -> {
                     null

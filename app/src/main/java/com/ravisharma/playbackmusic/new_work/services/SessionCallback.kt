@@ -40,7 +40,7 @@ class SessionCallback @Inject constructor(
         val availableCommands = connectionResult.availableSessionCommands.buildUpon()
         availableCommands.add(PlaybackCommandButtons.liked.sessionCommand!!)
         availableCommands.add(PlaybackCommandButtons.unliked.sessionCommand!!)
-//        availableCommands.add(PlaybackCommandButtons.cancel.sessionCommand!!)
+        availableCommands.add(PlaybackCommandButtons.cancel.sessionCommand!!)
         return MediaSession.ConnectionResult.accept(
             availableCommands.build(),
             connectionResult.availablePlayerCommands
@@ -57,7 +57,7 @@ class SessionCallback @Inject constructor(
                 PlaybackCommandButtons.previous,
                 PlaybackCommandButtons.playPause,
                 PlaybackCommandButtons.next,
-//                PlaybackCommandButtons.cancel
+                PlaybackCommandButtons.cancel
             )
         )
     }

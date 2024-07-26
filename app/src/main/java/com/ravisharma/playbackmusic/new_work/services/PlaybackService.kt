@@ -39,7 +39,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
-@UnstableApi @AndroidEntryPoint
+@UnstableApi
+@AndroidEntryPoint
 class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBroadcastReceiver.Callback {
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
@@ -147,7 +148,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
 
     override fun onDestroy() {
         super.onDestroy()
-//        stopService()
+        Handler(Looper.getMainLooper()).postDelayed({ exitProcess(0) }, 1500)
     }
 
     private fun showToast(message: String) {
@@ -188,7 +189,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
                 PlaybackCommandButtons.previous,
                 PlaybackCommandButtons.playPause,
                 PlaybackCommandButtons.next,
-//                PlaybackCommandButtons.cancel
+                PlaybackCommandButtons.cancel
             )
         )
     }
@@ -301,6 +302,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
          * To close the media session, first call mediaSession.release followed by stopSelf()
          * See issue: https://github.com/androidx/media/issues/389#issuecomment-1546611545
          */
+        mediaSession.player.release()
         mediaSession.release()
         stopService()
         stopSelf()

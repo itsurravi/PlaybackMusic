@@ -1,6 +1,5 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
-import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -22,12 +21,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.work.WorkManager
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.BuildConfig
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AboutActivity
