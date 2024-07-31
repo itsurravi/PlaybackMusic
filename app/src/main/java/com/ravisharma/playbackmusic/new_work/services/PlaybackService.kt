@@ -65,7 +65,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         val isRunning = AtomicBoolean(false)
     }
 
-    private lateinit var mediaSession: MediaSession
+    private var mediaSession: MediaSession? = null
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
@@ -156,13 +156,14 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
     }
 
     private fun stopService() {
-        Log.i("Service", "Stopped")
         isRunning.set(false)
-        queueStateProvider.saveState(
-            queue = queueService.queue.map { it.location },
-            startIndex = exoPlayer.currentMediaItemIndex,
-            startPosition = exoPlayer.currentPosition
-        )
+        if(queueService.queue.isNotEmpty()) {
+            queueStateProvider.saveState(
+                queue = queueService.queue.map { it.location },
+                startIndex = exoPlayer.currentMediaItemIndex,
+                startPosition = exoPlayer.currentPosition
+            )
+        }
         with(queueService) {
             clearQueue()
             removeListener(this@PlaybackService)
@@ -183,7 +184,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
     }
 
     private fun updateNotification(isLiked: Boolean) {
-        mediaSession.setCustomLayout(
+        mediaSession?.setCustomLayout(
             listOf(
                 if (isLiked) PlaybackCommandButtons.liked else PlaybackCommandButtons.unliked,
                 PlaybackCommandButtons.previous,
@@ -302,15 +303,17 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
          * To close the media session, first call mediaSession.release followed by stopSelf()
          * See issue: https://github.com/androidx/media/issues/389#issuecomment-1546611545
          */
-        mediaSession.player.release()
-        mediaSession.release()
+        mediaSession?.player?.release()
+        mediaSession?.release()
+        mediaSession = null
         stopService()
         stopSelf()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        onBroadcastCancel()
         super.onTaskRemoved(rootIntent)
+        exoPlayer.stop()
+        onBroadcastCancel()
     }
 
 }
