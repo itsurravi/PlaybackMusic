@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic.new_work.ui.adapters.viewholder
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
@@ -22,6 +23,8 @@ class TrackViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(bi
             songArt.load(Uri.parse(song.artUri)) {
                 placeholder(R.drawable.logo)
                 error(R.drawable.logo)
+                diskCachePolicy(CachePolicy.ENABLED)
+                memoryCachePolicy(CachePolicy.ENABLED)
                 transformations(RoundedCornersTransformation(20f))
             }
 
