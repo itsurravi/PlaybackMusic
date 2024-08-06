@@ -108,7 +108,12 @@
         layout="@layout/no_data_found"
         android:visibility="invisible" />
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/song_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!--<com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -117,6 +122,6 @@
         app:fastScrollEnableThumbInactiveColor="true"
         app:fastScrollThumbColor="@color/scrollThumb"
         app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="@color/scrollThumb"  />
+        app:fastScrollThumbInactiveColor="@color/scrollThumb"  />-->
 
 </LinearLayout>

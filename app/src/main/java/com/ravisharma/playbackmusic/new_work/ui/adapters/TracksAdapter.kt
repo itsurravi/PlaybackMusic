@@ -13,7 +13,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 class TracksAdapter(
     private val onItemClick: ((Song, Int) -> Unit)? = null,
     private val onItemLongClick: ((Song, Int) -> Unit)? = null
-) : RecyclerView.Adapter<TrackViewHolder>(), FastScrollRecyclerView.SectionedAdapter {
+) : RecyclerView.Adapter<TrackViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song>() {
         override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
@@ -33,10 +33,6 @@ class TracksAdapter(
 
     fun getCurrentList(): List<Song> {
         return differList.currentList
-    }
-
-    override fun getSectionName(position: Int): String {
-        return differList.currentList[position].title[0].toString()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
