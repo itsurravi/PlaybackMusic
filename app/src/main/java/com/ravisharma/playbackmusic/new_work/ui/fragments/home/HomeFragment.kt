@@ -73,9 +73,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initDefaultData() {
-        if (!isLastPlayedListSet) {
-            isLastPlayedListSet = true
-            mainViewModel.setLastPlayedList()
+        if (mainViewModel.currentSongPlaying.value == false ||
+            mainViewModel.currentSongPlaying.value == null) {
+            if (!isLastPlayedListSet) {
+                isLastPlayedListSet = true
+                mainViewModel.setLastPlayedList()
+            }
         }
     }
 

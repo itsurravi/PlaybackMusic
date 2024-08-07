@@ -51,7 +51,7 @@ class AlbumAdapter : RecyclerView.Adapter<AlbumViewHolder>(),
         val currAlbum = mDiffer.currentList[holder.bindingAdapterPosition]
         holder.binding.apply {
             albumTitle.text = currAlbum.albumName
-            artistTitle.text = currAlbum.albumArtist
+//            artistTitle.text = currAlbum.albumArtist
 
             albumArt.load(currAlbum.albumArt) {
                 placeholder(R.drawable.logo)

@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -124,7 +123,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
                     this@ZenPlayer.applicationContext.sendBroadcast(broadcast)*/
                 }
             } catch (_: Exception) {
-                
+
             }
         }
 
@@ -310,11 +309,11 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         stopSelf()
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
+    /*override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         exoPlayer.stop()
         onBroadcastCancel()
-    }
+    }*/
 
 }
 

@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.MediaNotification
@@ -29,7 +30,7 @@ import javax.inject.Inject
 class PlaybackNotificationProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val queueService: QueueService,
-) : MediaNotification.Provider {
+) : MediaNotification.Provider, MediaNotification.Provider.Callback {
 
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -136,6 +137,10 @@ class PlaybackNotificationProvider @Inject constructor(
         }.forEach { builder.addAction(it) }
 
         return MediaNotification(PLAYER_NOTIFICATION_ID, builder.build())
+    }
+
+    override fun onNotificationChanged(notification: MediaNotification) {
+        notification.notification
     }
 
     override fun handleCustomCommand(
