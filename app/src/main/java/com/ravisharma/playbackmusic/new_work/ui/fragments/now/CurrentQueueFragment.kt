@@ -109,6 +109,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue) {
                 songDuration.text = it.durationFormatted
 
                 songArt.load(Uri.parse(it.artUri)) {
+                    placeholder(R.drawable.logo)
                     error(R.drawable.logo)
                     transformations(RoundedCornersTransformation(10f))
                     crossfade(true)

@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.request.CachePolicy
 import coil.transform.RoundedCornersTransformation
-import com.bumptech.glide.Glide
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.AdapSongBinding
@@ -24,6 +23,7 @@ class TrackViewHolder(val binding: AdapSongBinding) : RecyclerView.ViewHolder(bi
             songArt.load(Uri.parse(song.artUri)) {
                 placeholder(R.drawable.logo)
                 error(R.drawable.logo)
+                crossfade(true)
                 diskCachePolicy(CachePolicy.ENABLED)
                 memoryCachePolicy(CachePolicy.ENABLED)
                 transformations(RoundedCornersTransformation(20f))

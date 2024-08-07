@@ -234,6 +234,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     bottomPanel.isVisible = true
                 }
                 slideImage.load(Uri.parse(it.artUri)) {
+                    placeholder(R.drawable.logo)
                     error(R.drawable.logo)
                     transformations(RoundedCornersTransformation(10f))
                     crossfade(true)

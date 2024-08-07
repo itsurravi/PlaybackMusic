@@ -94,7 +94,7 @@ dependencies {
     implementation libs.media3Ui
     implementation libs.media3ExoPlayer
     implementation libs.media3Session
-    implementation libs.glide
+//    implementation libs.glide
 
     implementation libs.androidx.legacy.supportV4
 

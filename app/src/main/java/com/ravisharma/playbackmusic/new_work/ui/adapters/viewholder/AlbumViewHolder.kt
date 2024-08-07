@@ -17,6 +17,7 @@ class AlbumViewHolder(val binding: AdapterAlbumsBinding) : RecyclerView.ViewHold
             albumArt.load(Uri.parse(album.albumArtUri)) {
                 placeholder(R.drawable.logo)
                 error(R.drawable.logo)
+                crossfade(true)
                 transformations(RoundedCornersTransformation(20f))
             }
 

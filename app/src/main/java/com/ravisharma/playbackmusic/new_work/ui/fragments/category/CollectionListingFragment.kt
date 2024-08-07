@@ -165,6 +165,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
                 resources.getQuantityString(R.plurals.numberOfSongs, songCount, songCount)
 
             albumArt.load(data.topBarBackgroundImageUri) {
+                placeholder(R.drawable.logo)
                 error(R.drawable.logo)
                 crossfade(true)
             }

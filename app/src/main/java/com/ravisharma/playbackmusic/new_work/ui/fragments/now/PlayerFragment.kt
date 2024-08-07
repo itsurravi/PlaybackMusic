@@ -139,6 +139,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 totalDuration.text = it.durationMillis.toMS()
 
                 cardImage.load(Uri.parse(it.artUri)) {
+                    placeholder(R.drawable.logo)
                     error(R.drawable.logo)
                     transformations(RoundedCornersTransformation(20f))
                     crossfade(true)
