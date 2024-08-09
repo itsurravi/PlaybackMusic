@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    tools:background="@color/contentBGclr"
     tools:context="com.ravisharma.playbackmusic.fragments.NameWise">
 
     <FrameLayout
@@ -14,37 +15,40 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="horizontal">
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/btnAddNewPlaylist"
-            android:layout_width="0dp"
+            android:id="@+id/card_recentAdded"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
             app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="12dp"
-            app:contentPadding="14dp"
+            app:cardCornerRadius="8dp"
+            app:contentPadding="10dp"
             app:strokeColor="@color/tabIndicatorColor"
-            app:strokeWidth="2dp">
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_playlist_add_24" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_recent_timer"
+                    app:tint="@color/tabIndicatorColor" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/createNewPlaylist"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/recentAdded"
                     android:textAllCaps="true" />
 
             </LinearLayout>
@@ -52,33 +56,72 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_recentAdded"
-            android:layout_width="0dp"
+            android:id="@+id/card_mostPlayed"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:layout_weight="1"
             app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="12dp"
-            app:contentPadding="14dp"
+            app:cardCornerRadius="8dp"
+            app:contentPadding="10dp"
             app:strokeColor="@color/tabIndicatorColor"
-            app:strokeWidth="2dp">
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_recent_timer" />
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_most_played_24"
+                    app:tint="@color/tabIndicatorColor" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/recentAdded"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/mostPlayed"
+                    android:textAllCaps="true" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_favorites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="@color/colorPrimary"
+            app:cardCornerRadius="8dp"
+            app:contentPadding="10dp"
+            app:strokeColor="@color/tabIndicatorColor"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_fav_not"
+                    app:tint="@color/tabIndicatorColor" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/favTracks"
                     android:textAllCaps="true" />
 
             </LinearLayout>
@@ -87,39 +130,30 @@
 
     </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_favorites"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_marginHorizontal="16dp"
-        app:cardBackgroundColor="@color/colorPrimary"
-        app:cardCornerRadius="12dp"
-        app:contentPadding="14dp"
-        app:strokeColor="@color/tabIndicatorColor"
-        app:strokeWidth="2dp">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_weight="1"
+            android:text="My Playlists"
+            android:textSize="18sp" />
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_favorite_24" />
+        <ImageView
+            android:id="@+id/btnAddNewPlaylist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/createNewPlaylist"
+            android:padding="12dp"
+            android:src="@drawable/ic_playlist_add_24" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="@string/favTracks"
-                android:textAllCaps="true" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistRecycler"
@@ -127,7 +161,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingVertical="16dp"
         android:paddingBottom="90dp" />
 
     <FrameLayout

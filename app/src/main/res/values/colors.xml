@@ -19,5 +19,6 @@
     <color name="white">#FFFFFF</color>
     <color name="ripple_dark">#19FFFFFF</color>
     <color name="colorSwitchOff">#C7CBCC</color>
-    <color name="fav_on">#FF2851</color>
+    <color name="fav_on">#FE2851</color>
+    <color name="bottomNavigationActiveIndicator">#80FE2851</color>
 </resources>

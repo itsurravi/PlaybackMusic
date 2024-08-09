@@ -90,6 +90,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/nav_host_fragment"
         app:layout_constraintVertical_bias="1"
+        app:strokeWidth="0dp"
         tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -191,8 +192,10 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
+        style="@style/MyBottomNavigationView"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
+        app:itemActiveIndicatorStyle="@style/BottomNavigationIndicator"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:layout_constraintBottom_toTopOf="@id/bannerAd"

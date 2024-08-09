@@ -70,12 +70,14 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
             btnAddNewPlaylist.setOnClickListener {
                 createPlaylistDialog()
             }
-//            cardLastPlayed.setOnClickListener {
-//                 TODO
-//            }
-//            cardMostPlayed.setOnClickListener {
-//                 TODO
-//            }
+            cardMostPlayed.setOnClickListener {
+                val collectionType =
+                    CollectionType(CollectionType.MostPlayedType, "")
+                val bundle = Bundle().apply {
+                    putParcelable(CollectionType.Category, collectionType)
+                }
+                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+            }
             cardRecentAdded.setOnClickListener {
                 val collectionType =
                     CollectionType(CollectionType.RecentAddedType, "")

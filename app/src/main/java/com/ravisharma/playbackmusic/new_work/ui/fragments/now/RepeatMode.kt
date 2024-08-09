@@ -1,13 +1,14 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.now
 
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.R
 
-enum class RepeatMode(@DrawableRes val iconResource: Int) {
-    NO_REPEAT(R.drawable.ic_repeat_off),
-    REPEAT_ALL(R.drawable.ic_repeat_all),
-    REPEAT_ONE(R.drawable.ic_repeat_one);
+enum class RepeatMode(@DrawableRes val iconResource: Int, @ColorRes val tintColor: Int) {
+    NO_REPEAT(R.drawable.ic_repeat, R.color.white),
+    REPEAT_ALL(R.drawable.ic_repeat, R.color.fav_on),
+    REPEAT_ONE(R.drawable.ic_repeat_once, R.color.fav_on);
 
     fun next(): RepeatMode {
         return when(this){

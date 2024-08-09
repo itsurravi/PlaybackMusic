@@ -31,6 +31,8 @@ interface SongService {
     val lyricists: Flow<List<LyricistWithSongCount>>
     val genres: Flow<List<GenreWithSongCount>>
 
+    fun getRecentAddedSongs(): Flow<List<Song>>
+    fun getMostPlayedSongs(): Flow<List<Song>>
     fun getAlbumWithSongsByName(albumName: String): Flow<AlbumWithSongs?>
     fun getArtistWithSongsByName(artistName: String): Flow<ArtistWithSongs?>
     fun getAlbumArtistWithSongsByName(albumArtistName: String): Flow<AlbumArtistWithSongs?>
@@ -53,26 +55,30 @@ class SongServiceImpl(
     private val lyricistDao: LyricistDao,
     private val genreDao: GenreDao,
 ) : SongService {
-    override val songs: Flow<List<Song>>
-        = songDao.getAllSongs()
+    override val songs: Flow<List<Song>> = songDao.getAllSongs()
 
-    override val albums: Flow<List<Album>>
-        = albumDao.getAllAlbums()
+    override val albums: Flow<List<Album>> = albumDao.getAllAlbums()
 
-    override val artists: Flow<List<ArtistWithSongCount>>
-        = songDao.getAllArtistsWithSongCount()
+    override val artists: Flow<List<ArtistWithSongCount>> = songDao.getAllArtistsWithSongCount()
 
-    override val albumArtists: Flow<List<AlbumArtistWithSongCount>>
-        = songDao.getAllAlbumArtistsWithSongCount()
+    override val albumArtists: Flow<List<AlbumArtistWithSongCount>> =
+        songDao.getAllAlbumArtistsWithSongCount()
 
-    override val composers: Flow<List<ComposerWithSongCount>>
-        = songDao.getAllComposersWithSongCount()
+    override val composers: Flow<List<ComposerWithSongCount>> =
+        songDao.getAllComposersWithSongCount()
 
-    override val lyricists: Flow<List<LyricistWithSongCount>>
-        = songDao.getAllLyricistsWithSongCount()
+    override val lyricists: Flow<List<LyricistWithSongCount>> =
+        songDao.getAllLyricistsWithSongCount()
 
-    override val genres: Flow<List<GenreWithSongCount>>
-        = songDao.getAllGenresWithSongCount()
+    override val genres: Flow<List<GenreWithSongCount>> = songDao.getAllGenresWithSongCount()
+
+    override fun getRecentAddedSongs(): Flow<List<Song>> {
+        return songDao.getRecentAddedSongs()
+    }
+
+    override fun getMostPlayedSongs(): Flow<List<Song>> {
+        return songDao.getMostPlayedSongs()
+    }
 
     override fun getAlbumWithSongsByName(albumName: String): Flow<AlbumWithSongs?> {
         return albumDao.getAlbumWithSongsByName(albumName)

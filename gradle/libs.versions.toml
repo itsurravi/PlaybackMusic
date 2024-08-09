@@ -8,7 +8,7 @@ versionName = "2.8.4"
 jvm = "11"
 
 appUpdate = "2.1.0"
-androidGradlePlugin = "7.3.1"
+androidGradlePlugin = "7.4.2"
 firebaseCrashlyticsPlugin = "2.9.2"
 firebasePerfPlugin = "1.4.2"
 googleServicesVersion = "4.3.10"

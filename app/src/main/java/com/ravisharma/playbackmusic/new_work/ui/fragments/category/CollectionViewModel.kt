@@ -52,10 +52,22 @@ class CollectionViewModel @Inject constructor(
     val collectionUi = _collectionType
         .flatMapLatest { type ->
             when (type?.type) {
+                CollectionType.MostPlayedType -> {
+                    songService.getMostPlayedSongs().map {
+                        if (it.isEmpty()) CollectionUi()
+                        else {
+                            CollectionUi(
+                                songs = it,
+                                topBarTitle = "Most Played",
+                                topBarBackgroundImageUri = it[0].artUri ?: ""
+                            )
+                        }
+                    }
+                }
                 CollectionType.RecentAddedType -> {
-                    songService.songs.map {
+                    songService.getRecentAddedSongs().map {
                         CollectionUi(
-                            songs = it.sortedByDescending { it.modifiedDate },
+                            songs = it,
                             topBarTitle = "Recent Added",
                             topBarBackgroundImageUri = it[0].artUri ?: ""
                         )

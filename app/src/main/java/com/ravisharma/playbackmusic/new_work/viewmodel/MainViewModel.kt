@@ -24,9 +24,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,7 +38,6 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val exoPlayer: ExoPlayer,
-    private val songExtractor: SongExtractor,
     private val playlistService: PlaylistService,
     private val songService: SongService,
     private val queueService: QueueService,
@@ -51,14 +52,15 @@ class MainViewModel @Inject constructor(
     private val _message = MutableStateFlow("")
     val message = _message.asStateFlow()
 
-    val allSongs = songService.songs
-        .catch { exception ->
-            Log.e("allSongs", "$exception")
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = null
-        )
+    val allSongs = songService.songs.map {
+        it.filter { song -> song.location.contains(".mp3") }
+    }.catch { exception ->
+        Log.e("allSongs", "$exception")
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = null
+    )
 
     val allAlbums = songService.albums
         .catch { exception ->
@@ -154,6 +156,11 @@ class MainViewModel @Inject constructor(
         exoPlayer.addListener(exoPlayerListener)
         queue.addAll(queueService.queue)
         queueService.addListener(queueServiceListener)
+        viewModelScope.launch {
+            currentSong.collectLatest {
+                updatePlayCount(it)
+            }
+        }
     }
 
     private fun showMessage(message: String) {
@@ -290,6 +297,14 @@ class MainViewModel @Inject constructor(
             playerService.startServiceIfNotRunning(songs, startPlayingFromIndex)
         }
         showMessage("Playing")
+    }
+
+    fun updatePlayCount(song: Song? = currentSong.value) {
+        if (song == null) return
+        val updatedSong = song.copy(playCount = song.playCount+1)
+        viewModelScope.launch(Dispatchers.IO) {
+            songService.updateSong(updatedSong)
+        }
     }
 
     /**

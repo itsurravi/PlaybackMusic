@@ -12,8 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/colorPrimary"
-        android:paddingHorizontal="16dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/iv_back"
@@ -42,7 +42,7 @@
             android:textStyle="bold"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/txtSongArtist"
-            app:layout_constraintEnd_toStartOf="@id/iv_info"
+            app:layout_constraintEnd_toStartOf="@id/imgAdd"
             app:layout_constraintStart_toEndOf="@id/iv_back"
             app:layout_constraintTop_toTopOf="@id/iv_back"
             app:layout_constraintVertical_chainStyle="packed"
@@ -65,16 +65,19 @@
             android:textColor="@color/textSecondary"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="@id/iv_back"
-            app:layout_constraintEnd_toStartOf="@id/iv_info"
+            app:layout_constraintEnd_toStartOf="@id/imgAdd"
             app:layout_constraintStart_toEndOf="@id/iv_back"
             app:layout_constraintTop_toBottomOf="@id/txtSongName"
             tools:text="En" />
 
         <ImageView
-            android:id="@+id/iv_info"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_info"
+            android:id="@+id/imgAdd"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/saveInPlaylist"
+            android:src="@drawable/ic_add_circle_24"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
@@ -117,34 +120,71 @@
 
             <ImageView
                 android:id="@+id/cardImage"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="40dp"
-                android:elevation="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/logo"
-                app:layout_constraintBottom_toTopOf="@id/imgFav"
+                app:layout_constrainedHeight="true"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@id/seekBar"
                 app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0" />
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="40dp"
+                android:padding="7dp"
+                android:progressTint="@color/seek_progress"
+                android:thumbTint="@color/white"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/cardImage" />
+
+            <TextView
+                android:id="@+id/currentPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:paddingEnd="5dp"
+                android:text="@string/time0"
+                android:textColor="@color/textPrimary"
+                app:layout_constraintStart_toStartOf="@id/seekBar"
+                app:layout_constraintTop_toBottomOf="@id/seekBar"
+                tools:ignore="RtlSymmetry" />
+
+            <TextView
+                android:id="@+id/totalDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="5dp"
+                android:paddingStart="5dp"
+                android:text="@string/time0"
+                android:textAlignment="textEnd"
+                android:textColor="@color/textPrimary"
+                app:layout_constraintEnd_toEndOf="@id/seekBar"
+                app:layout_constraintTop_toBottomOf="@id/seekBar"
+                tools:ignore="RtlSymmetry" />
 
             <ImageView
                 android:id="@+id/imgFav"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/fav"
+                android:padding="10dp"
                 android:src="@drawable/ic_favorite_not_24"
-                app:layout_constraintBottom_toTopOf="@id/seekBar"
-                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
+                app:layout_constraintBottom_toBottomOf="@id/btn_Prev"
+                app:layout_constraintEnd_toStartOf="@id/btn_Prev"
+                app:layout_constraintStart_toEndOf="@id/guidelineLeft"
+                app:layout_constraintTop_toTopOf="@id/btn_Prev" />
 
-            <ImageView
+            <!--<ImageView
                 android:id="@+id/imgPlaylist"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -153,89 +193,9 @@
                 android:contentDescription="@string/playlist"
                 android:src="@drawable/ic_playlist_24"
                 android:visibility="visible"
+                app:layout_constraintEnd_toStartOf="@id/btn_repeat"
                 app:layout_constraintStart_toEndOf="@id/imgFav"
-                app:layout_constraintTop_toTopOf="@id/imgFav" />
-
-            <ImageView
-                android:id="@+id/imgAdd"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="20dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/saveInPlaylist"
-                android:src="@drawable/ic_add_circle_24"
-                android:visibility="visible"
-                app:layout_constraintEnd_toStartOf="@id/imgFav"
-                app:layout_constraintTop_toTopOf="@id/imgFav" />
-
-            <TextView
-                android:id="@+id/currentPosition"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:paddingEnd="5dp"
-                android:text="@string/time0"
-                android:textColor="@color/textPrimary"
-                app:layout_constraintBottom_toTopOf="@id/seekBar"
-                app:layout_constraintStart_toStartOf="@id/seekBar"
-                tools:ignore="RtlSymmetry" />
-
-            <TextView
-                android:id="@+id/totalDuration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="12dp"
-                android:paddingStart="5dp"
-                android:text="@string/time0"
-                android:textAlignment="textEnd"
-                android:textColor="@color/textPrimary"
-                app:layout_constraintBottom_toTopOf="@id/seekBar"
-                app:layout_constraintEnd_toEndOf="@id/seekBar"
-                tools:ignore="RtlSymmetry" />
-
-            <SeekBar
-                android:id="@+id/seekBar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginBottom="12dp"
-                android:padding="7dp"
-                android:progressTint="@color/seek_progress"
-                android:thumbTint="@color/white"
-                app:layout_constraintBottom_toTopOf="@id/btn_PlayPause"
-                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
-
-            <ImageView
-                android:id="@+id/btn_PlayPause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="28dp"
-                android:layout_weight="2"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/uamp_ic_play_arrow_white_48dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft"
-                tools:targetApi="lollipop" />
-
-            <ImageView
-                android:id="@+id/btn_Shuffle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="12sp"
-                android:src="@drawable/ic_shuffle_off"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="@id/btn_Prev"
-                app:layout_constraintEnd_toStartOf="@id/btn_Prev"
-                app:layout_constraintStart_toStartOf="@id/guidelineLeft"
-                app:layout_constraintTop_toTopOf="@id/btn_Prev"
-                tools:targetApi="lollipop" />
+                app:layout_constraintTop_toTopOf="@id/imgFav" />-->
 
             <ImageView
                 android:id="@+id/btn_Prev"
@@ -246,8 +206,22 @@
                 android:src="@drawable/ic_skip_previous_white_48dp"
                 app:layout_constraintBottom_toBottomOf="@id/btn_PlayPause"
                 app:layout_constraintEnd_toStartOf="@id/btn_PlayPause"
-                app:layout_constraintStart_toEndOf="@id/btn_Shuffle"
+                app:layout_constraintStart_toEndOf="@id/imgFav"
                 app:layout_constraintTop_toTopOf="@id/btn_PlayPause"
+                tools:targetApi="lollipop" />
+
+            <ImageView
+                android:id="@+id/btn_PlayPause"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="28dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/uamp_ic_play_arrow_white_48dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guidelineRight"
+                app:layout_constraintStart_toStartOf="@id/guidelineLeft"
+                app:layout_constraintTop_toBottomOf="@id/totalDuration"
                 tools:targetApi="lollipop" />
 
             <ImageView
@@ -267,16 +241,14 @@
                 android:id="@+id/btn_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="12sp"
-                android:src="@drawable/ic_repeat_off"
+                android:padding="10dp"
+                android:src="@drawable/ic_repeat"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@id/btn_Next"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toEndOf="@id/btn_Next"
-                app:layout_constraintTop_toTopOf="@id/btn_Next"
-                tools:targetApi="lollipop" />
+                app:layout_constraintTop_toTopOf="@id/btn_Next" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineLeft"

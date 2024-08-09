@@ -36,6 +36,12 @@ interface SongDao {
     @Query("DELETE FROM ${Constants.Tables.SONG_TABLE}")
     suspend fun deleteAllSongs()
 
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE location COLLATE NOCASE LIKE '%.mp3' ORDER BY modifiedDate DESC")
+    fun getRecentAddedSongs(): Flow<List<Song>>
+
+    @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE playCount > 0 ORDER BY playCount DESC LIMIT 30")
+    fun getMostPlayedSongs(): Flow<List<Song>>
+
     @Query("SELECT * FROM ${Constants.Tables.SONG_TABLE} WHERE title LIKE '%' || :query || '%' OR " +
             "artist LIKE '%' || :query || '%' OR " +
             "albumArtist LIKE '%' || :query || '%' OR " +
@@ -51,7 +57,6 @@ interface SongDao {
     @Query("SELECT albumArtist as name, COUNT(*) as count FROM ${Constants.Tables.SONG_TABLE} GROUP BY " +
             "${Constants.Tables.SONG_TABLE}.albumArtist")
     fun getAllAlbumArtistsWithSongCount(): Flow<List<AlbumArtistWithSongCount>>
-
 
     @Query("SELECT composer as name, COUNT(*) as count FROM ${Constants.Tables.SONG_TABLE} GROUP BY " +
             "${Constants.Tables.SONG_TABLE}.composer")

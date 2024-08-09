@@ -215,6 +215,8 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     private fun updateRepeatMode(repeatMode: RepeatMode) {
         binding.apply {
             btnRepeat.setImageResource(repeatMode.iconResource)
+            val tintColor = ContextCompat.getColor(requireContext(), repeatMode.tintColor)
+            btnRepeat.imageTintList = ColorStateList.valueOf(tintColor)
         }
     }
 
@@ -237,15 +239,12 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     e.printStackTrace()
                 }
             }
-            btnShuffle.setOnClickListener {
-//                mainViewModel.toggleShuffleMode()
-            }
             btnRepeat.setOnClickListener {
                 mainViewModel.toggleRepeatMode()
             }
-            imgPlaylist.setOnClickListener {
+            /*imgPlaylist.setOnClickListener {
                 findNavController().navigate(R.id.action_playerFragment_to_currentQueueFragment)
-            }
+            }*/
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
@@ -257,11 +256,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     )
                 }
                 findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
-            }
-            ivInfo.setOnClickListener {
-                currentSong?.let {
-                    requireContext().showSongInfo(it)
-                }
             }
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
