@@ -52,4 +52,25 @@ interface PlaylistDao {
             "${Constants.Tables.PLAYLIST_SONG_CROSS_REF_TABLE} GROUP BY playlistId)")
     fun getAllPlaylistWithSongCount(): Flow<List<PlaylistWithSongCount>>
 
+    @Transaction
+    suspend fun transferPlaylistToNewDB(playlist: Map<String, List<String>>) {
+        playlist.forEach { (playlistName, songLocations) ->
+            if (playlistName.isNotBlank()) {
+                val playlistToSave = PlaylistExceptId(
+                    playlistName = playlistName.trim(),
+                    createdAt = System.currentTimeMillis()
+                )
+                val playlistId = insertPlaylist(playlistToSave)
+
+                insertPlaylistSongCrossRef(
+                    songLocations.map {
+                        PlaylistSongCrossRef(
+                            playlistId = playlistId,
+                            location = it
+                        )
+                    }
+                )
+            }
+        }
+    }
 }

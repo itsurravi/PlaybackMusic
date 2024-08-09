@@ -8,7 +8,9 @@ import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.model.Playlist
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PlaylistRepository @Inject constructor(
     private val playlistDao: PlaylistDao
 ) {

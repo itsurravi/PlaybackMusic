@@ -1,7 +1,6 @@
 package com.ravisharma.playbackmusic.new_work.services.data
 
 import com.ravisharma.playbackmusic.data.db.dao.PlaylistDao
-import com.ravisharma.playbackmusic.data.db.dao.ThumbnailDao
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.data.db.model.embedded.PlaylistWithSongs
 import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
@@ -21,6 +20,8 @@ interface PlaylistService {
 
     suspend fun addSongsToPlaylist(songLocations: List<String>, playlistId: Long): List<Long>
     suspend fun removeSongsFromPlaylist(songLocations: List<String>, playlistId: Long)
+
+    suspend fun transferPlaylistToNewDB(oldPlaylistWithSongs: Map<String, List<String>>)
 }
 
 class PlaylistServiceImpl(
@@ -71,5 +72,9 @@ class PlaylistServiceImpl(
                 )
             )
         }
+    }
+
+    override suspend fun transferPlaylistToNewDB(oldPlaylistWithSongs: Map<String, List<String>>) {
+        playlistDao.transferPlaylistToNewDB(oldPlaylistWithSongs)
     }
 }

@@ -82,7 +82,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MusicService" />
+        <service android:name=".MusicService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ExportedService" />
 
         <service
             android:name=".new_work.services.PlaybackService"
