@@ -10,9 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -27,7 +25,6 @@ import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -40,27 +37,10 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
 
     private var scanStatus: ScanningStatus = ScanningStatus.NOT_STARTED
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private val permissionToRequest33 = arrayOf(
-        Manifest.permission.WAKE_LOCK,
-        Manifest.permission.FOREGROUND_SERVICE,
-        Manifest.permission.MODIFY_AUDIO_SETTINGS,
-        Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.READ_MEDIA_AUDIO,
-    )
-
-    private val permissionToRequest = arrayOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WAKE_LOCK,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.FOREGROUND_SERVICE,
-        Manifest.permission.MODIFY_AUDIO_SETTINGS
-    )
-
     private var isDenied: Boolean = false
 
     private val isPermissionGranted: (Boolean) -> Unit = {
-        Toast.makeText(requireContext(), "Permissions Granted", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireContext(), "Permissions Granted", Toast.LENGTH_SHORT).show()
         showScanViews()
     }
 
@@ -143,14 +123,16 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                 viewModel.scanStatus.collect {
                     when (it) {
                         ScanStatus.ScanComplete -> {
-                            scanStatus = ScanningStatus.COMPLETED
                             binding.btnScan.text = "Finish"
+                            binding.btnScan.isClickable = true
+                            scanStatus = ScanningStatus.COMPLETED
                         }
 
                         ScanStatus.ScanNotRunning -> {}
                         is ScanStatus.ScanProgress -> updateProgress(it.parsed, it.total)
                         ScanStatus.ScanStarted -> {
                             binding.btnScan.text = "Scanning"
+                            binding.btnScan.isClickable = false
                             scanStatus = ScanningStatus.STARTED
                         }
                     }
@@ -172,12 +154,20 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
     }
 
     private fun getPermissionList(): Array<String> {
-        val strings = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionToRequest33
+        val permissions = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            permissions.add(Manifest.permission.FOREGROUND_SERVICE)
         } else {
-            permissionToRequest
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
-        val list = strings.filter {
+        permissions.add(Manifest.permission.MODIFY_AUDIO_SETTINGS)
+        permissions.add(Manifest.permission.WAKE_LOCK)
+
+        val list = permissions.filter {
             ContextCompat.checkSelfPermission(
                 requireContext(),
                 it

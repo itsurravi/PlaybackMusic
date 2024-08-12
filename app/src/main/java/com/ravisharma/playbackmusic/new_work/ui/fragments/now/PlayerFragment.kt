@@ -23,7 +23,6 @@ import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
 import com.ravisharma.playbackmusic.new_work.Constants
 import com.ravisharma.playbackmusic.new_work.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -139,10 +138,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 totalDuration.text = it.durationMillis.toMS()
 
                 cardImage.load(Uri.parse(it.artUri)) {
-                    placeholder(R.drawable.logo)
                     error(R.drawable.logo)
                     transformations(RoundedCornersTransformation(20f))
-                    crossfade(true)
+                    crossfade(300)
                 }
                 if (it.favourite) {
                     imgFav.setImageResource(R.drawable.ic_favorite_24)
@@ -242,9 +240,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             btnRepeat.setOnClickListener {
                 mainViewModel.toggleRepeatMode()
             }
-            /*imgPlaylist.setOnClickListener {
+            imgPlaylist.setOnClickListener {
                 findNavController().navigate(R.id.action_playerFragment_to_currentQueueFragment)
-            }*/
+            }
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }

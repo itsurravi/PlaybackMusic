@@ -1,12 +1,19 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -107,14 +114,6 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
         }
     }
 
-    private fun createPlaylistDialog() {
-        val listener = AlertClickListener { newPlaylistName ->
-            mainViewModel.onPlaylistCreate(newPlaylistName)
-        }
-        val alert = PlaylistAlert(context, listener)
-        alert.showCreateListAlert()
-    }
-
     private fun initObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
@@ -139,7 +138,51 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
     }
 
     private fun onPlaylistLongClick(playlistWithSongCount: PlaylistWithSongCount) {
-        // TODO
+        val items = resources.getStringArray(R.array.longPressItemsPlaylist)
+        val ad = ArrayAdapter(requireContext(), R.layout.adapter_alert_list, items)
+        val v = LayoutInflater.from(context).inflate(R.layout.alert_playlist, null)
+        val lv = v.findViewById<ListView>(R.id.list)
+        val tv = v.findViewById<TextView>(R.id.title)
+        tv.text = playlistWithSongCount.playlistName
+        lv.adapter = ad
+        val dialog = AlertDialog.Builder(
+            requireContext()
+        )
+        dialog.setView(v)
+        val alertDialog = dialog.create()
+        alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation_2
+        alertDialog.show()
+        lv.onItemClickListener = AdapterView.OnItemClickListener { parent, view, i, id ->
+            when (i) {
+                0 -> playPlaylistSongs(playlistWithSongCount)
+                1 -> updatePlaylistDialog(playlistWithSongCount)
+                2 -> mainViewModel.deletePlaylist(playlistWithSongCount)
+            }
+            alertDialog.dismiss()
+        }
+    }
+
+    private fun playPlaylistSongs(playlistWithSongCount: PlaylistWithSongCount) {
+        mainViewModel.playPlaylistSongs(playlistWithSongCount)
+    }
+
+    private fun createPlaylistDialog() {
+        val listener = AlertClickListener { newPlaylistName ->
+            mainViewModel.onPlaylistCreate(newPlaylistName)
+        }
+        val alert = PlaylistAlert(context, listener)
+        alert.showCreateListAlert()
+    }
+
+    private fun updatePlaylistDialog(oldPlaylistName: PlaylistWithSongCount) {
+        val listener = AlertClickListener { newPlaylistName ->
+            mainViewModel.updatePlaylistName(oldPlaylistName.copy(
+                playlistName = newPlaylistName
+            ))
+        }
+        val alert = PlaylistAlert(context, listener)
+        alert.showUpdateListAlert(oldPlaylistName.playlistName)
     }
 
     companion object {

@@ -94,7 +94,7 @@
     <string name="playlist_Name">Playlist Name</string>
     <string name="Cancel">Cancel</string>
     <string name="ok">Create</string>
-    <string name="createNewPlaylist">New Playlist</string>
+    <string name="createNewPlaylist">Create Playlist</string>
     <string name="shuffleLibrary">Shuffle Library</string>
     <string name="location">Location:</string>
     <string name="duration">Duration:</string>
@@ -181,7 +181,7 @@
     <string name="updateLater">Not Now</string>
 
     <string name="permissionHead">Permission Required</string>
-    <string name="permissionReason">Playback Music is an Local Audio File Player.\n\nPlayback Music plays only Song / Audio files that are located in your device storage.\n\nDue to this reason, this app requires storage permission to play Songs / Audio files.\n</string>
+    <string name="permissionReason">Playback Music is a local audio player that exclusively plays songs and audio files stored on your device.\n\nTo access and play your music, the app requires the necessary permissions.</string>
     <string name="permissionAgree">Agree</string>
 
     <string name="noFileFound">No Song / Audio File Found</string>

@@ -9,7 +9,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.data.db.model.tables.Playlist
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.data.utils.Constants
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
 import com.ravisharma.playbackmusic.new_work.services.PlayerHelper
@@ -299,9 +298,19 @@ class MainViewModel @Inject constructor(
         showMessage("Playing")
     }
 
-    fun updatePlayCount(song: Song? = currentSong.value) {
+    fun playPlaylistSongs(playlistWithSongCount: PlaylistWithSongCount) {
+        viewModelScope.launch {
+            playlistService.getPlaylistWithSongsById(
+                playlistWithSongCount.playlistId
+            ).first()?.let {
+                setQueue(it.songs, 0)
+            }
+        }
+    }
+
+    private fun updatePlayCount(song: Song? = currentSong.value) {
         if (song == null) return
-        val updatedSong = song.copy(playCount = song.playCount+1)
+        val updatedSong = song.copy(playCount = song.playCount + 1)
         viewModelScope.launch(Dispatchers.IO) {
             songService.updateSong(updatedSong)
         }

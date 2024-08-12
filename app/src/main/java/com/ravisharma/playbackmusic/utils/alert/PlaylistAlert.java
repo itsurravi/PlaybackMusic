@@ -95,10 +95,10 @@ public class PlaylistAlert {
 
         tvOk.setOnClickListener(v1 -> {
             String playlistName = edPlayListName.getText().toString().trim();
-            if (playlistName.length() > 0) {
+            if (!playlistName.isEmpty()) {
                 if (playlistName.equalsIgnoreCase("My Favorites") ||
                         playlistName.equalsIgnoreCase("Recent Added") ||
-                        playlistName.equalsIgnoreCase("Last Played") ||
+//                        playlistName.equalsIgnoreCase("Last Played") ||
                         playlistName.equalsIgnoreCase("Most Played")){
 
                     Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();
