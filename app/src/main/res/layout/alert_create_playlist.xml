@@ -9,34 +9,41 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="24dp">
 
         <TextView
             android:id="@+id/dialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="16dp"
             android:gravity="center_horizontal"
-            android:text="New Playlist"
+            android:text="@string/createNewPlaylist"
             android:textColor="@color/white"
             android:textSize="20sp" />
 
-        <EditText
-            android:id="@+id/edPlaylistName"
-            style="@style/TextAppearance.AppCompat.Medium"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/scrollThumb"
-            android:hint="@string/playlist_Name"
-            android:inputType="textCapWords"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textColorHint="#BDBDBD"
-            android:textCursorDrawable="@null" />
+            app:boxStrokeColor="#BDBDBD"
+            app:boxStrokeWidth="1dp"
+            app:hintTextColor="#BDBDBD"
+            app:placeholderTextColor="#BDBDBD">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edPlaylistName"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/playlist_Name"
+                android:inputType="textCapWords"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textColorHint="#BDBDBD"
+                android:textCursorDrawable="@null" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
