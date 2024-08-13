@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         alertDialog.show()
     }
 
-    override fun onRequestPermissionsResult(
+    /*override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
         grantResults: IntArray
@@ -323,7 +323,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
             }
         }
-    }
+    }*/
 
     private fun runTask() {
         clearPrefDataOnAppUpdate()
