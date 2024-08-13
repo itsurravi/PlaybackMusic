@@ -13,7 +13,7 @@
         android:background="?android:selectableItemBackground"
         android:contentDescription="@string/back"
         android:padding="14dp"
-        android:src="@drawable/ic_left"
+        android:src="@drawable/ic_back_28"
         app:layout_constraintBottom_toBottomOf="@id/top_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"

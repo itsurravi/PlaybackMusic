@@ -19,9 +19,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/back"
-            android:background="?android:selectableItemBackground"
+            android:background="?android:selectableItemBackgroundBorderless"
             android:padding="15dp"
-            android:src="@drawable/ic_left"
+            android:src="@drawable/ic_back_28"
             tools:ignore="RtlSymmetry" />
 
         <ImageView
@@ -87,7 +87,7 @@
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
             android:padding="15dp"
-            android:src="@drawable/ic_left"
+            android:src="@drawable/ic_back_28"
             tools:ignore="RtlSymmetry" />
 
         <TextView

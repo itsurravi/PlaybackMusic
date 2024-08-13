@@ -1,12 +1,8 @@
 package com.ravisharma.playbackmusic.new_work.ui.activity
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding

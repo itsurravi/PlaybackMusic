@@ -29,7 +29,7 @@
                 android:background="?android:selectableItemBackground"
                 android:padding="15dp"
                 android:contentDescription="@string/back"
-                android:src="@drawable/ic_left"
+                android:src="@drawable/ic_back_28"
                 tools:ignore="RtlSymmetry" />
 
             <EditText

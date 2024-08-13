@@ -24,7 +24,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="12dp"
-            android:src="@drawable/ic_left" />
+            android:src="@drawable/ic_back_28" />
 
         <TextView
             android:id="@+id/equalizer_fragment_title"
