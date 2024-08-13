@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.new_work
+package com.ravisharma.playbackmusic.new_work.utils
 
 object Constants {
 

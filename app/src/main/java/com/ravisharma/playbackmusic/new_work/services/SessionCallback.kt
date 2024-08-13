@@ -14,7 +14,7 @@ import com.ravisharma.playbackmusic.new_work.services.data.SongService
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.new_work.Constants
+import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped

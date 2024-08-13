@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.FragmentOnboardingBinding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +41,6 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
     private var isDenied: Boolean = false
 
     private val isPermissionGranted: (Boolean) -> Unit = {
-//        Toast.makeText(requireContext(), "Permissions Granted", Toast.LENGTH_SHORT).show()
         showScanViews()
     }
 
@@ -59,6 +59,11 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                 checkForRationaleDialog()
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().changeStatusBarColor(R.color.contentBGclr)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -123,17 +128,19 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                 viewModel.scanStatus.collect {
                     when (it) {
                         ScanStatus.ScanComplete -> {
+                            scanStatus = ScanningStatus.COMPLETED
                             binding.btnScan.text = "Finish"
                             binding.btnScan.isClickable = true
-                            scanStatus = ScanningStatus.COMPLETED
+                            requireContext().showToast("Scan Completed")
                         }
 
                         ScanStatus.ScanNotRunning -> {}
                         is ScanStatus.ScanProgress -> updateProgress(it.parsed, it.total)
                         ScanStatus.ScanStarted -> {
+                            scanStatus = ScanningStatus.STARTED
                             binding.btnScan.text = "Scanning"
                             binding.btnScan.isClickable = false
-                            scanStatus = ScanningStatus.STARTED
+                            requireContext().showToast("Scan Started")
                         }
                     }
                 }

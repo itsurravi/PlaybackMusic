@@ -16,7 +16,7 @@ import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCurrentQueueBinding
-import com.ravisharma.playbackmusic.new_work.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint

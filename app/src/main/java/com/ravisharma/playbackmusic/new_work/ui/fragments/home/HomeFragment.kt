@@ -29,13 +29,13 @@ import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
-import com.ravisharma.playbackmusic.new_work.Constants
+import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -58,6 +58,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             ),
             PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().changeStatusBarColor(R.color.colorPrimaryDark)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

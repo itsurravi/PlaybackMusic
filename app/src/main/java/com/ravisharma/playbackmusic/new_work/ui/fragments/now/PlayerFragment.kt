@@ -20,8 +20,8 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.utils.toMS
 import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
-import com.ravisharma.playbackmusic.new_work.Constants
-import com.ravisharma.playbackmusic.new_work.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.Constants
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint

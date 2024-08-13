@@ -3,15 +3,14 @@ package com.ravisharma.playbackmusic.new_work.ui.activity
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import com.ravisharma.playbackmusic.R
-import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
-import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class NewPlayerActivity : AppCompatActivity() {
@@ -41,19 +40,5 @@ class NewPlayerActivity : AppCompatActivity() {
 
         navGraph.setStartDestination(startDestination)
         navController.graph = navGraph
-
-        scannerObserver()
-    }
-
-    private fun scannerObserver() {
-        lifecycleScope.launch {
-            viewModel.scanStatus.collect {
-                when (it) {
-                    ScanStatus.ScanComplete -> showToast("Scan Completed")
-                    ScanStatus.ScanStarted -> showToast("Scan Started")
-                    else -> Unit
-                }
-            }
-        }
     }
 }

@@ -9,6 +9,7 @@ import com.ravisharma.playbackmusic.prefrences.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +24,7 @@ class MusicScanViewModel @Inject constructor(
     val scanStatus = songExtractor.scanStatus.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(
-            stopTimeoutMillis = 300,
+            stopTimeoutMillis = 10_000,
             replayExpirationMillis = 0
         ),
         initialValue = ScanStatus.ScanNotRunning

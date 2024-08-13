@@ -22,7 +22,7 @@ import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
-import com.ravisharma.playbackmusic.new_work.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress

@@ -21,7 +21,7 @@ import com.ravisharma.playbackmusic.data.utils.TinyDb
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
-import com.ravisharma.playbackmusic.new_work.Constants
+import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateSerializer
 import com.ravisharma.playbackmusic.new_work.services.DataManager
