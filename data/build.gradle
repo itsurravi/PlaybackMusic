@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
 
@@ -42,9 +42,6 @@ android {
         jvmTarget = libs.versions.jvm.get()
     }
 }
-kapt {
-    correctErrorTypes true
-}
 
 dependencies {
     implementation libs.androidx.core.ktx
@@ -54,10 +51,10 @@ dependencies {
 
     implementation libs.androidx.room.ktx
     implementation libs.androidx.room.runtime
-    kapt libs.androidx.room.compiler
+    ksp libs.androidx.room.compiler
 
     implementation libs.hilt.android
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
 
     implementation libs.google.gson
 }

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.sevices)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.perf)
@@ -67,7 +67,7 @@ dependencies {
     implementation libs.androidx.fragment
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.lifecycle.livedata.ktx
-    kapt libs.androidx.lifecycle.compiler
+    ksp libs.androidx.lifecycle.compiler
     implementation libs.androidx.navigation.fragment.ktx
     implementation libs.androidx.navigation.ui.ktx
 
@@ -75,7 +75,7 @@ dependencies {
     implementation libs.androidx.media
     implementation libs.androidx.room.ktx
     implementation libs.androidx.room.runtime
-    kapt libs.androidx.room.compiler
+    ksp libs.androidx.room.compiler
 
     implementation libs.androidx.work.runtime.ktx
 
@@ -88,13 +88,9 @@ dependencies {
     implementation libs.com.slidinguppanel
     implementation libs.com.verticalseekbar
 
-//    implementation libs.exoplayer
-//    implementation libs.exoPlayerUi
-
     implementation libs.media3Ui
     implementation libs.media3ExoPlayer
     implementation libs.media3Session
-//    implementation libs.glide
 
     implementation libs.androidx.legacy.supportV4
 
@@ -107,7 +103,7 @@ dependencies {
     implementation libs.google.gson
 
     implementation libs.hilt.android
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
 
     implementation libs.app.update
     implementation libs.app.update.ktx
