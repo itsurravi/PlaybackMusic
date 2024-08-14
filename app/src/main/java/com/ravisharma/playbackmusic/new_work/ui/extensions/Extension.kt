@@ -10,18 +10,20 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.databinding.InfoBinding
-import java.util.concurrent.TimeUnit
 
-sealed class LongItemClick(val title : String) {
+sealed class LongItemClick(val title: String) {
     object Play : LongItemClick("Play")
     object SinglePlay : LongItemClick("Play This Only")
-//    object PlayNext : LongItemClick("Play Next")
+
+    //    object PlayNext : LongItemClick("Play Next")
     object AddToQueue : LongItemClick("Add To Queue")
     object AddToPlaylist : LongItemClick("Add To Playlist")
+
     //    object Delete : LongItemClick("Delete")
     object Share : LongItemClick("Share")
     object Details : LongItemClick("Details")
@@ -43,8 +45,9 @@ fun Context.onSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {
     val alertList = AlertListBinding.inflate(LayoutInflater.from(this))
     alertList.apply {
         songArt.load(Uri.parse(song.artUri)) {
-            placeholder(R.drawable.logo)
             error(R.drawable.logo)
+            crossfade(true)
+            transformations(RoundedCornersTransformation(20f))
         }
 
         title.text = song.title
@@ -87,6 +90,11 @@ fun Context.showSongInfo(song: Song) {
     val binding = InfoBinding.inflate(LayoutInflater.from(this))
     val builder = AlertDialog.Builder(this)
     builder.setView(binding.root)
+    binding.infoArt.load(Uri.parse(song.artUri)) {
+        error(R.drawable.logo)
+        crossfade(true)
+        transformations(RoundedCornersTransformation(20f))
+    }
     binding.infoTitle.text = song.title
     binding.infoArtist.text = song.artist
     binding.infoAlbum.text = song.album

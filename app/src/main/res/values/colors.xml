@@ -6,7 +6,7 @@
     <color name="contentBGclr">#101d25</color>
     <color name="scrollThumb">#FE2851</color>
     <color name="seek_progress">#FE2851</color>
-    <color name="notificationBackground">#242424</color>
+    <color name="navigationBarColor">#242424</color>
     <color name="textPrimary">#FFFFFF</color>
     <color name="textSecondary">#bebbb4</color>
     <color name="listitemDuration">#bebbb4</color>

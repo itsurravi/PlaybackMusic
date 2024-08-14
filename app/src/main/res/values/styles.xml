@@ -10,7 +10,7 @@
         <item name="popupMenuBackground">@color/popupItemBackground</item>
         <item name="android:colorControlHighlight">@color/ripple_dark</item>
         <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:navigationBarColor">@color/notificationBackground</item>
+        <item name="android:navigationBarColor">@color/navigationBarColor</item>
     </style>
 
     <style name="AlertDialogCustom" parent="@style/ThemeOverlay.Material3.Dialog.Alert">

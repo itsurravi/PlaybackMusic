@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,9 +21,10 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.utils.toMS
 import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
+import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
-import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -255,9 +257,42 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
                 findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
             }
+            ivMoreOptions.setOnClickListener {
+                showMoreOptionsPopup(it)
+            }
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
             }
+        }
+    }
+
+    private fun showMoreOptionsPopup(view: View) {
+        PopupMenu(requireContext(), view).apply {
+            menuInflater.inflate(R.menu.player_menu, menu)
+
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.addToPlaylist -> {
+                        val bundle = Bundle().apply {
+                            putStringArrayList(
+                                NavigationConstant.AddToPlaylistSongs,
+                                arrayListOf(currentSong?.location)
+                            )
+                        }
+                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                        true
+                    }
+
+                    R.id.info -> {
+                        currentSong?.let { requireContext().showSongInfo(it) }
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }.also {
+            it.show()
         }
     }
 }
