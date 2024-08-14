@@ -248,15 +248,6 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
-            imgAdd.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putStringArrayList(
-                        NavigationConstant.AddToPlaylistSongs,
-                        arrayListOf(currentSong?.location)
-                    )
-                }
-                findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
-            }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)
             }
