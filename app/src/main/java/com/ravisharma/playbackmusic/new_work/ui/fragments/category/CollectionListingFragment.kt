@@ -18,21 +18,21 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.databinding.ActivityCategorySongBinding
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.databinding.FragmentCollectionListingBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
+class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing) {
 
-    private var _binding: ActivityCategorySongBinding? = null
+    private var _binding: FragmentCollectionListingBinding? = null
     private val binding get() = _binding!!
 
     private val collectionViewModel: CollectionViewModel by viewModels()
@@ -58,7 +58,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _binding = ActivityCategorySongBinding.bind(view)
+        _binding = FragmentCollectionListingBinding.bind(view)
 
         setupFragment()
     }
@@ -72,7 +72,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
     private fun initViews() {
         binding.apply {
-            binding.playlistLayout.apply {
+            binding.apply {
                 firstLayout.isVisible = true
 
                 songList.apply {
@@ -136,7 +136,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
             }
             launch {
                 collectionViewModel.message.collect {
-                    if(it.isNotEmpty()) {
+                    if (it.isNotEmpty()) {
                         requireContext().showToast(it)
                     }
                 }
@@ -158,7 +158,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
     }
 
     private fun updateUi(data: CollectionUi) {
-        binding.playlistLayout.apply {
+        binding.apply {
             txtPlaylistName1.text = data.topBarTitle
             val songCount = data.songs.size
             noOfSongs.text =
@@ -181,7 +181,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
     private fun songClicked(song: Song, position: Int) {
         val currentList =
-            (binding.playlistLayout.songList.adapter as TracksAdapter).getCurrentList()
+            (binding.songList.adapter as TracksAdapter).getCurrentList()
         collectionViewModel.setQueue(currentList, position)
     }
 

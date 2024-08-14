@@ -104,16 +104,16 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     }
 
     override fun onPlaylistClick(position: Int) {
-        val bundle = Bundle()
+        /*val bundle = Bundle()
         bundle.putString("argType", PLAYLIST)
         bundle.putString("actName", playListArrayList[position])
-        openFragment(bundle)
+        openFragment(bundle)*/
     }
 
     private fun openFragment(bundle: Bundle) {
-        val fragment = CategorySongFragment()
+        /*val fragment = CategorySongFragment()
         fragment.arguments = bundle
-        requireActivity().openFragment(fragment)
+        requireActivity().openFragment(fragment)*/
     }
 
     override fun onClick(view: View) {

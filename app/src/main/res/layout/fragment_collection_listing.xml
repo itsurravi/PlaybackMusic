@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/contentBGclr"
-    android:orientation="vertical">
+    android:background="@color/contentBGclr">
 
     <RelativeLayout
         android:id="@+id/firstLayout"
@@ -15,7 +14,7 @@
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="@id/barrier"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
@@ -90,7 +89,8 @@
         app:layout_constraintBottom_toBottomOf="@id/barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0">
 
         <ImageView
             android:id="@+id/imageBack2"
@@ -125,13 +125,11 @@
         android:id="@+id/song_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="60dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier" />
+        app:layout_constraintTop_toBottomOf="@id/banner_container_recentActivity" />
 
     <include
         android:id="@+id/no_data_found"
@@ -143,7 +141,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier" />
+        app:layout_constraintTop_toBottomOf="@id/banner_container_recentActivity" />
 
     <!--<com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"
@@ -155,5 +153,14 @@
         app:fastScrollThumbColor="@color/scrollThumb"
         app:fastScrollThumbEnabled="true"
         app:fastScrollThumbInactiveColor="@color/scrollThumb"  />-->
+
+
+    <FrameLayout
+        android:id="@+id/banner_container_recentActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

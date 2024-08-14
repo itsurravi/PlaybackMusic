@@ -60,7 +60,7 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
     }
 
     override fun onAlbumClick(position: Int) {
-        val bundle = Bundle().apply {
+        /*val bundle = Bundle().apply {
             putString("argType", QUERY_ALBUM)
             putString("albumId", albumsList[position].albumId.toString())
             putString("actName", albumsList[position].albumName)
@@ -69,6 +69,6 @@ class AlbumsFragment : Fragment(), OnAlbumClicked {
 
         val fragment = CategorySongFragment()
         fragment.arguments = bundle
-        (activity as MainActivity).openFragment(fragment)
+        (activity as MainActivity).openFragment(fragment)*/
     }
 }

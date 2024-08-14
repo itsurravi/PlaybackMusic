@@ -95,7 +95,7 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragmentItemClicked,
-    NowPlayingFragment.OnFragmentItemClicked, CategorySongFragment.OnFragmentItemClicked {
+    NowPlayingFragment.OnFragmentItemClicked/*, CategorySongFragment.OnFragmentItemClicked*/ {
 
     private var TAG: String? = null
     private var CHANNEL_ID: String? = null

@@ -64,7 +64,7 @@
         android:id="@+id/categoryListingFragment"
         android:name="com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionListingFragment"
         android:label="CategoryListingFragment"
-        tools:layout="@layout/activity_category_song" />
+        tools:layout="@layout/fragment_collection_listing" />
     <action
         android:id="@+id/action_to_addToPlaylistFragment"
         app:destination="@id/addToPlaylistFragment"
