@@ -70,7 +70,7 @@ class AddToPlaylistFragment : Fragment(R.layout.activity_add_to_playlist) {
 
             binding.bannerAd.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

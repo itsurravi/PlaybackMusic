@@ -153,7 +153,7 @@ class CollectionListingFragment : Fragment(R.layout.activity_category_song) {
 
             binding.bannerContainerRecentActivity.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

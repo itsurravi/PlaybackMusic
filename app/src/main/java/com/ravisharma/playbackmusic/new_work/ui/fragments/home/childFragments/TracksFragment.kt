@@ -78,7 +78,7 @@ class TracksFragment : Fragment() {
 
             binding.bannerAd.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

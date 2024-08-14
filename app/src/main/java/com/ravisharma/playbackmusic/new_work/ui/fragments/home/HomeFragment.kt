@@ -29,20 +29,25 @@ import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
-import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
+import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
+import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var sleepTimerService: SleepTimerService
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val musicViewModel: MusicScanViewModel by activityViewModels()
@@ -80,7 +85,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun initDefaultData() {
         if (mainViewModel.currentSongPlaying.value == false ||
-            mainViewModel.currentSongPlaying.value == null) {
+            mainViewModel.currentSongPlaying.value == null
+        ) {
             if (!isLastPlayedListSet) {
                 isLastPlayedListSet = true
                 mainViewModel.setLastPlayedList()
@@ -320,13 +326,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 dialogBinding.txtOnOff.text = "Off"
                 dialogBinding.timerBlocker.visibility = View.VISIBLE
                 alertDialog.setCancelable(true)
-                /*if (am != null && pi != null) {
-                    am!!.cancel(pi!!)
-                    am = null
-                    pi = null
-                    requireContext().showToast(getString(R.string.timeOff))
-                }*/
-//                TimerWorker.cancelSleepTimer(requireContext())
+                sleepTimerService.cancel()
             } else {
                 TIMER = true
                 dialogBinding.txtOnOff.text = "On"
@@ -337,32 +337,32 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         dialogBinding.txtSave.setOnClickListener {
             when (alert_current_value) {
                 0 -> {
-                    setTimer(15 * 60 * 1000)
+                    setTimer(15 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins15))
                 }
 
                 1 -> {
-                    setTimer(30 * 60 * 1000)
+                    setTimer(30 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins30))
                 }
 
                 2 -> {
-                    setTimer(45 * 60 * 1000)
+                    setTimer(45 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins45))
                 }
 
                 3 -> {
-                    setTimer(60 * 60 * 1000)
+                    setTimer(60 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins60))
                 }
 
                 4 -> {
-                    setTimer(90 * 60 * 1000)
+                    setTimer(90 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins90))
                 }
 
                 5 -> {
-                    setTimer(120 * 60 * 1000)
+                    setTimer(120 * 60/* * 1000*/)
                     requireContext().showToast(getString(R.string.mins120))
                 }
             }
@@ -371,13 +371,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun setTimer(time: Int) {
-        /*val i = Intent(requireContext(), Timer::class.java)
-        pi = PendingIntent.getBroadcast(requireContext(), 1234, i, PendingIntent.FLAG_IMMUTABLE)
-        am = requireContext().getSystemService(ALARM_SERVICE) as AlarmManager
-        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi*/
-
         try {
-//            TimerWorker.scheduleSleepTimer(time.toLong(), requireContext())
+            sleepTimerService.begin(time)
         } catch (e: Exception) {
             e.printStackTrace()
         }

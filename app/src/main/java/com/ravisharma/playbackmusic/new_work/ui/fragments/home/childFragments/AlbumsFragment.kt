@@ -60,7 +60,7 @@ class AlbumsFragment : Fragment(R.layout.fragment_albums) {
 
             binding.bannerAd.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

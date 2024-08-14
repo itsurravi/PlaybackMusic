@@ -60,7 +60,7 @@ class ArtistsFragment : Fragment(R.layout.fragment_artist) {
 
             binding.bannerAd.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

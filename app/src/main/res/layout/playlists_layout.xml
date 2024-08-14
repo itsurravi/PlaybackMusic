@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,19 +10,15 @@
     <RelativeLayout
         android:id="@+id/firstLayout"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:visibility="gone"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
-
-        <ImageView
-            android:id="@+id/imageBack1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="@string/back"
-            android:background="?android:selectableItemBackgroundBorderless"
-            android:padding="15dp"
-            android:src="@drawable/ic_back_28"
-            tools:ignore="RtlSymmetry" />
 
         <ImageView
             android:id="@+id/albumArt"
@@ -36,6 +32,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/image_gradient_effect" />
+
+        <ImageView
+            android:id="@+id/imageBack1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back"
+            android:padding="15dp"
+            android:src="@drawable/ic_back_28"
+            tools:ignore="RtlSymmetry" />
 
         <TextView
             android:id="@+id/txtPlaylistName1"
@@ -79,7 +86,11 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageBack2"
@@ -103,15 +114,34 @@
 
     </LinearLayout>
 
-    <include
-        android:id="@+id/no_data_found"
-        layout="@layout/no_data_found"
-        android:visibility="invisible" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="firstLayout, secondLayout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/song_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier" />
+
+    <include
+        android:id="@+id/no_data_found"
+        layout="@layout/no_data_found"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barrier" />
 
     <!--<com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
         android:id="@+id/song_list"
@@ -124,4 +154,4 @@
         app:fastScrollThumbEnabled="true"
         app:fastScrollThumbInactiveColor="@color/scrollThumb"  />-->
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

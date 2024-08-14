@@ -68,7 +68,7 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
 
             binding.bannerAd.addView(adView)
 
-//            adView!!.loadAd(adRequest)
+            adView!!.loadAd(adRequest)
         }
     }
 

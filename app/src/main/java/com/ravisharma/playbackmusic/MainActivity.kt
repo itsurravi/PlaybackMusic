@@ -531,9 +531,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
             }
             if (check) {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
             } else {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
             }
         }
 
@@ -783,7 +783,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (exist > 0) {
                 musicSrv!!.updateFavNotification(false)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
 
                 viewModel.removeSong(getString(R.string.favTracks), song.id)
             } else {
@@ -792,7 +792,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
                 musicSrv!!.updateFavNotification(true)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
 
                 Toast.makeText(
                     this@MainActivity,
@@ -807,10 +807,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInFav(song: Song?) {
         val exist = viewModel.isSongExist(getString(R.string.favTracks), song!!.id)
         if (exist > 0) {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
             musicSrv!!.updateFavNotification(true)
         } else {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
             musicSrv!!.updateFavNotification(false)
         }
     }
