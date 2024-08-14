@@ -261,6 +261,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun updateBottomPanel(playing: Boolean?) {
         playing?.let {
             binding.apply {
+                txtSongName.isSelected = it
+                txtSongArtist.isSelected = it
                 btnPlayPauseSlide.setImageResource(
                     if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
                 )
