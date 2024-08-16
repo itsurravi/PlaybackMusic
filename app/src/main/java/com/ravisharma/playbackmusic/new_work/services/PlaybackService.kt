@@ -237,6 +237,10 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         exoPlayer.moveMediaItem(from, to)
     }
 
+    override fun onRemove(from: Int) {
+        exoPlayer.removeMediaItem(from)
+    }
+
     override fun onClear() {}
 
     override fun onSetQueue(songs: List<Song>, startPlayingFromPosition: Int) {

@@ -74,7 +74,8 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
         binding.apply {
             val currentQueueAdapter = CurrentQueueAdapter(
                 dragListener = this@CurrentQueueFragment,
-                onItemClick = ::songClicked
+                onItemClick = ::songClicked,
+                onItemRemoveClick = ::removeSongFromQueue
             )
 
             rvSongList.apply {
@@ -95,6 +96,16 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
             itemTouchHelper.attachToRecyclerView(rvSongList)
         }
         initClickListeners()
+    }
+
+    private fun removeSongFromQueue(song: Song, position: Int) {
+        val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
+        val list = adapter.getCurrentList().map {
+            it.copy()
+        }.toMutableList()
+        list.removeAt(position)
+        adapter.submitList(list)
+        mainViewModel.onSongRemoveFromQueue(position)
     }
 
     private fun initClickListeners() {

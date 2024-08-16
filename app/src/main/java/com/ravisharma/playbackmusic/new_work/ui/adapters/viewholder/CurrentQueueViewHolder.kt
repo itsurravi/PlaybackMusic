@@ -22,7 +22,8 @@ class CurrentQueueViewHolder(
     fun bind(
         song: Song,
         onItemClick: ((Song, Int) -> Unit)? = null,
-        onItemLongClick: ((Song, Int) -> Unit)? = null
+        onItemLongClick: ((Song, Int) -> Unit)? = null,
+        onItemRemoveClick: ((Song, Int) -> Unit)? = null
     ) {
         binding.apply {
             songTitle.text = song.title
@@ -48,6 +49,9 @@ class CurrentQueueViewHolder(
                     }
                     return@setOnLongClickListener true
                 }
+            }
+            imgRemove.setOnClickListener {
+                onItemRemoveClick?.let { it1 -> it1(song, bindingAdapterPosition) }
             }
             ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {

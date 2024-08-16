@@ -129,6 +129,10 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.Default) { queue.apply { add(to, removeAt(from)) } }
         }
 
+        override fun onRemove(from: Int) {
+            viewModelScope.launch(Dispatchers.Default) { queue.apply { removeAt(from) } }
+        }
+
         override fun onClear() {
             viewModelScope.launch(Dispatchers.Default) { queue.clear() }
         }
@@ -329,6 +333,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun onSongDrag(fromIndex: Int, toIndex: Int) = queueService.moveSong(fromIndex, toIndex)
+
+    fun onSongRemoveFromQueue(fromIndex: Int) = queueService.removeSong(fromIndex)
 
     fun setLastPlayedList() {
         viewModelScope.launch(Dispatchers.Default) {

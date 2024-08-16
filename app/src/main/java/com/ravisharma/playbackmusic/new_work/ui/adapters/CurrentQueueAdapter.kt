@@ -14,7 +14,8 @@ import java.util.Collections
 class CurrentQueueAdapter(
     private var dragListener: StartDragListener,
     private val onItemClick: ((Song, Int) -> Unit)? = null,
-    private val onItemLongClick: ((Song, Int) -> Unit)? = null
+    private val onItemLongClick: ((Song, Int) -> Unit)? = null,
+    private val onItemRemoveClick: ((Song, Int) -> Unit)? = null
 ) : RecyclerView.Adapter<CurrentQueueViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song>() {
@@ -52,7 +53,8 @@ class CurrentQueueAdapter(
         holder.bind(
             song = differList.currentList[position],
             onItemClick = onItemClick,
-            onItemLongClick = onItemLongClick
+            onItemLongClick = onItemLongClick,
+            onItemRemoveClick = onItemRemoveClick
         )
     }
 

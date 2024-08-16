@@ -17,6 +17,7 @@ interface QueueService {
     fun append(songs: List<Song>): Boolean
     fun update(song: Song): Boolean
     fun moveSong(initialPosition: Int, finalPosition: Int): Boolean
+    fun removeSong(from: Int)
 
     fun clearQueue()
     fun setQueue(songs: List<Song>, startPlayingFromPosition: Int)
@@ -34,6 +35,7 @@ interface QueueService {
         fun onAppend(songs: List<Song>)
         fun onUpdate(updatedSong: Song, position: Int)
         fun onMove(from: Int, to: Int)
+        fun onRemove(from: Int)
         fun onClear()
         fun onSetQueue(songs: List<Song>, startPlayingFromPosition: Int)
     }
@@ -76,17 +78,17 @@ class QueueServiceImpl() : QueueService {
     override fun update(song: Song): Boolean {
         if (!locations.contains(song.location)) return false
         var position = -1
-        for (idx in mutableQueue.indices){
-            if (mutableQueue[idx].location == song.location){
+        for (idx in mutableQueue.indices) {
+            if (mutableQueue[idx].location == song.location) {
                 mutableQueue[idx] = song
                 position = idx
                 break
             }
         }
-        if (song.location == _currentSong.value?.location){
+        if (song.location == _currentSong.value?.location) {
             _currentSong.update { song }
         }
-        if (position != -1){
+        if (position != -1) {
             callbacks.forEach { it.onUpdate(song, position) }
         }
         return true
@@ -103,6 +105,13 @@ class QueueServiceImpl() : QueueService {
         return true
     }
 
+    override fun removeSong(from: Int) {
+        mutableQueue.apply {
+            removeAt(from)
+        }
+        callbacks.forEach { it.onRemove(from) }
+    }
+
     override fun clearQueue() {
         mutableQueue.clear()
         _currentSong.update { null }
@@ -111,13 +120,13 @@ class QueueServiceImpl() : QueueService {
     }
 
     override fun setQueue(songs: List<Song>, startPlayingFromPosition: Int) {
-        if(songs.isEmpty()) return
+        if (songs.isEmpty()) return
         mutableQueue.apply {
             clear()
             addAll(songs)
         }
         val idx = if (startPlayingFromPosition >= songs.size || startPlayingFromPosition < 0) 0
-            else startPlayingFromPosition
+        else startPlayingFromPosition
         _currentSong.update { mutableQueue[idx] }
         locations.clear()
         songs.forEach { locations.add(it.location) }
