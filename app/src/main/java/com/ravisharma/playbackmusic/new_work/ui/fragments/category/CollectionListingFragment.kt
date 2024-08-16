@@ -40,6 +40,8 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
     private var adView: AdView? = null
     private var adUnitId: String? = null
 
+    private var reorderListAllowed: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -116,10 +118,12 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                         }
 
                         CollectionType.PlaylistType -> {
+                            reorderListAllowed = true
                             adUnitId = getString(R.string.playlistActId)
                         }
 
                         CollectionType.FavouritesType -> {
+                            reorderListAllowed = true
                             adUnitId = getString(R.string.SingleSongActId)
                         }
 

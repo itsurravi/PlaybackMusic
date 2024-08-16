@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -52,6 +53,27 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
 
     private lateinit var binding: ActivitySingleSongPlayBinding
 
+    private val isPermissionGranted: (Boolean) -> Unit = {
+        runTask()
+    }
+
+    private val requestMultiplePermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (!permissions.isNullOrEmpty()) {
+            val isGranted = permissions.entries.all { it.value }
+            permissions.entries.forEach {
+                Log.i("DEBUG_PERMISSIONS", "${it.key} = ${it.value}")
+            }
+            if (isGranted) {
+                println("Successful......")
+                isPermissionGranted(true)
+            } else {
+                checkForRationaleDialog()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySingleSongPlayBinding.inflate(layoutInflater)
@@ -62,7 +84,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
         setFinishOnTouchOutside(false)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermission()
+            checkForMultiplePermissions(getPermissionList())
         } else {
             runTask()
         }
@@ -72,6 +94,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
         loadBanner()
+        Log.d("SongURI", intent.toString() + "")
 
         val data = intent
         setPlayerUI(data.data)
@@ -217,6 +240,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
                 }
                 player!!.setVolume(1.0f, 1.0f)
             }
+
             AudioManager.AUDIOFOCUS_LOSS -> {
                 if (player!!.isPlaying) {
                     player!!.pause()
@@ -224,6 +248,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
                 }
                 killApp()
             }
+
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                 if (player!!.isPlaying) {
                     player!!.setVolume(0.1f, 0.1f)
@@ -231,6 +256,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
                 }
                 killApp()
             }
+
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> if (player!!.isPlaying) {
                 player!!.setVolume(0.1f, 0.1f)
             }
@@ -433,75 +459,90 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
     /*
      *  Permissions Checking
      * */
-    private fun checkPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WAKE_LOCK
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.FOREGROUND_SERVICE
-            ) == PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.MODIFY_AUDIO_SETTINGS
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            runTask()
+    private fun checkForMultiplePermissions(manifestPermissions: Array<String>) {
+        var isDenied = false
+        for (permission in manifestPermissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                println("Permission Granted....")
+                isDenied = false
+            } else if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    permission
+                )
+            ) {
+                isDenied = true
+            } else {
+                requestMultiplePermissionsLauncher.launch(manifestPermissions)
+            }
+        }
+        if (isDenied) {
+            isPermissionGranted(false)
+            showPermissionRationaleDialog(true)
         } else {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.WAKE_LOCK,
-                    Manifest.permission.FOREGROUND_SERVICE,
-                    Manifest.permission.MODIFY_AUDIO_SETTINGS
-                ), 1
-            )
+            runTask()
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                runTask()
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    )
-                ) {
-                    finish()
+    private fun checkForRationaleDialog() {
+        val permissions = getPermissionList()
+
+        val showRationale = permissions.all {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                it
+            )
+        }
+
+        showPermissionRationaleDialog(showRationale)
+    }
+
+    private fun showPermissionRationaleDialog(showRationale: Boolean) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.permissionAlert))
+            .setPositiveButton(getString(R.string.Grant)) { dialog, id ->
+                if (showRationale) {
+                    requestMultiplePermissionsLauncher.launch(getPermissionList())
+                    dialog.cancel()
                 } else {
-                    val builder = AlertDialog.Builder(this)
-                    builder.setMessage(getString(R.string.permissionAlert))
-                        .setPositiveButton(getString(R.string.Grant)) { dialog, id ->
-                            finish()
-                            val intent = Intent(
-                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                Uri.fromParts(getString(R.string.packageName), packageName, null)
-                            )
-                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                            startActivity(intent)
-                        }
-                        .setNegativeButton(getString(R.string.dont)) { dialog, id -> finish() }
-                    builder.setCancelable(false)
-                    builder.create().show()
+                    finish()
+                    val intent = Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts(getString(R.string.packageName), packageName, null)
+                    )
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
                 }
             }
+            .setNegativeButton(getString(R.string.dont)) { dialog, id -> finish() }
+        builder.setCancelable(false)
+        builder.create().show()
+    }
+
+    private fun getPermissionList(): Array<String> {
+        val permissions = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            permissions.add(Manifest.permission.READ_MEDIA_AUDIO)
+        } else {
+            permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            permissions.add(Manifest.permission.FOREGROUND_SERVICE)
+        }
+        permissions.add(Manifest.permission.MODIFY_AUDIO_SETTINGS)
+        permissions.add(Manifest.permission.WAKE_LOCK)
+
+        val list = permissions.filter {
+            ContextCompat.checkSelfPermission(
+                this,
+                it
+            ) != PackageManager.PERMISSION_GRANTED
+        }
+        return list.toTypedArray()
     }
 }
