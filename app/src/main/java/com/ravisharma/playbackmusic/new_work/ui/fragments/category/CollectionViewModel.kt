@@ -54,7 +54,9 @@ class CollectionViewModel @Inject constructor(
             when (type?.type) {
                 CollectionType.MostPlayedType -> {
                     songService.getMostPlayedSongs().map {
-                        if (it.isEmpty()) CollectionUi()
+                        if (it.isEmpty()) CollectionUi(
+                            topBarTitle = "Most Played",
+                        )
                         else {
                             CollectionUi(
                                 songs = it,

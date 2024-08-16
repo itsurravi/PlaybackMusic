@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentSearchBinding
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -49,6 +49,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         binding.apply {
             imgBack.setOnClickListener {
                 findNavController().popBackStack()
+            }
+            tvClear.setOnClickListener {
+                edSearch.text?.clear()
             }
         }
     }

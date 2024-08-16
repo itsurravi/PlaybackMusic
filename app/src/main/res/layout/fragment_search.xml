@@ -10,7 +10,6 @@
         android:id="@+id/cv_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         app:cardBackgroundColor="@color/colorPrimary"
         app:cardCornerRadius="0dp"
         app:cardElevation="4dp"
@@ -57,14 +56,14 @@
                 android:textCursorDrawable="@null" />
 
             <ImageView
-                android:id="@+id/tvSearch"
+                android:id="@+id/tvClear"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/search"
                 android:padding="15dp"
-                android:src="@drawable/ic_search"
+                android:src="@drawable/ic_close_24"
                 android:text="@string/search"
                 android:textColor="@color/textPrimary" />
 
@@ -76,6 +75,8 @@
         android:id="@+id/song_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingVertical="8dp"
         app:layout_constrainedHeight="true"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"

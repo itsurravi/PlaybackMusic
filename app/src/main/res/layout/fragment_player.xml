@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_home_bottom"
+    android:background="@color/contentBGclr"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
         android:orientation="horizontal">
 
         <ImageView
@@ -17,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
+            android:padding="15dp"
             android:src="@drawable/ic_back_28"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
+            android:padding="15dp"
             android:src="@drawable/ic_more_options"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
