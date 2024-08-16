@@ -24,6 +24,7 @@ import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.StartDragListener
+import com.ravisharma.playbackmusic.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -100,7 +101,12 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
 
     private fun removeSongFromQueue(song: Song, position: Int) {
         val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
-        val list = adapter.getCurrentList().map {
+        val adapterList = adapter.getCurrentList()
+        if(adapterList.size == 1) {
+            requireContext().showToast("Last song left in queue")
+            return
+        }
+        val list = adapterList.map {
             it.copy()
         }.toMutableList()
         list.removeAt(position)
