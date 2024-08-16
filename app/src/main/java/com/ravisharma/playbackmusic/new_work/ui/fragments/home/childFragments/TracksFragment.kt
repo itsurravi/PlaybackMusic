@@ -65,7 +65,7 @@ class TracksFragment : Fragment() {
 
     private fun setupFragment() {
         adView = AdView(requireContext())
-        adUnitId = getString(R.string.SingleSongActId)
+        adUnitId = getString(R.string.tracksFragId)
         loadBanner()
     }
 

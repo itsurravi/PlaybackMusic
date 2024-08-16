@@ -17,6 +17,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.RoundedCornersTransformation
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.data.utils.toMS
@@ -45,6 +48,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     @Inject
     lateinit var exoPlayer: ExoPlayer
+
+    private var adView: AdView? = null
+    private var adUnitId: String? = null
 
     private val pendingPausePlayIntent by lazy {
         PendingIntent.getBroadcast(
@@ -87,8 +93,25 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private fun setupFragment() {
+        adView = AdView(requireContext())
         initViews()
         initObservers()
+
+        adUnitId = getString(R.string.nowPlayingActId)
+        loadBanner()
+    }
+
+    private fun loadBanner() {
+        adUnitId?.let { unitId ->
+            val adRequest = AdRequest.Builder().build()
+            val adSize = AdSize.BANNER
+            adView!!.adUnitId = unitId
+            adView!!.setAdSize(adSize)
+
+            binding.bannerContainerPlayer.addView(adView)
+
+            adView!!.loadAd(adRequest)
+        }
     }
 
     private fun initObservers() {

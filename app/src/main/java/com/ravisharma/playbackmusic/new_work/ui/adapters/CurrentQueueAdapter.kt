@@ -6,13 +6,16 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.databinding.AdapSongBinding
-import com.ravisharma.playbackmusic.new_work.ui.adapters.viewholder.TrackViewHolder
+import com.ravisharma.playbackmusic.databinding.AdapNowPlayingBinding
+import com.ravisharma.playbackmusic.new_work.ui.adapters.viewholder.CurrentQueueViewHolder
+import com.ravisharma.playbackmusic.utils.StartDragListener
+import java.util.Collections
 
 class CurrentQueueAdapter(
+    private var dragListener: StartDragListener,
     private val onItemClick: ((Song, Int) -> Unit)? = null,
     private val onItemLongClick: ((Song, Int) -> Unit)? = null
-) : RecyclerView.Adapter<TrackViewHolder>() {
+) : RecyclerView.Adapter<CurrentQueueViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<Song>() {
         override fun areItemsTheSame(oldItem: Song, newItem: Song): Boolean {
@@ -34,9 +37,10 @@ class CurrentQueueAdapter(
         return differList.currentList
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        return TrackViewHolder(
-            AdapSongBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrentQueueViewHolder {
+        return CurrentQueueViewHolder(
+            dragListener,
+            AdapNowPlayingBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -44,7 +48,7 @@ class CurrentQueueAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CurrentQueueViewHolder, position: Int) {
         holder.bind(
             song = differList.currentList[position],
             onItemClick = onItemClick,

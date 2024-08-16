@@ -201,19 +201,10 @@
         app:itemActiveIndicatorStyle="@style/BottomNavigationIndicator"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@id/bannerAd"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bottom_panel"
         app:menu="@menu/bottom_navigation_menu" />
-
-    <FrameLayout
-        android:id="@+id/bannerAd"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bottomNavigationView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

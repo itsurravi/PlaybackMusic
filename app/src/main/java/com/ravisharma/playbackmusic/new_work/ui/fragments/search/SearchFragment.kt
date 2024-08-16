@@ -13,6 +13,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentSearchBinding
@@ -36,6 +39,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private val searchViewModel: SearchViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
+    private var adView: AdView? = null
+    private var adUnitId: String? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSearchBinding.bind(view)
@@ -44,8 +50,13 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun setupFragment() {
+        adView = AdView(requireContext())
         initViews()
         initObserver()
+
+        adUnitId = getString(R.string.searchActId)
+        loadBanner()
+
         binding.apply {
             imgBack.setOnClickListener {
                 findNavController().popBackStack()
@@ -53,6 +64,19 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             tvClear.setOnClickListener {
                 edSearch.text?.clear()
             }
+        }
+    }
+
+    private fun loadBanner() {
+        adUnitId?.let { unitId ->
+            val adRequest = AdRequest.Builder().build()
+            val adSize = AdSize.BANNER
+            adView!!.adUnitId = unitId
+            adView!!.setAdSize(adSize)
+
+            binding.bannerContainerSearch.addView(adView)
+
+            adView!!.loadAd(adRequest)
         }
     }
 

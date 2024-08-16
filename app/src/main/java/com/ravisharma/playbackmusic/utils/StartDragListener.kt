@@ -1,7 +1,7 @@
-package com.ravisharma.playbackmusic.utils;
+package com.ravisharma.playbackmusic.utils
 
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView
 
-public interface StartDragListener {
-    void requestDrag(RecyclerView.ViewHolder viewHolder);
+interface StartDragListener {
+    fun requestDrag(viewHolder: RecyclerView.ViewHolder)
 }

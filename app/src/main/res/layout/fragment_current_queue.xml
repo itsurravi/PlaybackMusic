@@ -11,11 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@id/rv_song_list"
+        app:layout_constraintBottom_toTopOf="@id/currentPlayingPanel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed">
 
         <ImageView
             android:id="@+id/ivBack"
@@ -169,6 +170,15 @@
             app:layout_constraintTop_toBottomOf="@id/songArt" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <FrameLayout
+        android:id="@+id/bannerAd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/rv_song_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/currentPlayingPanel" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_song_list"
         android:layout_width="match_parent"
@@ -177,6 +187,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/currentPlayingPanel" />
+        app:layout_constraintTop_toBottomOf="@id/bannerAd" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -58,7 +58,6 @@ import com.google.gson.Gson
 import com.ravisharma.playbackmusic.MusicService.MusicBinder
 import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.activities.EqualizerActivity
-import com.ravisharma.playbackmusic.activities.SearchActivity
 import com.ravisharma.playbackmusic.broadcast.Timer
 import com.ravisharma.playbackmusic.database.model.LastPlayed
 import com.ravisharma.playbackmusic.database.model.MostPlayed
@@ -78,17 +77,13 @@ import com.ravisharma.playbackmusic.prefrences.TinyDB
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
-import com.ravisharma.playbackmusic.utils.UpdateManager.FlexibleUpdateDownloadListener
-import com.ravisharma.playbackmusic.utils.UpdateManager.UpdateInfoListener
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import org.jsoup.Jsoup
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -574,7 +569,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun loadBanner1() {
         adView = AdView(this)
-        adView!!.adUnitId = getString(R.string.mainActId)
+        adView!!.adUnitId = getString(R.string.tracksFragId)
         binding.playingPanel.bannerContainerPlayer.addView(adView)
 
         val adRequest = AdRequest.Builder().build()
