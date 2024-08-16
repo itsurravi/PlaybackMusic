@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@id/currentPlayingPanel"
         app:layout_constraintEnd_toEndOf="parent"
