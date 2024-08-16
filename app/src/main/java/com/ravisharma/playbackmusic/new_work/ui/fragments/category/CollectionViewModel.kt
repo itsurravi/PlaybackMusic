@@ -12,7 +12,7 @@ import com.ravisharma.playbackmusic.new_work.services.data.PlayerService
 import com.ravisharma.playbackmusic.new_work.services.data.PlaylistService
 import com.ravisharma.playbackmusic.new_work.services.data.QueueService
 import com.ravisharma.playbackmusic.new_work.services.data.SongService
-import com.ravisharma.playbackmusic.utils.showToast
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

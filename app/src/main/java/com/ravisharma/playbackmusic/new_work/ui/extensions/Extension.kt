@@ -8,6 +8,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import coil.load
 import coil.transform.RoundedCornersTransformation
@@ -27,6 +28,10 @@ sealed class LongItemClick(val title: String) {
     //    object Delete : LongItemClick("Delete")
     object Share : LongItemClick("Share")
     object Details : LongItemClick("Details")
+}
+
+fun Context.showToast(msg: String) {
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
 fun Context.onSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {

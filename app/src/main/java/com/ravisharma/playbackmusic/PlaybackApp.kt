@@ -6,15 +6,14 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.google.android.gms.ads.MobileAds
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class PlaybackApp : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
-        /*MobileAds.initialize(this, initializationStatus -> {
-
-        });*/
+        MobileAds.initialize(this) {  }
     }
 
     override fun newImageLoader(): ImageLoader {

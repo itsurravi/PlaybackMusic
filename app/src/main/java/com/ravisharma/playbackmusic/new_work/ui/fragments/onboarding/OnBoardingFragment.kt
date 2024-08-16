@@ -23,7 +23,7 @@ import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.FragmentOnboardingBinding
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
-import com.ravisharma.playbackmusic.utils.showToast
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
