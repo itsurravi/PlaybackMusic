@@ -51,7 +51,7 @@
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@color/textColor"
+            android:textColor="@color/textPrimary"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/txtSongArtist"
             app:layout_constraintEnd_toStartOf="@id/btn_PlayPause_slide"
@@ -72,7 +72,7 @@
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/textColor"
+            android:textColor="@color/textSecondary"
             app:layout_constraintBottom_toBottomOf="@id/slideImage"
             app:layout_constraintEnd_toStartOf="@id/btn_PlayPause_slide"
             app:layout_constraintStart_toEndOf="@id/slideImage"
@@ -149,7 +149,7 @@
                 android:layout_marginEnd="20dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/eq"
-                android:src="@drawable/ic_equalizer2"
+                android:src="@drawable/ic_equalizer"
                 app:layout_constraintEnd_toStartOf="@id/imgFav"
                 app:layout_constraintTop_toTopOf="@id/imgFav" />
 
@@ -160,7 +160,7 @@
                 android:layout_marginBottom="12dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/fav"
-                android:src="@drawable/ic_fav_not"
+                android:src="@drawable/ic_favorite_not_24"
                 app:layout_constraintBottom_toTopOf="@id/pipe"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
@@ -183,7 +183,7 @@
                 android:layout_marginEnd="2dp"
                 android:paddingEnd="5dp"
                 android:text="@string/time0"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 app:layout_constraintBottom_toBottomOf="@id/pipe"
                 app:layout_constraintEnd_toStartOf="@id/pipe"
                 app:layout_constraintTop_toTopOf="@id/pipe"
@@ -195,7 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="@string/pipe"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 app:layout_constraintBottom_toTopOf="@id/seekBar"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
@@ -209,7 +209,7 @@
                 android:paddingStart="5dp"
                 android:text="@string/time0"
                 android:textAlignment="textEnd"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 app:layout_constraintBottom_toBottomOf="@id/pipe"
                 app:layout_constraintStart_toEndOf="@id/pipe"
                 app:layout_constraintTop_toTopOf="@id/pipe"
@@ -224,7 +224,7 @@
                 android:layout_marginBottom="12dp"
                 android:padding="7dp"
                 android:progressTint="@color/seek_progress"
-                android:thumbTint="@color/textColor"
+                android:thumbTint="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/btn_PlayPause"
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toStartOf="@id/guidelineLeft" />
@@ -295,6 +295,7 @@
                 app:layout_constraintEnd_toEndOf="@id/guidelineRight"
                 app:layout_constraintStart_toEndOf="@id/btn_Next"
                 app:layout_constraintTop_toTopOf="@id/btn_Next"
+                app:tint="@color/white"
                 tools:targetApi="lollipop" />
 
             <androidx.constraintlayout.widget.Guideline

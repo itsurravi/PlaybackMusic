@@ -36,7 +36,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -59,7 +58,6 @@ import com.google.gson.Gson
 import com.ravisharma.playbackmusic.MusicService.MusicBinder
 import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.activities.EqualizerActivity
-import com.ravisharma.playbackmusic.activities.SearchActivity
 import com.ravisharma.playbackmusic.broadcast.Timer
 import com.ravisharma.playbackmusic.database.model.LastPlayed
 import com.ravisharma.playbackmusic.database.model.MostPlayed
@@ -92,7 +90,7 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragmentItemClicked,
-    NowPlayingFragment.OnFragmentItemClicked, CategorySongFragment.OnFragmentItemClicked {
+    NowPlayingFragment.OnFragmentItemClicked/*, CategorySongFragment.OnFragmentItemClicked*/ {
 
     private var TAG: String? = null
     private var CHANNEL_ID: String? = null
@@ -202,7 +200,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         TAG = getString(R.string.app_name)
 
         binding.toolbar.title = getString(R.string.app_name)
-        binding.toolbar.setTitleTextColor(resources.getColor(R.color.titleColor))
+        binding.toolbar.setTitleTextColor(resources.getColor(R.color.textPrimary))
 
         setSupportActionBar(binding.toolbar)
     }
@@ -218,50 +216,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private val permissions33 = listOf(
-        Manifest.permission.READ_MEDIA_AUDIO,
-        Manifest.permission.WAKE_LOCK,
-        Manifest.permission.POST_NOTIFICATIONS,
-        Manifest.permission.FOREGROUND_SERVICE,
-        Manifest.permission.MODIFY_AUDIO_SETTINGS,
-    )
-
-    private val permissions = listOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WAKE_LOCK,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.FOREGROUND_SERVICE,
-        Manifest.permission.MODIFY_AUDIO_SETTINGS,
-    )
-
     /*
      *  Permissions Checking
      * */
     private fun checkPermission() {
-        var isPermissionGranted = false
-        val permissionList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions33
-        } else {
-            permissions
-        }
-        for (permission in permissionList) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                isPermissionGranted = false
-                break
-            }
-            isPermissionGranted = true
-        }
-        if(isPermissionGranted) {
-            runTask()
-        } else {
-            showPermissionReasonDialog()
-        }
-        /*if ((ContextCompat.checkSelfPermission(
+        if ((ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED &&
@@ -285,7 +244,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             runTask()
         } else {
             showPermissionReasonDialog()
-        }*/
+        }
     }
 
     private fun showPermissionReasonDialog() {
@@ -305,17 +264,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         dialogBinding.txtSave.setOnClickListener {
             alertDialog.dismiss()
             ActivityCompat.requestPermissions(
-                this, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissions33.toTypedArray()
-                } else {
-                    permissions.toTypedArray()
-                }, 1
+                this, arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.WAKE_LOCK,
+                    Manifest.permission.FOREGROUND_SERVICE,
+                    Manifest.permission.MODIFY_AUDIO_SETTINGS
+                ), 1
             )
         }
         alertDialog.show()
     }
 
-    override fun onRequestPermissionsResult(
+    /*override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
         grantResults: IntArray
@@ -325,14 +286,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 runTask()
             } else {
-                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    Manifest.permission.READ_MEDIA_AUDIO
-                } else {
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                }
                 if (ActivityCompat.shouldShowRequestPermissionRationale(
                         this,
-                        permission
+                        Manifest.permission.READ_EXTERNAL_STORAGE
                     )
                 ) {
                     finish()
@@ -362,7 +318,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
             }
         }
-    }
+    }*/
 
     private fun runTask() {
         clearPrefDataOnAppUpdate()
@@ -396,7 +352,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun setUpView() {
         if (playIntent == null) {
             playIntent = Intent(this, MusicService::class.java)
-            bindService(playIntent, musicConnection, BIND_AUTO_CREATE)
+            bindService(playIntent!!, musicConnection, BIND_AUTO_CREATE)
         }
         musicSrv = MusicService()
         binding.playingPanel.playerController.alpha = 0f
@@ -519,12 +475,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     songList.size == 0 -> {
                         start = false
                     }
-
                     songList.size <= position.toInt() -> {
                         songPosn = 0
                         setSongPosition(songPosn)
                     }
-
                     else -> {
                         songPosn = position.toInt()
                         setSongPosition(songPosn)
@@ -572,9 +526,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
             }
             if (check) {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
             } else {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
             }
         }
 
@@ -615,7 +569,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
     private fun loadBanner1() {
         adView = AdView(this)
-        adView!!.adUnitId = getString(R.string.mainActId)
+        adView!!.adUnitId = getString(R.string.tracksFragId)
         binding.playingPanel.bannerContainerPlayer.addView(adView)
 
         val adRequest = AdRequest.Builder().build()
@@ -633,7 +587,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 onFragmentItemClick(position, songsArrayList, false)
             }
 
-            /*if (requestCode != SEARCH_RESULT) {
+            if (requestCode != SEARCH_RESULT) {
                 if (DELETE_URI != null) {
                     val file = File(DELETE_URI!!.path!!)
                     if (file.exists()) {
@@ -652,7 +606,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         fragment.onActivityResult(requestCode, resultCode, data)
                     }
                 }
-            }*/
+            }
         }
     }
 
@@ -824,7 +778,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (exist > 0) {
                 musicSrv!!.updateFavNotification(false)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
 
                 viewModel.removeSong(getString(R.string.favTracks), song.id)
             } else {
@@ -833,7 +787,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
                 musicSrv!!.updateFavNotification(true)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
 
                 Toast.makeText(
                     this@MainActivity,
@@ -848,10 +802,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInFav(song: Song?) {
         val exist = viewModel.isSongExist(getString(R.string.favTracks), song!!.id)
         if (exist > 0) {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
             musicSrv!!.updateFavNotification(true)
         } else {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_fav_not)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
             musicSrv!!.updateFavNotification(false)
         }
     }
@@ -966,16 +920,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         //menu item selected
         when (item.itemId) {
             R.id.timer -> showTimer()
-            R.id.equalizer -> {
+            /*R.id.equalizer -> {
                 val eq = Intent(this@MainActivity, EqualizerActivity::class.java)
                 startActivity(eq)
             }
-
             R.id.search -> {
                 val i = Intent(this@MainActivity, SearchActivity::class.java)
                 startActivityForResult(i, SEARCH_RESULT)
-            }
-
+            }*/
             R.id.rescan -> {
                 val scan = SongsProvider()
                 scan.fetchAllData(contentResolver).observe(this) { aBoolean ->
@@ -984,7 +936,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     }
                 }
             }
-
             R.id.share -> try {
                 val shareIntent = Intent(Intent.ACTION_SEND)
                 shareIntent.type = "text/plain"
@@ -997,7 +948,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             } catch (e: Exception) {
                 //e.toString();
             }
-
             R.id.rateUs -> launchMarket()
             R.id.suggestion -> {
                 val email = Intent(Intent.ACTION_SEND)
@@ -1007,7 +957,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 email.type = "message/rfc822"
                 startActivity(Intent.createChooser(email, "Choose an Email client :"))
             }
-
             R.id.about -> startActivity(Intent(this@MainActivity, AboutActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
@@ -1090,7 +1039,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 dialogBinding.timerBlocker.visibility = View.VISIBLE
                 alertDialog.setCancelable(true)
                 if (am != null && pi != null) {
-                    am!!.cancel(pi)
+                    am!!.cancel(pi!!)
                     am = null
                     pi = null
                     showSnackBar(getString(R.string.timeOff))
@@ -1109,27 +1058,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                         setTimer(15 * 60 * 1000)
                         showSnackBar(getString(R.string.mins15))
                     }
-
                     1 -> {
                         setTimer(30 * 60 * 1000)
                         showSnackBar(getString(R.string.mins30))
                     }
-
                     2 -> {
                         setTimer(45 * 60 * 1000)
                         showSnackBar(getString(R.string.mins45))
                     }
-
                     3 -> {
                         setTimer(60 * 60 * 1000)
                         showSnackBar(getString(R.string.mins60))
                     }
-
                     4 -> {
                         setTimer(90 * 60 * 1000)
                         showSnackBar(getString(R.string.mins90))
                     }
-
                     5 -> {
                         setTimer(120 * 60 * 1000)
                         showSnackBar(getString(R.string.mins120))
@@ -1171,7 +1115,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         val i = Intent(this, Timer::class.java)
         pi = PendingIntent.getBroadcast(this, 1234, i, PendingIntent.FLAG_IMMUTABLE)
         am = getSystemService(ALARM_SERVICE) as AlarmManager
-        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi
+        am!![AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + time] = pi!!
     }
 
     //play next
@@ -1248,7 +1192,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
 
         if (TIMER && timerSelectedValue) {
-            am!!.cancel(pi)
+            am!!.cancel(pi!!)
         }
         if (mediaSession != null) {
             mediaSession!!.release()
@@ -1637,8 +1581,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             }
         } catch (exp: Exception) {
             menu?.let { menu ->
-                val menuItem = menu.findItem(R.id.equalizer)
-                menuItem.isVisible = false
+//                val menuItem = menu.findItem(R.id.equalizer)
+//                menuItem.isVisible = false
             }
         }
     }
@@ -1806,17 +1750,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 started = true
                 setPauseIcons()
             } else {
-                Toast.makeText(
-                    this@MainActivity,
-                    getString(R.string.noSongFoundToPlay),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
             }
-        } ?: Toast.makeText(
-            this@MainActivity,
-            getString(R.string.noSongFoundToPlay),
-            Toast.LENGTH_SHORT
-        ).show()
+        } ?: Toast.makeText(this@MainActivity, getString(R.string.noSongFoundToPlay), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,22 +7,27 @@
     android:orientation="vertical"
     tools:context=".fragments.AlbumsFragment">
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <FrameLayout
+        android:id="@+id/bannerAd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/album_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/album_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="2000"
-        app:fastScrollEnableThumbInactiveColor="true"
-        app:fastScrollPopupBackgroundSize="@dimen/scrollPopupBackgroundSize"
-        app:fastScrollPopupBgColor="@color/scrollThumb"
-        app:fastScrollPopupPosition="adjacent"
-        app:fastScrollPopupTextColor="@color/white"
-        app:fastScrollPopupTextSize="@dimen/scrollPopupTextSize"
-        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
-        app:fastScrollThumbColor="@color/scrollThumb"
-        app:fastScrollThumbEnabled="true"
-        app:fastScrollThumbInactiveColor="@color/scrollThumb"/>
+        android:clipToPadding="false"
+        android:paddingBottom="90dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bannerAd" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

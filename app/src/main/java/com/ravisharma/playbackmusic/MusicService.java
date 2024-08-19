@@ -16,7 +16,6 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.core.app.NotificationCompat;
@@ -405,7 +404,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 .Builder(R.drawable.ic_previous_24, "Previous", retrievePlaybackIntent(2))
                 .build();
         NotificationCompat.Action playPause = new NotificationCompat.Action
-                .Builder(R.drawable.ic_pause_24, "PlayPause", retrievePlaybackIntent(3))
+                .Builder(R.drawable.ic_baseline_pause_24, "PlayPause", retrievePlaybackIntent(3))
                 .build();
         NotificationCompat.Action next = new NotificationCompat.Action
                 .Builder(R.drawable.ic_next_24, "Next", retrievePlaybackIntent(4))
@@ -442,9 +441,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private void togglePlayPauseNotification(boolean playing) {
         if (playing) {
-            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_pause_24, "PlayPause", retrievePlaybackIntent(3));
+            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_baseline_pause_24, "PlayPause", retrievePlaybackIntent(3));
         } else {
-            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_play_24, "PlayPause", retrievePlaybackIntent(3));
+            playerNotification.actions[2] = new Notification.Action(R.drawable.ic_baseline_play_24, "PlayPause", retrievePlaybackIntent(3));
         }
         notificationManagerCompat.notify(id, playerNotification);
     }

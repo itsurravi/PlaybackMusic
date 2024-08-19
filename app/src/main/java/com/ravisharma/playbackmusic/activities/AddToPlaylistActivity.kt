@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -51,9 +50,9 @@ class AddToPlaylistActivity : AppCompatActivity(), OnPlaylistClicked, OnPlaylist
         binding.btnAddNewPlaylist.setOnClickListener { showCreateListAlert() }
 
         adView = AdView(this)
-        adView!!.adUnitId = getString(R.string.addToPlaylist)
+        adView!!.adUnitId = getString(R.string.addToPlaylistFragId)
 
-        binding.bannerContainerAddToPlaylist.addView(adView)
+        binding.bannerAd.addView(adView)
         loadBanner()
     }
 

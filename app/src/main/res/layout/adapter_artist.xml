@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/listitemTitle" />
+                android:textColor="@color/textPrimary" />
 
             <TextView
                 android:id="@+id/numberOfSongs"
@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:textColor="@color/listitemArtist" />
+                android:textColor="@color/textSecondary" />
         </LinearLayout>
 
         <ImageView

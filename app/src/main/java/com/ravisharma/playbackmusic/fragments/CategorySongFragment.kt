@@ -1,4 +1,5 @@
 package com.ravisharma.playbackmusic.fragments
+/*
 
 import android.app.RecoverableSecurityException
 import android.content.ContentUris
@@ -485,4 +486,4 @@ class CategorySongFragment : Fragment(), CategoryAdapter.OnItemClicked,
     interface OnFragmentItemClicked {
         fun onFragmentItemClick(position: Int, songsArrayList: ArrayList<Song>, nowPlaying: Boolean)
     }
-}
+}*/

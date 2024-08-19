@@ -65,7 +65,7 @@
         android:layout_marginTop="10dp"
         android:padding="7dp"
         android:progressTint="@color/seek_progress"
-        android:thumbTint="@color/textColor" />
+        android:thumbTint="@color/white" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="5dp"
                 android:text="@string/time0"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 tools:ignore="RtlSymmetry" />
 
             <TextView
@@ -96,7 +96,7 @@
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
                 android:text="@string/pipe"
-                android:textColor="@color/textColor" />
+                android:textColor="@color/textPrimary" />
 
             <TextView
                 android:id="@+id/tvTotalDuration"
@@ -105,7 +105,7 @@
                 android:paddingStart="5dp"
                 android:text="@string/time0"
                 android:textAlignment="textEnd"
-                android:textColor="@color/textColor"
+                android:textColor="@color/textPrimary"
                 tools:ignore="RtlSymmetry" />
 
         </LinearLayout>

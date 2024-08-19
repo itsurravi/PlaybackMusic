@@ -44,7 +44,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@color/listitemTitle"
+                    android:textColor="@color/textPrimary"
                     tools:text="Title 1" />
 
                 <TextView
@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:textColor="@color/listitemArtist"
+                    android:textColor="@color/textSecondary"
                     android:textSize="12sp"
                     tools:text="Artist 1" />
 
@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
                     tools:text="0:00"
-                    android:textColor="@color/listitemDuration" />
+                    android:textColor="@color/textPrimary" />
 
             </LinearLayout>
 

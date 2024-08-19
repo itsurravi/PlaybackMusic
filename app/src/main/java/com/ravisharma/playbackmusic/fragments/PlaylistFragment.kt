@@ -61,8 +61,8 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
 
         binding.apply {
             cardRecentAdded.setOnClickListener(this@PlaylistFragment)
-            cardLastPlayed.setOnClickListener(this@PlaylistFragment)
-            cardMostPlayed.setOnClickListener(this@PlaylistFragment)
+//            cardLastPlayed.setOnClickListener(this@PlaylistFragment)
+//            cardMostPlayed.setOnClickListener(this@PlaylistFragment)
             btnAddNewPlaylist.setOnClickListener(this@PlaylistFragment)
         }
 
@@ -104,16 +104,16 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     }
 
     override fun onPlaylistClick(position: Int) {
-        val bundle = Bundle()
+        /*val bundle = Bundle()
         bundle.putString("argType", PLAYLIST)
         bundle.putString("actName", playListArrayList[position])
-        openFragment(bundle)
+        openFragment(bundle)*/
     }
 
     private fun openFragment(bundle: Bundle) {
-        val fragment = CategorySongFragment()
+        /*val fragment = CategorySongFragment()
         fragment.arguments = bundle
-        requireActivity().openFragment(fragment)
+        requireActivity().openFragment(fragment)*/
     }
 
     override fun onClick(view: View) {
@@ -127,14 +127,14 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
                 bundle.putString("argType", "Recent Added")
                 bundle.putString("actName", "Recent Added")
             }
-            binding.cardLastPlayed -> {
+            /*binding.cardLastPlayed -> {
                 bundle.putString("argType", "Last Played")
                 bundle.putString("actName", "Last Played")
             }
             binding.cardMostPlayed -> {
                 bundle.putString("argType", "Most Played")
                 bundle.putString("actName", "Most Played")
-            }
+            }*/
         }
         openFragment(bundle)
     }

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.ravisharma.playbackmusic.R;
 
 public class PlaylistAlert {
@@ -25,7 +26,7 @@ public class PlaylistAlert {
     public void showCreateListAlert() {
         View v = LayoutInflater.from(context).inflate(R.layout.alert_create_playlist, null);
 
-        final EditText edPlayListName = v.findViewById(R.id.edPlaylistName);
+        final TextInputEditText edPlayListName = v.findViewById(R.id.edPlaylistName);
         TextView tvCancel = v.findViewById(R.id.tvCancel);
         TextView tvOk = v.findViewById(R.id.tvOk);
 
@@ -71,7 +72,7 @@ public class PlaylistAlert {
     public void showUpdateListAlert(final String oldPlaylistName) {
         View v = LayoutInflater.from(context).inflate(R.layout.alert_create_playlist, null);
 
-        final EditText edPlayListName = v.findViewById(R.id.edPlaylistName);
+        final TextInputEditText edPlayListName = v.findViewById(R.id.edPlaylistName);
         TextView dialogTitle = v.findViewById(R.id.dialogTitle);
         TextView tvCancel = v.findViewById(R.id.tvCancel);
         TextView tvOk = v.findViewById(R.id.tvOk);
@@ -95,10 +96,10 @@ public class PlaylistAlert {
 
         tvOk.setOnClickListener(v1 -> {
             String playlistName = edPlayListName.getText().toString().trim();
-            if (playlistName.length() > 0) {
+            if (!playlistName.isEmpty()) {
                 if (playlistName.equalsIgnoreCase("My Favorites") ||
                         playlistName.equalsIgnoreCase("Recent Added") ||
-                        playlistName.equalsIgnoreCase("Last Played") ||
+//                        playlistName.equalsIgnoreCase("Last Played") ||
                         playlistName.equalsIgnoreCase("Most Played")){
 
                     Toast.makeText(context, "Named Playlist Already Exists", Toast.LENGTH_SHORT).show();

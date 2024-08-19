@@ -19,11 +19,12 @@
         app:layout_constraintVertical_bias="0.498" />
 
     <TextView
+        android:id="@+id/tv_no_data_found"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/noSong"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/listitemTitle"
+        android:textColor="@color/textPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

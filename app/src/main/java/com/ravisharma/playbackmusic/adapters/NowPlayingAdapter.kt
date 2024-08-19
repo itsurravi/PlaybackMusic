@@ -3,7 +3,6 @@ package com.ravisharma.playbackmusic.adapters
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.MotionEvent
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
@@ -67,9 +66,9 @@ class NowPlayingAdapter(private var dragListener: StartDragListener) : RecyclerV
                 true
             }
 
-            imgRemove.setOnClickListener {
-                onClick.onItemRemove(holder.adapterPosition)
-            }
+//            imgRemove.setOnClickListener {
+//                onClick.onItemRemove(holder.adapterPosition)
+//            }
 
             ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
