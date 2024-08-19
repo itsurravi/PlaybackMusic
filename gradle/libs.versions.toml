@@ -2,6 +2,7 @@
 compileSdk = "34"
 legacySupportV4 = "1.0.0"
 minSdk = "21"
+
 versionCode = "66"
 versionName = "2.9.0"
 jvm = "17"
