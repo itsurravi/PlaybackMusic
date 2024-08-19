@@ -100,18 +100,22 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
     }
 
     private fun removeSongFromQueue(song: Song, position: Int) {
-        val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
-        val adapterList = adapter.getCurrentList()
-        if(adapterList.size == 1) {
-            requireContext().showToast("Last song left in queue")
-            return
+        viewLifecycleOwner.lifecycleScope.launch {
+            val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
+            val adapterList = adapter.getCurrentList()
+            if(adapterList.size == 1) {
+                requireContext().showToast("Last song left in queue")
+                return@launch
+            }
+            val list = withContext(Dispatchers.Default) {
+                adapterList.map {
+                    it.copy()
+                }.toMutableList()
+            }
+            list.removeAt(position)
+            adapter.submitList(list)
+            mainViewModel.onSongRemoveFromQueue(position)
         }
-        val list = adapterList.map {
-            it.copy()
-        }.toMutableList()
-        list.removeAt(position)
-        adapter.submitList(list)
-        mainViewModel.onSongRemoveFromQueue(position)
     }
 
     private fun initClickListeners() {

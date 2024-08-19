@@ -31,7 +31,7 @@ class CurrentQueueAdapter(
     private val differList = AsyncListDiffer(this, diffCallback)
 
     fun submitList(list: List<Song>, callback: Runnable? = null) {
-        differList.submitList(list, callback)
+        differList.submitList(list.map { it.copy() }, callback)
     }
 
     fun getCurrentList(): List<Song> {
