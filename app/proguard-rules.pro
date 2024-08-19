@@ -23,3 +23,11 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class com.ravisharma.playbackmusic.equalizer.model.** { *; }
+
+-keepclassmembers class * implements android.os.Parcelable {
+    static ** CREATOR;
+}
+
+-keep class com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
+
+-keep class * extends com.google.protobuf.GeneratedMessageLite { *; }

@@ -132,6 +132,9 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                             binding.btnScan.text = "Finish"
                             binding.btnScan.isClickable = true
                             requireContext().showToast("Scan Completed")
+                            launch(Dispatchers.IO) {
+                                viewModel.migratePlaylists()
+                            }
                         }
 
                         ScanStatus.ScanNotRunning -> {}
@@ -145,9 +148,7 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
                     }
                 }
             }
-            launch(Dispatchers.IO) {
-                viewModel.migratePlaylists()
-            }
+
         }
     }
 

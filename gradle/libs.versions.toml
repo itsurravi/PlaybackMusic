@@ -2,8 +2,8 @@
 compileSdk = "34"
 legacySupportV4 = "1.0.0"
 minSdk = "21"
-versionCode = "61"
-versionName = "2.8.4"
+versionCode = "65"
+versionName = "2.9.0"
 jvm = "17"
 
 appUpdate = "2.1.0"

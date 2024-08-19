@@ -24,9 +24,9 @@ import com.ravisharma.playbackmusic.data.utils.Constants
     tableName = Constants.Tables.PLAYLIST_SONG_CROSS_REF_TABLE,
 )
 data class PlaylistSongCrossRef(
-    val playlistId: Long,
+    @ColumnInfo(name = "playlistId") val playlistId: Long,
 
     // refers to location of song
-    @ColumnInfo(index = true)
+    @ColumnInfo(index = true, name = "location")
     val location: String,
 )
