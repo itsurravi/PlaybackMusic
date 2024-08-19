@@ -62,14 +62,19 @@ interface PlaylistDao {
                 )
                 val playlistId = insertPlaylist(playlistToSave)
 
-                insertPlaylistSongCrossRef(
-                    songLocations.map {
-                        PlaylistSongCrossRef(
-                            playlistId = playlistId,
-                            location = it
-                        )
-                    }
-                )
+                try {
+                    insertPlaylistSongCrossRef(
+                        songLocations.map {
+                            PlaylistSongCrossRef(
+                                playlistId = playlistId,
+                                location = it
+                            )
+                        }
+                    )
+                } catch (e: Exception) {
+
+                }
+
             }
         }
     }
