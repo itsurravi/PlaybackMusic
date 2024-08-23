@@ -61,14 +61,12 @@
             android:name=".activities.AddToPlaylistActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.SearchActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".new_work.ui.activity.NewPlayerActivity"
             android:exported="true"
+            android:theme="@style/Theme.App.Starting"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -89,8 +87,8 @@
 
         <service
             android:name=".new_work.services.PlaybackService"
-            android:exported="true"
             android:foregroundServiceType="mediaPlayback"
+            android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
