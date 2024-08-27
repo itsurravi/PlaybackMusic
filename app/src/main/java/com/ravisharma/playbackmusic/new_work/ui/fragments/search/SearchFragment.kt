@@ -25,6 +25,9 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeSystemBarsPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -95,6 +98,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 val title = it?.toString()
                 title?.let { it1 -> searchViewModel.updateQuery(it1) }
             }
+//            cvSearch.changeStatusBarMargin()
+            root.changeSystemBarsPadding()
         }
     }
 

@@ -25,6 +25,8 @@ import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.StartDragListener
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,11 +92,23 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                     )
                 )
             }.also {
-                currentQueueAdapter.submitList(mainViewModel.queue) {
-                    it.scrollToPosition(mainViewModel.queue.indexOf(mainViewModel.currentSong.value))
+                val shuffleIndex = mainViewModel.shuffledIndex
+                val list = if(shuffleIndex.isNotEmpty()) {
+                    shuffleIndex.map {
+                        mainViewModel.queue[it]
+                    }
+                } else {
+                    mainViewModel.queue
+                }
+
+                currentQueueAdapter.submitList(list) {
+                    it.scrollToPosition(list.indexOf(mainViewModel.currentSong.value))
                 }
             }
-            itemTouchHelper.attachToRecyclerView(rvSongList)
+//            itemTouchHelper.attachToRecyclerView(rvSongList)
+
+            topBar.changeStatusBarMargin()
+            rvSongList.changeNavigationBarMargin()
         }
         initClickListeners()
     }
@@ -168,14 +182,20 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
     }
 
     private fun songClicked(song: Song, position: Int) {
-        mainViewModel.playerHelper.seekTo(position, 0)
+        val list = mainViewModel.shuffledIndex
+        val index = if(list.isNotEmpty()) {
+            list[position]
+        } else {
+            position
+        }
+        mainViewModel.playerHelper.seekTo(index, 0)
     }
 
     override fun requestDrag(viewHolder: RecyclerView.ViewHolder) {
-        itemTouchHelper.startDrag(viewHolder)
+//        itemTouchHelper.startDrag(viewHolder)
     }
 
-    private val itemTouchHelper by lazy {
+    /*private val itemTouchHelper by lazy {
         val simpleCallback: ItemTouchHelper.SimpleCallback =
             object : ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP or
@@ -202,6 +222,6 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                 }
             }
         ItemTouchHelper(simpleCallback)
-    }
+    }*/
 
 }

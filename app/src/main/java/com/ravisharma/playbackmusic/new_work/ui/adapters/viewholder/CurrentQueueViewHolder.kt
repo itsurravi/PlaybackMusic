@@ -53,12 +53,12 @@ class CurrentQueueViewHolder(
             imgRemove.setOnClickListener {
                 onItemRemoveClick?.let { it1 -> it1(song, bindingAdapterPosition) }
             }
-            ivOrder.setOnTouchListener { v, event ->
+            /*ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     dragListener.requestDrag(this@CurrentQueueViewHolder)
                 }
                 true
-            }
+            }*/
         }
     }
 }

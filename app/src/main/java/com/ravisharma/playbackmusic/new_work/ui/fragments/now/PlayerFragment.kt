@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.widget.PopupMenu
@@ -27,7 +28,11 @@ import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.utils.Constants
+import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -48,6 +53,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     @Inject
     lateinit var exoPlayer: ExoPlayer
+
+    @Inject
+    lateinit var themeManager: DynamicThemeManager
 
     private var adView: AdView? = null
     private var adUnitId: String? = null
@@ -137,11 +145,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
             launch {
-                /*mainViewModel.shuffleMode.collect {
+                mainViewModel.shuffle.collect {
                     updateShuffleMode(it)
-                }*/
+                }
             }
         }
+    }
+
+    private fun updateShuffleMode(isShuffled: Boolean) {
+        Log.i("updateShuffleMode", "$isShuffled")
     }
 
     private fun togglePlaying(playing: Boolean?) {
@@ -167,6 +179,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     transformations(RoundedCornersTransformation(20f))
                     crossfade(300)
                 }
+
+                setDynamicBackground(it.artUri)
+
                 if (it.favourite) {
                     imgFav.setImageResource(R.drawable.ic_favorite_24)
                     imgFav.imageTintList = ColorStateList.valueOf(
@@ -186,9 +201,23 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
+    private fun setDynamicBackground(artUri: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            artUri?.let {
+                val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
+                color?.let { it1 ->
+                    binding.rootView.background =
+                        binding.rootView.linearGradientBackground(it1)
+                }
+            }
+        }
+    }
+
     private fun initViews() {
         initSeekbarListener()
         initClickListeners()
+        binding.topBar.changeStatusBarMargin()
+        binding.playerController.changeNavigationBarMargin()
     }
 
     /*private fun currentAudioProgress(exoPlayer: ExoPlayer) = flow {
@@ -270,6 +299,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             }
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
+//                mainViewModel.toggleShuffle()
             }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)

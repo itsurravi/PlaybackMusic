@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -11,9 +12,12 @@ import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -31,11 +35,16 @@ import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.Constants
+import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeSystemBarsPadding
+import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,6 +57,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     @Inject
     lateinit var sleepTimerService: SleepTimerService
+
+    @Inject
+    lateinit var themeManager: DynamicThemeManager
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val musicViewModel: MusicScanViewModel by activityViewModels()
@@ -67,7 +79,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().changeStatusBarColor(R.color.colorPrimaryDark)
+        requireActivity().changeStatusBarColor(R.color.statusBarColor)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,6 +110,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initClickListeners()
         setupBottomNavigation()
+        binding.root.changeSystemBarsPadding()
     }
 
     private fun setupBottomNavigation() {
@@ -172,9 +185,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                     R.id.rateUs -> {
                         try {
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                                )
                             )
                         } catch (e: ActivityNotFoundException) {
                             requireContext().showToast(getString(R.string.unableToFindMarketApp))

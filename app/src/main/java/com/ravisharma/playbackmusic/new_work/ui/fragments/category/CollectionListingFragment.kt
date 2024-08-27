@@ -24,8 +24,11 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeSystemBarsPadding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -74,28 +77,28 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
 
     private fun initViews() {
         binding.apply {
-            binding.apply {
-                firstLayout.isVisible = true
+            firstLayout.isVisible = true
 
-                songList.apply {
-                    layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                    itemAnimator = DefaultItemAnimator()
-                    addItemDecoration(
-                        DividerItemDecoration(
-                            this.context,
-                            DividerItemDecoration.VERTICAL
-                        )
+            songList.apply {
+                layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                itemAnimator = DefaultItemAnimator()
+                addItemDecoration(
+                    DividerItemDecoration(
+                        this.context,
+                        DividerItemDecoration.VERTICAL
                     )
-                    adapter = TracksAdapter(
-                        onItemClick = ::songClicked,
-                        onItemLongClick = ::songLongClicked
-                    )
-                }
-
-                imageBack1.setOnClickListener {
-                    findNavController().popBackStack()
-                }
+                )
+                adapter = TracksAdapter(
+                    onItemClick = ::songClicked,
+                    onItemLongClick = ::songLongClicked
+                )
             }
+
+            imageBack1.setOnClickListener {
+                findNavController().popBackStack()
+            }
+            imageBack1.changeStatusBarMargin()
+            songList.changeSystemBarsPadding()
         }
     }
 

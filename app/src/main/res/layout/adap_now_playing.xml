@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="10dp"
+            android:visibility="gone"
             android:src="@drawable/ic_reorder_24" />
 
         <ImageView
@@ -86,6 +87,7 @@
                     android:layout_gravity="center"
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:padding="5dp"
+                    android:visibility="gone"
                     android:src="@drawable/ic_close" />
 
             </LinearLayout>
