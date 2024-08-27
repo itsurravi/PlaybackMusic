@@ -15,6 +15,7 @@ googleServicesVersion = "4.4.2"
 hiltVersion = "2.48.1"
 kotlinVersion = "1.9.10"
 kspVersion = "1.9.10-1.0.13"
+paletteKtx = "1.0.0"
 protoPlugin = "0.9.1"
 
 activityKtx = "1.9.1"
@@ -29,7 +30,7 @@ fragmentKtx = "1.8.2"
 firebaseCrashlytics = "19.0.3"
 firebaseAnalytics = "22.0.2"
 firebasePerf = "21.0.1"
-#glide = "4.15.1"
+glide = "4.15.1"
 gson = "2.9.0"
 lifecycleVersion = "2.6.1"
 material = "1.12.0"
@@ -65,6 +66,7 @@ androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler"
 androidx-media = { module = "androidx.media:media", version.ref = "media" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
+androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerView" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
@@ -84,7 +86,7 @@ com-verticalseekbar = { module = "com.h6ah4i.android.widget.verticalseekbar:vert
 
 #exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoPlayer" }
 #exoPlayerUi = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoPlayer" }
-#glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 media3Ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3ExoPlayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3Session = { module = "androidx.media3:media3-session", version.ref = "media3" }

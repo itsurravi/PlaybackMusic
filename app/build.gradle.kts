@@ -127,7 +127,8 @@ dependencies {
     implementation(libs.app.update.ktx)
 
     implementation(libs.androidx.core.splash)
-
+    implementation(libs.androidx.palette.ktx)
+    implementation(libs.glide)
 }
 allprojects {
     tasks.withType<KotlinCompile>().configureEach {
