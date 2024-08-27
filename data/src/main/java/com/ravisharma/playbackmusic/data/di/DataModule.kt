@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.ravisharma.playbackmusic.data.components.DaoCollection
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
-import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.data.utils.Constants
 import com.ravisharma.playbackmusic.data.utils.TinyDb
