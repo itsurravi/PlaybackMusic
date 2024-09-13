@@ -23,6 +23,7 @@
     <color name="fav_on">#FE2851</color>
     <color name="bottomNavigationActiveIndicator">#80FE2851</color>
 
+    <color name="translucentBg">#33FFFFFF</color>
     <color name="statusBarColor">#00101d25</color>
     <color name="cardBg">#232d36</color>
 </resources>

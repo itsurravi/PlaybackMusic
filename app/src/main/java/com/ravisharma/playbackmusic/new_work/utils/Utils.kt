@@ -70,12 +70,11 @@ fun View.changeStatusBarMargin() {
 }
 
 fun View.linearGradientBackground(dominantColor: Int): GradientDrawable {
-
     return GradientDrawable().apply {
         colors = intArrayOf(
             dominantColor,
             dominantColor,
-            Color.parseColor("#101d25"),
+//            Color.parseColor("#101d25"),
         )
         gradientType = GradientDrawable.LINEAR_GRADIENT
         orientation = GradientDrawable.Orientation.TOP_BOTTOM
