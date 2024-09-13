@@ -30,9 +30,8 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -180,7 +179,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     crossfade(300)
                 }
 
-                setDynamicBackground(it.artUri)
+//                setDynamicBackground(it.artUri)
 
                 if (it.favourite) {
                     imgFav.setImageResource(R.drawable.ic_favorite_24)
@@ -201,23 +200,27 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
-    private fun setDynamicBackground(artUri: String?) {
+    /*private fun setDynamicBackground(artUri: String?) {
         viewLifecycleOwner.lifecycleScope.launch {
             artUri?.let {
                 val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
                 color?.let { it1 ->
-                    binding.rootView.background =
-                        binding.rootView.linearGradientBackground(it1)
+                    val initialBg = binding.controlBack.background
+                    val newBackground = binding.controlBack.linearGradientBackground(it1)
+                    val transitionDrawable = TransitionDrawable(arrayOf(initialBg, newBackground))
+                    binding.controlBack.background = transitionDrawable
+                    transitionDrawable.startTransition(200)
+
                 }
             }
         }
-    }
+    }*/
 
     private fun initViews() {
         initSeekbarListener()
         initClickListeners()
-        binding.topBar.changeStatusBarMargin()
-        binding.playerController.changeNavigationBarMargin()
+        binding.topBar.changeStatusBarPadding()
+        binding.controlPanel.changeNavigationBarPadding()
     }
 
     /*private fun currentAudioProgress(exoPlayer: ExoPlayer) = flow {

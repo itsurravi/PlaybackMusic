@@ -16,10 +16,10 @@ import com.google.android.gms.ads.AdView
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.databinding.ActivityAddToPlaylistBinding
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.PlaylistsAdapter
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
@@ -92,8 +92,8 @@ class AddToPlaylistFragment : Fragment(R.layout.activity_add_to_playlist) {
                     onClick = ::onPlaylistClick,
                 )
             }
-            topBar.changeStatusBarMargin()
-            playlistRecycler.changeNavigationBarMargin()
+            topBar.changeStatusBarPadding()
+            playlistRecycler.changeNavigationBarPadding()
         }
     }
 

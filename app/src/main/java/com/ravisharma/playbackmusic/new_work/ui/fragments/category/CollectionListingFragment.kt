@@ -26,9 +26,8 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeSystemBarsPadding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -98,7 +97,7 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                 findNavController().popBackStack()
             }
             imageBack1.changeStatusBarMargin()
-            songList.changeSystemBarsPadding()
+            songList.changeNavigationBarPadding()
         }
     }
 

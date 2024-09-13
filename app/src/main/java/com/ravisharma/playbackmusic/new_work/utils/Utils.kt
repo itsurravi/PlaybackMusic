@@ -17,7 +17,7 @@ fun Activity.changeStatusBarColor(@ColorRes color: Int) {
 //    window.statusBarColor = ContextCompat.getColor(this, color)
 }
 
-fun View.changeSystemBarsPadding() {
+/*fun View.changeSystemBarsPadding() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
         val bars = insets.getInsets(
             WindowInsetsCompat.Type.systemBars()
@@ -25,6 +25,31 @@ fun View.changeSystemBarsPadding() {
         )
         v.updatePadding(
             top = bars.top,
+            bottom = bars.bottom,
+        )
+        WindowInsetsCompat.CONSUMED
+    }
+}*/
+
+fun View.changeStatusBarPadding() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val bars = insets.getInsets(
+            WindowInsetsCompat.Type.statusBars()
+                    or WindowInsetsCompat.Type.displayCutout()
+        )
+        v.updatePadding(
+            top = bars.top,
+        )
+        WindowInsetsCompat.CONSUMED
+    }
+}
+
+fun View.changeNavigationBarPadding() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val bars = insets.getInsets(
+            WindowInsetsCompat.Type.navigationBars()
+        )
+        v.updatePadding(
             bottom = bars.bottom,
         )
         WindowInsetsCompat.CONSUMED
@@ -44,26 +69,16 @@ fun View.changeStatusBarMargin() {
     }
 }
 
-fun View.changeNavigationBarMargin() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
-        val bars = insets.getInsets(
-            WindowInsetsCompat.Type.navigationBars()
-        )
-        v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            bottomMargin = bars.bottom
-        }
-        WindowInsetsCompat.CONSUMED
-    }
-}
-
 fun View.linearGradientBackground(dominantColor: Int): GradientDrawable {
 
     return GradientDrawable().apply {
         colors = intArrayOf(
             dominantColor,
-            Color.parseColor("#0A0A0A"),
+            dominantColor,
+            Color.parseColor("#101d25"),
         )
         gradientType = GradientDrawable.LINEAR_GRADIENT
         orientation = GradientDrawable.Orientation.TOP_BOTTOM
+
     }
 }

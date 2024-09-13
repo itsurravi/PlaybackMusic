@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -21,17 +20,16 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCurrentQueueBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.StartDragListener
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections
 
 @AndroidEntryPoint
 class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDragListener {
@@ -93,7 +91,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                 )
             }.also {
                 val shuffleIndex = mainViewModel.shuffledIndex
-                val list = if(shuffleIndex.isNotEmpty()) {
+                val list = if (shuffleIndex.isNotEmpty()) {
                     shuffleIndex.map {
                         mainViewModel.queue[it]
                     }
@@ -107,8 +105,8 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
             }
 //            itemTouchHelper.attachToRecyclerView(rvSongList)
 
-            topBar.changeStatusBarMargin()
-            rvSongList.changeNavigationBarMargin()
+            currentPlayingPanel.changeStatusBarPadding()
+            rvSongList.changeNavigationBarPadding()
         }
         initClickListeners()
     }
@@ -117,7 +115,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
         viewLifecycleOwner.lifecycleScope.launch {
             val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
             val adapterList = adapter.getCurrentList()
-            if(adapterList.size == 1) {
+            if (adapterList.size == 1) {
                 requireContext().showToast("Last song left in queue")
                 return@launch
             }
@@ -183,7 +181,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
 
     private fun songClicked(song: Song, position: Int) {
         val list = mainViewModel.shuffledIndex
-        val index = if(list.isNotEmpty()) {
+        val index = if (list.isNotEmpty()) {
             list[position]
         } else {
             position

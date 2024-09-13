@@ -40,7 +40,7 @@
             android:layout_marginTop="12dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:padding="15dp"
+            android:padding="16dp"
             android:src="@drawable/ic_back_28"
             tools:ignore="RtlSymmetry" />
 
@@ -97,7 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
-            android:padding="15dp"
+            android:padding="16dp"
             android:src="@drawable/ic_back_28"
             tools:ignore="RtlSymmetry" />
 

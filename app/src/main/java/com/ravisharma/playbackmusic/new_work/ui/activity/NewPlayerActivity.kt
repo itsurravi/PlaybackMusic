@@ -10,8 +10,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.fragment.NavHostFragment
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import com.ravisharma.playbackmusic.utils.AppRate
 import com.ravisharma.playbackmusic.utils.UpdateManager
@@ -34,10 +32,8 @@ class NewPlayerActivity : AppCompatActivity() {
 
         enableEdgeToEdge(
             navigationBarStyle = SystemBarStyle.auto(
-                ContextCompat.getColor(
-                    this,
-                    R.color.navigationBarColor
-                ), ContextCompat.getColor(this, R.color.navigationBarColor)
+                ContextCompat.getColor(this, R.color.navigationBarColor),
+                ContextCompat.getColor(this, R.color.navigationBarColor)
             )
         )
         setContentView(binding.root)

@@ -3,7 +3,7 @@
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Set the splash screen background, animated icon, and animation
    duration. -->
-        <item name="windowSplashScreenBackground">@color/colorPrimary</item>
+        <item name="windowSplashScreenBackground">@color/colorAccent</item>
 
         <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
              drawable. One of these is required. -->
@@ -27,7 +27,7 @@
         <item name="android:colorControlHighlight">@color/ripple_dark</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:navigationBarColor">@color/navigationBarColor</item>
-        <item name="android:windowTranslucentStatus">true</item>
+<!--        <item name="android:windowTranslucentStatus">false</item>-->
     </style>
 
     <style name="AlertDialogCustom" parent="@style/ThemeOverlay.Material3.Dialog.Alert">

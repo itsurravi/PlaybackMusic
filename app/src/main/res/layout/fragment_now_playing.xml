@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:contentDescription="@string/back"
-                android:padding="15dp"
+                android:padding="16dp"
                 android:src="@drawable/ic_back_28"
                 tools:ignore="RtlSymmetry" />
 
@@ -46,7 +46,7 @@
                 android:layout_gravity="center"
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/save_as_playlist"
-                android:padding="15dp"
+                android:padding="16dp"
                 android:src="@drawable/ic_save_24" />
 
 

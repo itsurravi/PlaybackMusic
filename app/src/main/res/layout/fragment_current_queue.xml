@@ -7,11 +7,11 @@
     android:background="@color/contentBGclr">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/top_bar"
+        android:id="@+id/currentPlayingPanel"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@id/currentPlayingPanel"
+        app:layout_constraintBottom_toTopOf="@id/rv_song_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,9 +24,9 @@
             android:layout_height="wrap_content"
             android:background="?android:selectableItemBackground"
             android:contentDescription="@string/back"
-            android:padding="15dp"
+            android:padding="16dp"
             android:src="@drawable/ic_back_28"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/barrier"
             app:layout_constraintEnd_toStartOf="@id/tvCurrentTitle"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -38,10 +38,11 @@
             android:id="@+id/tvCurrentTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:letterSpacing="0.01"
             android:text="Current Queue"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/barrier"
             app:layout_constraintEnd_toStartOf="@id/ivSave"
             app:layout_constraintStart_toEndOf="@id/ivBack"
             app:layout_constraintTop_toTopOf="parent" />
@@ -53,25 +54,20 @@
             android:layout_gravity="center"
             android:background="?android:selectableItemBackground"
             android:contentDescription="@string/save_as_playlist"
-            android:padding="15dp"
+            android:padding="16dp"
             android:src="@drawable/ic_save_24"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/barrier"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintStart_toEndOf="@id/tvCurrentTitle"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/currentPlayingPanel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@id/rv_song_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_bar">
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="ivBack, ivSave, tvCurrentTitle" />
 
         <ImageView
             android:id="@+id/songArt"
@@ -85,7 +81,7 @@
             app:layout_constraintEnd_toEndOf="@id/song_art_barrier"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier"
             app:layout_constraintVertical_bias="0"
             app:layout_constraintVertical_chainStyle="packed"
             tools:src="@drawable/logo" />

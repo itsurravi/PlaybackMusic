@@ -3,21 +3,18 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -38,10 +35,9 @@ import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
-import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
-import com.ravisharma.playbackmusic.new_work.utils.changeSystemBarsPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
@@ -110,7 +106,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initClickListeners()
         setupBottomNavigation()
-        binding.root.changeSystemBarsPadding()
+        binding.appBar.changeStatusBarPadding()
+        binding.bottomNavigationView.changeNavigationBarPadding()
     }
 
     private fun setupBottomNavigation() {
@@ -266,9 +263,28 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     transformations(RoundedCornersTransformation(10f))
                     crossfade(true)
                 }
+
+                setDynamicBackground(it.artUri)
+
                 txtSongName.text = it.title
                 txtSongArtist.text = it.artist
                 progressSong.max = it.durationMillis.toInt()
+            }
+        }
+    }
+
+    private fun setDynamicBackground(artUri: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            artUri?.let {
+                val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
+                color?.let { it1 ->
+                    val initialBg = binding.bottomPanel.background
+                    val newBackground = binding.bottomPanel.linearGradientBackground(it1)
+                    val transitionDrawable = TransitionDrawable(arrayOf(initialBg, newBackground))
+                    binding.bottomPanel.background = transitionDrawable
+                    transitionDrawable.startTransition(200)
+
+                }
             }
         }
     }

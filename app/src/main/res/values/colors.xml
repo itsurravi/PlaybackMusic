@@ -2,26 +2,27 @@
 <resources>
     <color name="colorPrimary">#232d36</color>
     <color name="colorPrimaryDark">#232d36</color>
-    <color name="colorAccent">#14192d</color>
+    <color name="colorAccent">#101d25</color>
     <color name="contentBGclr">#101d25</color>
     <color name="scrollThumb">#FE2851</color>
     <color name="seek_progress">#FE2851</color>
-    <color name="navigationBarColor">#242424</color>
+    <color name="navigationBarColor">#101d25</color>
     <color name="textPrimary">#FFFFFF</color>
-    <color name="textSecondary">#bebbb4</color>
+    <color name="textSecondary">#E9EEF2</color>
     <color name="listitemDuration">#bebbb4</color>
 
-    <color name="popupItemBackground">#2B3742</color>
+    <color name="popupItemBackground">#232d36</color>
     <color name="tabIndicatorColor">#FE2851</color>
     <color name="tabSelectedTextColor">#f9d5d4</color>
     <color name="tabTextColor">#C3C3C3</color>
 
+    <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="ripple_dark">#19FFFFFF</color>
     <color name="colorSwitchOff">#C7CBCC</color>
     <color name="fav_on">#FE2851</color>
     <color name="bottomNavigationActiveIndicator">#80FE2851</color>
 
-    <color name="statusBarColor">#00232D36</color>
-    <color name="cardBg">#3314192d</color>
+    <color name="statusBarColor">#00101d25</color>
+    <color name="cardBg">#232d36</color>
 </resources>

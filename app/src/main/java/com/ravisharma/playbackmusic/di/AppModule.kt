@@ -16,15 +16,12 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
-import com.ravisharma.playbackmusic.data.provider.DataProvider
-import com.ravisharma.playbackmusic.data.utils.TinyDb
 import com.ravisharma.playbackmusic.database.PlaylistDatabase
 import com.ravisharma.playbackmusic.database.dao.PlaylistDao
 import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateSerializer
-import com.ravisharma.playbackmusic.new_work.services.DataManager
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.services.data.PlayerService
 import com.ravisharma.playbackmusic.new_work.services.data.PlayerServiceImpl
@@ -38,6 +35,8 @@ import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
 import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerServiceImpl
 import com.ravisharma.playbackmusic.new_work.services.data.SongService
 import com.ravisharma.playbackmusic.new_work.services.data.SongServiceImpl
+import com.ravisharma.playbackmusic.new_work.utils.DrawableFromUrlUseCase
+import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
 import com.ravisharma.playbackmusic.prefrences.PrefManager
 import com.ravisharma.playbackmusic.prefrences.TinyDB
 import dagger.Module
@@ -85,18 +84,6 @@ object AppModule {
     @Provides
     @Singleton
     fun providePlaylistRepository(playlistDao: PlaylistDao) = PlaylistRepository(playlistDao)
-
-    @Provides
-    @Singleton
-    fun provideDataManger(
-        @ApplicationContext context: Context,
-        dataProvider: DataProvider,
-        tinyDb: TinyDb,
-        @Named(value = "lastPlayedInfo")
-        pref: SharedPreferences
-    ): DataManager {
-        return DataManager(context, dataProvider, tinyDb, pref)
-    }
 
     @SuppressLint("UnsafeOptInUsageError")
     @Singleton
@@ -217,5 +204,11 @@ object AppModule {
                 PendingIntent.FLAG_IMMUTABLE
             )
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideThemeManager(): DynamicThemeManager {
+        return DynamicThemeManager(DrawableFromUrlUseCase(), Dispatchers.IO)
     }
 }
