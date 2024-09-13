@@ -18,6 +18,11 @@
     <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>
     <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
     <string name="tracksFragId">ca-app-pub-8188016146639430/7494562314</string>
+    
+    <string name="nativeAdvanceId">ca-app-pub-8188016146639430/1615506674</string>
+    <string name="testNativeAdvanceId">ca-app-pub-3940256099942544/2247696110</string>
+
+    <string name="ad_attribution">Ad</string>
 
     <string name="doit">do</string>
     <string name="prev">prev</string>

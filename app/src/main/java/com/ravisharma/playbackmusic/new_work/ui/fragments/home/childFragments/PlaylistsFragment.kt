@@ -18,12 +18,19 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.ads.mediation.admob.AdMobAdapter
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.VideoOptions
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.databinding.FragmentPlaylistBinding
+import com.ravisharma.playbackmusic.nativetemplates.NativeTemplateStyle
 import com.ravisharma.playbackmusic.new_work.ui.adapters.PlaylistsAdapter
 import com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
@@ -59,8 +66,35 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
         loadBanner()
     }
 
+    private fun setupAdLoader() {
+//        val builder = AdLoader.Builder(requireContext(), getString(R.string.nativeAdvanceId))
+        val builder = AdLoader.Builder(requireContext(), getString(R.string.testNativeAdvanceId))
+        builder.forNativeAd { nativeAd ->
+            val styles = NativeTemplateStyle.Builder().build()
+            binding.myTemplate.setStyles(styles)
+            binding.myTemplate.setNativeAd(nativeAd)
+            binding.myTemplate.visibility = View.VISIBLE
+        }
+/*
+        val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
+        val adOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
+        builder.withNativeAdOptions(adOptions)*/
+
+        val adLoader = builder.withAdListener(object : AdListener() {
+            override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                val error = "domain: ${loadAdError.domain}, " +
+                        "code: ${loadAdError.code}, " +
+                        "message: ${loadAdError.message}"
+            }
+        }).build()
+
+        adLoader.loadAd(AdRequest.Builder().build())
+    }
+
     private fun loadBanner() {
-        adUnitId?.let { unitId ->
+        setupAdLoader()
+
+        /*adUnitId?.let { unitId ->
             val adRequest = AdRequest.Builder().build()
             val adSize = AdSize.BANNER
             adView!!.adUnitId = unitId
@@ -69,7 +103,7 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
             binding.bannerAd.addView(adView)
 
             adView!!.loadAd(adRequest)
-        }
+        }*/
     }
 
     private fun initViews() {
