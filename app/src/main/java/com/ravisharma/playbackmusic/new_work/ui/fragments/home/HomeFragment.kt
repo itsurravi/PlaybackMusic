@@ -172,10 +172,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                     R.id.rateUs -> {
                         try {
-                            Intent(
+                            startActivity(Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                            )
+                            ))
                         } catch (e: ActivityNotFoundException) {
                             requireContext().showToast(getString(R.string.unableToFindMarketApp))
                         }
