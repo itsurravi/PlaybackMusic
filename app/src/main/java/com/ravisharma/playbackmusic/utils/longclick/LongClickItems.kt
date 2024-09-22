@@ -84,17 +84,17 @@ class LongClickItems {
                         context.startActivity(this)
                     }
                 }
+//                5 -> {
+//                    showDeleteSongDialog(songList[mPosition])
+//                }
                 5 -> {
-                    showDeleteSongDialog(songList[mPosition])
-                }
-                6 -> {
                     val intent = Intent(Intent.ACTION_SEND)
                     intent.type = "audio/*"
                     val uri = Uri.parse(songList[mPosition].data)
                     intent.putExtra(Intent.EXTRA_STREAM, uri)
                     context.startActivity(Intent.createChooser(intent, "Share Via"))
                 }
-                7 -> {
+                6 -> {
                     context.showSongInfo(songList[mPosition])
                 }
             }

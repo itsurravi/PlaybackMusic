@@ -124,7 +124,6 @@
         <item>Play Next</item>
         <item>Add To Queue</item>
         <item>Add To Playlist</item>
-        <item>Delete</item>
         <item>Share</item>
         <item>Details</item>
     </string-array>
