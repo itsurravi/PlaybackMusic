@@ -67,7 +67,7 @@ dependencies {
 
     //Added Dependencies
     implementation libs.androidx.recyclerview
-    implementation files('libs/jsoup.jar')
+//    implementation files('libs/jsoup.jar')
 
     implementation libs.androidx.activity
     implementation libs.androidx.core.ktx

@@ -22,5 +22,6 @@
     <color name="fav_on">#FE2851</color>
     <color name="bottomNavigationActiveIndicator">#80FE2851</color>
 
+    <color name="translucentBg">#33FFFFFF</color>
     <color name="cardBg">#3314192d</color>
 </resources>
