@@ -21,6 +21,7 @@ import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCollectionListingBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
+import com.ravisharma.playbackmusic.new_work.ui.extensions.onPlaylistSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
@@ -192,39 +193,112 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
     }
 
     private fun songLongClicked(song: Song, position: Int) {
-        requireContext().onSongLongPress(song) { longItemClick ->
-            when (longItemClick) {
-                LongItemClick.Play -> {
-                    songClicked(song, position)
-                }
-
-                LongItemClick.SinglePlay -> {
-                    collectionViewModel.setQueue(listOf(song), 0)
-                }
-
-                LongItemClick.AddToQueue -> {
-                    collectionViewModel.addToQueue(song)
-                }
-
-                LongItemClick.AddToPlaylist -> {
-                    val bundle = Bundle().apply {
-                        putStringArrayList(
-                            NavigationConstant.AddToPlaylistSongs,
-                            arrayListOf(song.location)
-                        )
+        if (reorderListAllowed) {
+            requireContext().onPlaylistSongLongPress(song) { longItemClick ->
+                longClickItem(longItemClick, song, position)
+                /*when (longItemClick) {
+                    LongItemClick.Play -> {
+                        songClicked(song, position)
                     }
-                    findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
-                }
 
-                LongItemClick.Share -> {
-                    requireContext().shareSong(song.location)
-                }
+                    LongItemClick.SinglePlay -> {
+                        collectionViewModel.setQueue(listOf(song), 0)
+                    }
 
-                LongItemClick.Details -> {
-                    requireContext().showSongInfo(song)
-                }
+                    LongItemClick.AddToQueue -> {
+                        collectionViewModel.addToQueue(song)
+                    }
+
+                    LongItemClick.RemoveFromList -> {
+                        collectionViewModel.removeFromPlaylist(song)
+                    }
+
+                    LongItemClick.Share -> {
+                        requireContext().shareSong(song.location)
+                    }
+
+                    LongItemClick.Details -> {
+                        requireContext().showSongInfo(song)
+                    }
+
+                    else -> Unit
+                }*/
+            }
+        } else {
+            requireContext().onSongLongPress(song) { longItemClick ->
+                longClickItem(longItemClick, song, position)
+                /*when (longItemClick) {
+                    LongItemClick.Play -> {
+                        songClicked(song, position)
+                    }
+
+                    LongItemClick.SinglePlay -> {
+                        collectionViewModel.setQueue(listOf(song), 0)
+                    }
+
+                    LongItemClick.AddToQueue -> {
+                        collectionViewModel.addToQueue(song)
+                    }
+
+                    LongItemClick.AddToPlaylist -> {
+                        val bundle = Bundle().apply {
+                            putStringArrayList(
+                                NavigationConstant.AddToPlaylistSongs,
+                                arrayListOf(song.location)
+                            )
+                        }
+                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                    }
+
+                    LongItemClick.Share -> {
+                        requireContext().shareSong(song.location)
+                    }
+
+                    LongItemClick.Details -> {
+                        requireContext().showSongInfo(song)
+                    }
+
+                    else -> Unit
+                }*/
             }
         }
-        requireContext().showToast("song long click")
+    }
+
+    private fun longClickItem(longItemClick: LongItemClick, song: Song, position: Int) {
+        when (longItemClick) {
+            LongItemClick.Play -> {
+                songClicked(song, position)
+            }
+
+            LongItemClick.SinglePlay -> {
+                collectionViewModel.setQueue(listOf(song), 0)
+            }
+
+            LongItemClick.AddToQueue -> {
+                collectionViewModel.addToQueue(song)
+            }
+
+            LongItemClick.RemoveFromList -> {
+                collectionViewModel.removeFromPlaylist(song)
+            }
+
+            LongItemClick.Share -> {
+                requireContext().shareSong(song.location)
+            }
+
+            LongItemClick.Details -> {
+                requireContext().showSongInfo(song)
+            }
+
+            LongItemClick.AddToPlaylist -> {
+                val bundle = Bundle().apply {
+                    putStringArrayList(
+                        NavigationConstant.AddToPlaylistSongs,
+                        arrayListOf(song.location)
+                    )
+                }
+                findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+            }
+        }
     }
 }

@@ -12,13 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.ravisharma.playbackmusic.nativetemplates.TemplateView
-        android:id="@+id/my_template"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:gnt_template_type="@layout/gnt_small_template_view" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,8 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:gravity="center"
-                    android:text="@string/recentAdded"
-                    android:textAllCaps="true" />
+                    android:text="@string/recentAdded" />
 
             </LinearLayout>
 
@@ -92,8 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:gravity="center"
-                    android:text="@string/mostPlayed"
-                    android:textAllCaps="true" />
+                    android:text="@string/mostPlayed" />
 
             </LinearLayout>
 
@@ -128,8 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:gravity="center"
-                    android:text="@string/favTracks"
-                    android:textAllCaps="true" />
+                    android:text="@string/favTracks" />
 
             </LinearLayout>
 
@@ -137,10 +127,17 @@
 
     </LinearLayout>
 
+    <com.ravisharma.playbackmusic.nativetemplates.TemplateView
+        android:id="@+id/my_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:gnt_template_type="@layout/gnt_small_template_view" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
+        android:paddingHorizontal="16dp"
         android:layout_marginTop="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">

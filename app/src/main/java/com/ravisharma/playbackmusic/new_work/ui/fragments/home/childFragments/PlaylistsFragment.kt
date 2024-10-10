@@ -69,6 +69,7 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
     private fun setupAdLoader() {
 //        val builder = AdLoader.Builder(requireContext(), getString(R.string.nativeAdvanceId))
         val builder = AdLoader.Builder(requireContext(), getString(R.string.testNativeAdvanceId))
+        // TODO need to change when going to production
         builder.forNativeAd { nativeAd ->
             val styles = NativeTemplateStyle.Builder().build()
             binding.myTemplate.setStyles(styles)

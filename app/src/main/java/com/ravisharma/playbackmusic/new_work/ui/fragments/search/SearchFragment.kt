@@ -141,6 +141,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 LongItemClick.AddToQueue -> mainViewModel.addToQueue(song)
                 LongItemClick.Share -> requireContext().shareSong(song.location)
                 LongItemClick.Details -> requireContext().showSongInfo(song)
+                else -> Unit
             }
         }
     }

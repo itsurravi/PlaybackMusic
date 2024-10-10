@@ -18,20 +18,64 @@ import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.databinding.InfoBinding
 
 sealed class LongItemClick(val title: String) {
-    object Play : LongItemClick("Play")
-    object SinglePlay : LongItemClick("Play This Only")
-
+    data object Play : LongItemClick("Play")
+    data object SinglePlay : LongItemClick("Play This Only")
     //    object PlayNext : LongItemClick("Play Next")
-    object AddToQueue : LongItemClick("Add To Queue")
-    object AddToPlaylist : LongItemClick("Add To Playlist")
-
+    data object AddToQueue : LongItemClick("Add To Queue")
+    data object AddToPlaylist : LongItemClick("Add To Playlist")
+    data object RemoveFromList : LongItemClick("Remove From List")
     //    object Delete : LongItemClick("Delete")
-    object Share : LongItemClick("Share")
-    object Details : LongItemClick("Details")
+    data object Share : LongItemClick("Share")
+    data object Details : LongItemClick("Details")
 }
 
 fun Context.showToast(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+}
+
+fun Context.onPlaylistSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {
+    val items = listOf(
+        LongItemClick.Play.title,
+        LongItemClick.SinglePlay.title,
+        LongItemClick.AddToQueue.title,
+        LongItemClick.RemoveFromList.title,
+        LongItemClick.Share.title,
+        LongItemClick.Details.title
+    )
+    val ad = ArrayAdapter(this, R.layout.adapter_alert_list, items)
+
+    val alertList = AlertListBinding.inflate(LayoutInflater.from(this))
+    alertList.apply {
+        songArt.load(Uri.parse(song.artUri)) {
+            error(R.drawable.logo)
+            crossfade(true)
+            transformations(RoundedCornersTransformation(20f))
+        }
+
+        title.text = song.title
+        list.adapter = ad
+    }
+
+    val dialog = AlertDialog.Builder(this)
+    dialog.setView(alertList.root)
+
+    val alertDialog = dialog.create()
+    alertDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog.window!!.attributes.windowAnimations = R.style.DialogAnimation_2
+    alertDialog.show()
+
+    alertList.list.onItemClickListener =
+        AdapterView.OnItemClickListener { parent, view, itemPosition, id ->
+            when (items[itemPosition]) {
+                LongItemClick.Play.title -> itemClick(LongItemClick.Play)
+                LongItemClick.SinglePlay.title -> itemClick(LongItemClick.SinglePlay)
+                LongItemClick.AddToQueue.title -> itemClick(LongItemClick.AddToQueue)
+                LongItemClick.RemoveFromList.title -> itemClick(LongItemClick.RemoveFromList)
+                LongItemClick.Share.title -> itemClick(LongItemClick.Share)
+                LongItemClick.Details.title -> itemClick(LongItemClick.Details)
+            }
+            alertDialog.dismiss()
+        }
 }
 
 fun Context.onSongLongPress(song: Song, itemClick: (LongItemClick) -> Unit) {

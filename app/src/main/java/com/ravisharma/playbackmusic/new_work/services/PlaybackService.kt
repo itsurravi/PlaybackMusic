@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -14,27 +15,30 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.ravisharma.playbackmusic.data.db.model.tables.Song
+import com.ravisharma.playbackmusic.data.provider.SongExtractor
+import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateProvider
+import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationProvider
 import com.ravisharma.playbackmusic.new_work.services.data.QueueService
 import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
 import com.ravisharma.playbackmusic.new_work.services.data.SongService
-import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.new_work.utils.Constants
-import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateProvider
-import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlin.system.exitProcess
 
 @UnstableApi
@@ -70,7 +74,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         super.onCreate()
         isRunning.set(true)
         broadcastReceiver = PlaybackBroadcastReceiver()
-        mediaSession = MediaSession.Builder(applicationContext, exoPlayer)
+        mediaSession = MediaSession.Builder(this, exoPlayer)
             .setCallback(sessionCallback)
             .setId(System.currentTimeMillis().toString())
             .build()
@@ -96,8 +100,32 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
             }
         }*/
         scope.launch {
-            queueService.repeatMode.collect {
-                withContext(Dispatchers.Main) { exoPlayer.repeatMode = it.toExoPlayerRepeatMode() }
+            launch {
+                queueService.repeatMode.collect {
+                    withContext(Dispatchers.Main) { exoPlayer.repeatMode = it.toExoPlayerRepeatMode() }
+                }
+            }
+            launch {
+                queueService.shuffle.collect {
+                    withContext(Dispatchers.Main) {
+                        exoPlayer.shuffleModeEnabled = it
+                        try {
+                            val shuffleOrder = CustomShuffleOrder(
+                                exoPlayer.mediaItemCount,
+                                exoPlayer.currentMediaItemIndex,
+                                Random.nextLong(1, 100)
+                            )
+                            exoPlayer.setShuffleOrder(shuffleOrder)
+                            if(exoPlayer.shuffleModeEnabled) {
+                                checkShuffleData(shuffleOrder)
+                            } else {
+                                queueService.updateShuffleIndex(emptyList())
+                            }
+                        } catch (_: Exception) {
+
+                        }
+                    }
+                }
             }
         }
 
@@ -211,6 +239,23 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         }
     }
 
+    private fun checkShuffleData(shuffleOrder: ShuffleOrder) {
+        val list = mutableListOf<Int>()
+        val length = shuffleOrder.length
+        val firstIndex = shuffleOrder.firstIndex
+        val lastIndex = shuffleOrder.lastIndex
+        Log.i("ShuffleOrder", "$length $firstIndex $lastIndex")
+        if (firstIndex > -1) {
+            var index = firstIndex
+            do {
+                list.add(index)
+                Log.i("ShuffleOrder", "Order Value: $index")
+                index = shuffleOrder.getNextIndex(index)
+            } while (index != -1)
+        }
+        queueService.updateShuffleIndex(list)
+    }
+
     override fun onAppend(song: Song) {
         exoPlayer.addMediaItem(song.toMediaItem())
     }
@@ -305,9 +350,11 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
          * To close the media session, first call mediaSession.release followed by stopSelf()
          * See issue: https://github.com/androidx/media/issues/389#issuecomment-1546611545
          */
-        mediaSession?.player?.release()
-        mediaSession?.release()
-        mediaSession = null
+        mediaSession?.run {
+            player.release()
+            release()
+            mediaSession = null
+        }
         stopService()
         stopSelf()
     }

@@ -167,6 +167,7 @@ class TracksFragment : Fragment() {
                 LongItemClick.Details -> {
                     requireContext().showSongInfo(song)
                 }
+                else -> Unit
             }
         }
         requireContext().showToast("song long click")

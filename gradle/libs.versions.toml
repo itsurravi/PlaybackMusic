@@ -2,9 +2,8 @@
 compileSdk = "34"
 legacySupportV4 = "1.0.0"
 minSdk = "21"
-
-versionCode = "66"
-versionName = "2.9.0"
+versionCode = "67"
+versionName = "2.9.1"
 jvm = "17"
 
 appUpdate = "2.1.0"
@@ -48,7 +47,7 @@ workRuntimeKtx = "2.8.1"
 junit = "4.13.2"
 #androidx-test-ext-junit = "1.1.5"
 #exoPlayer = "2.18.1"
-media3 = "1.4.0"
+media3 = "1.4.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
