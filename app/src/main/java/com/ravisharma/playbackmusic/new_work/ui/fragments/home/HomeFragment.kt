@@ -36,7 +36,7 @@ import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
 import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
@@ -73,11 +73,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireActivity().changeStatusBarColor(R.color.statusBarColor)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentHomeBinding.bind(view)
@@ -106,7 +101,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initClickListeners()
         setupBottomNavigation()
-        binding.appBar.changeStatusBarPadding()
+        binding.appBar.changeStatusBarMargin()
         binding.bottomNavigationView.changeNavigationBarPadding()
     }
 

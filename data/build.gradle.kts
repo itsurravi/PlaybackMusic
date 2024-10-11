@@ -53,7 +53,6 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.google.material)
     testImplementation(libs.junit)
 
     implementation(libs.androidx.room.ktx)

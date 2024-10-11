@@ -126,7 +126,7 @@
             android:gravity="center"
             android:maxLines="1"
             android:textColor="@color/textPrimary"
-            app:drawableLeftCompat="@drawable/ic_artist"
+            app:drawableLeftCompat="@drawable/ic_artist_filled_24"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/songDuration"
             app:layout_constraintEnd_toEndOf="parent"

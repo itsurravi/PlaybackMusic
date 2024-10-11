@@ -71,9 +71,9 @@
     <string name="mins90">Timer Set To 90 Mins</string>
     <string name="mins120">Timer Set To 120 Mins</string>
     <string name="playlist">Playlist</string>
-    <string name="Tracks">Tracks</string>
-    <string name="Albums">Albums</string>
-    <string name="Artists">Artists</string>
+    <string name="tracks">Tracks</string>
+    <string name="albums">Albums</string>
+    <string name="artists">Artists</string>
     <string name="music_Service">Music Service</string>
     <string name="PlaybackMusicService">PlaybackMusicService</string>
     <string name="Grant">Grant</string>
@@ -111,7 +111,6 @@
     <string name="noSong">No Song for This Category</string>
     <string name="save_as_playlist">Save as Playlist</string>
     <string name="timer">Timer</string>
-    <string name="tracks">Tracks</string>
     <string name="sleep_after">Sleep After:</string>
     <string name="sleep_timer_title">Sleep Timer</string>
     <string name="time_text_off">Off</string>
@@ -194,4 +193,5 @@
 
     <string name="noSongDialog">noSongDialog</string>
     <string name="noSongFoundToPlay">No Song Found to Play</string>
+    <string name="my_playlists">My Playlists</string>
 </resources>

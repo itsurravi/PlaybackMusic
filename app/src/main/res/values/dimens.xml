@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="cardCorner">16dp</dimen>
+    <dimen name="cardCorner">12dp</dimen>
     <dimen name="scrollPopupBackgroundSize">62dp</dimen>
     <dimen name="scrollPopupTextSize">32dp</dimen>
 

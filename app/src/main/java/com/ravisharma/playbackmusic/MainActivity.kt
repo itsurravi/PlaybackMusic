@@ -370,9 +370,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         ) { tab: TabLayout.Tab, position: Int ->
             when (position) {
                 0 -> tab.text = getString(R.string.playlist)
-                1 -> tab.text = getString(R.string.Tracks)
-                2 -> tab.text = getString(R.string.Albums)
-                3 -> tab.text = getString(R.string.Artists)
+                1 -> tab.text = getString(R.string.tracks)
+                2 -> tab.text = getString(R.string.albums)
+                3 -> tab.text = getString(R.string.artists)
             }
         }.attach()
 

@@ -1,21 +1,12 @@
 package com.ravisharma.playbackmusic.new_work.utils
 
-import android.app.Activity
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.ColorRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-
-fun Activity.changeStatusBarColor(@ColorRes color: Int) {
-//    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-//    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-//    window.statusBarColor = ContextCompat.getColor(this, color)
-}
 
 /*fun View.changeSystemBarsPadding() {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->

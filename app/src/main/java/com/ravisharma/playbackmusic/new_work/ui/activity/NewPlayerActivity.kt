@@ -31,9 +31,11 @@ class NewPlayerActivity : AppCompatActivity() {
         installSplashScreen()
 
         enableEdgeToEdge(
-            navigationBarStyle = SystemBarStyle.auto(
-                ContextCompat.getColor(this, R.color.navigationBarColor),
-                ContextCompat.getColor(this, R.color.navigationBarColor)
+            navigationBarStyle = SystemBarStyle.dark(
+                ContextCompat.getColor(this, R.color.colorPrimary)
+            ),
+            statusBarStyle = SystemBarStyle.dark(
+                ContextCompat.getColor(this, R.color.colorPrimary)
             )
         )
         setContentView(binding.root)
