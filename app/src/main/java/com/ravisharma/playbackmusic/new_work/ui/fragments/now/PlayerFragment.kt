@@ -331,7 +331,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     }
 
                     R.id.info -> {
-                        currentSong?.let { requireContext().showSongInfo(it) }
+                        currentSong?.let { requireActivity().showSongInfo(it) }
                         true
                     }
 

@@ -11,6 +11,7 @@
     <color name="textSecondary">#E9EEF2</color>
     <color name="listitemDuration">#bebbb4</color>
     <color name="yellow">#FDC100</color>
+    <color name="divider">#232d36</color>
 
     <color name="popupItemBackground">#232d36</color>
     <color name="tabIndicatorColor">#FE2851</color>
@@ -25,7 +26,7 @@
     <color name="bottomNavigationActiveIndicator">#80FE2851</color>
 
     <color name="translucentBg">#33FFFFFF</color>
-    <color name="statusBarColor">#00101d25</color>
+    <color name="statusBarColor">#1A101D25</color>
     <color name="cardBg">#232d36</color>
 
 

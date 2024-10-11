@@ -101,7 +101,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initClickListeners()
         setupBottomNavigation()
-        binding.appBar.changeStatusBarMargin()
+        binding.appBar.changeStatusBarPadding()
         binding.bottomNavigationView.changeNavigationBarPadding()
     }
 
@@ -273,12 +273,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             artUri?.let {
                 val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
                 color?.let { it1 ->
-                    val initialBg = binding.bottomPanel.background
-                    val newBackground = binding.bottomPanel.linearGradientBackground(it1)
-                    val transitionDrawable = TransitionDrawable(arrayOf(initialBg, newBackground))
-                    binding.bottomPanel.background = transitionDrawable
-                    transitionDrawable.startTransition(200)
-
+                    binding.bottomPanel.linearGradientBackground(it1)
                 }
             }
         }

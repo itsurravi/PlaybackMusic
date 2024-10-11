@@ -1,6 +1,7 @@
 package com.ravisharma.playbackmusic.new_work.utils
 
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
@@ -60,8 +61,8 @@ fun View.changeStatusBarMargin() {
     }
 }
 
-fun View.linearGradientBackground(dominantColor: Int): GradientDrawable {
-    return GradientDrawable().apply {
+fun View.linearGradientBackground(dominantColor: Int) {
+    val newBackground = GradientDrawable().apply {
         colors = intArrayOf(
             dominantColor,
             dominantColor,
@@ -69,6 +70,8 @@ fun View.linearGradientBackground(dominantColor: Int): GradientDrawable {
         )
         gradientType = GradientDrawable.LINEAR_GRADIENT
         orientation = GradientDrawable.Orientation.TOP_BOTTOM
-
     }
+    val transitionDrawable = TransitionDrawable(arrayOf(background, newBackground))
+    background = transitionDrawable
+    transitionDrawable.startTransition(200)
 }

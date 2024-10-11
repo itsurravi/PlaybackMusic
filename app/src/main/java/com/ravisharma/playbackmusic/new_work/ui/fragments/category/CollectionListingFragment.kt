@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.category
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,6 +17,7 @@ import coil.load
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCollectionListingBinding
@@ -83,11 +85,12 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
                 addItemDecoration(
-                    DividerItemDecoration(
-                        this.context,
+                    MaterialDividerItemDecoration(
+                        requireContext(),
                         DividerItemDecoration.VERTICAL
-                    )
-                )
+                    ).apply {
+                        dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                    })
                 adapter = TracksAdapter(
                     onItemClick = ::songClicked,
                     onItemLongClick = ::songLongClicked
@@ -194,7 +197,7 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
 
     private fun songLongClicked(song: Song, position: Int) {
         if (reorderListAllowed) {
-            requireContext().onPlaylistSongLongPress(song) { longItemClick ->
+            requireActivity().onPlaylistSongLongPress(song) { longItemClick ->
                 longClickItem(longItemClick, song, position)
                 /*when (longItemClick) {
                     LongItemClick.Play -> {
@@ -225,7 +228,7 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                 }*/
             }
         } else {
-            requireContext().onSongLongPress(song) { longItemClick ->
+            requireActivity().onSongLongPress(song) { longItemClick ->
                 longClickItem(longItemClick, song, position)
                 /*when (longItemClick) {
                     LongItemClick.Play -> {
@@ -287,7 +290,7 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
             }
 
             LongItemClick.Details -> {
-                requireContext().showSongInfo(song)
+                requireActivity().showSongInfo(song)
             }
 
             LongItemClick.AddToPlaylist -> {

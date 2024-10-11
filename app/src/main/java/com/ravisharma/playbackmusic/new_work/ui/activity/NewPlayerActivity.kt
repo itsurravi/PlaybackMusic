@@ -35,7 +35,7 @@ class NewPlayerActivity : AppCompatActivity() {
                 ContextCompat.getColor(this, R.color.colorPrimary)
             ),
             statusBarStyle = SystemBarStyle.dark(
-                ContextCompat.getColor(this, R.color.colorPrimary)
+                ContextCompat.getColor(this, R.color.statusBarColor)
             )
         )
         setContentView(binding.root)

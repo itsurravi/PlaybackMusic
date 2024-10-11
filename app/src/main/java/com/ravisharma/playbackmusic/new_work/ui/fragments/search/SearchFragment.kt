@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.search
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,9 +17,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentSearchBinding
+import com.ravisharma.playbackmusic.new_work.ui.activity.NewPlayerActivity
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
@@ -87,7 +90,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             songList.apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
-                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                addItemDecoration(MaterialDividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+                    dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                })
                 adapter = TracksAdapter(
                     onItemClick = ::songClicked,
                     onItemLongClick = ::songLongClicked
@@ -123,7 +128,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     }
 
     private fun songLongClicked(song: Song, position: Int) {
-        requireContext().onSongLongPress(song) { longItemClick ->
+        requireActivity().onSongLongPress(song) { longItemClick ->
             when (longItemClick) {
                 LongItemClick.AddToPlaylist -> {
                     val bundle = Bundle().apply {
@@ -140,7 +145,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                 LongItemClick.SinglePlay -> mainViewModel.setQueue(listOf(song), 0)
                 LongItemClick.AddToQueue -> mainViewModel.addToQueue(song)
                 LongItemClick.Share -> requireContext().shareSong(song.location)
-                LongItemClick.Details -> requireContext().showSongInfo(song)
+                LongItemClick.Details -> requireActivity().showSongInfo(song)
                 else -> Unit
             }
         }
