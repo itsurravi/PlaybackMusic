@@ -11,7 +11,8 @@
     <color name="textSecondary">#E9EEF2</color>
     <color name="listitemDuration">#bebbb4</color>
     <color name="yellow">#FDC100</color>
-    <color name="divider">#232d36</color>
+    <color name="divider">#0C1821</color>
+    <color name="gray">#BDBDBD</color>
 
     <color name="popupItemBackground">#232d36</color>
     <color name="tabIndicatorColor">#FE2851</color>

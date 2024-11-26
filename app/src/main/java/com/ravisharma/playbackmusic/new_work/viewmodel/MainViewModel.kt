@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
     val message = _message.asStateFlow()
 
     val allSongs = songService.songs.map {
-        it.filter { song -> song.location.contains(".mp3") }
+        it.filterNot { song -> song.location.lowercase().contains("voice note") }
     }.catch { exception ->
         Log.e("allSongs", "$exception")
     }.stateIn(

@@ -77,7 +77,7 @@ class PlaybackNotificationProvider @Inject constructor(
 
         val builder = NotificationCompat.Builder(context, PLAYER_SERVICE_NOTIFICATION_CHANNEL_ID)
             .apply {
-                setSmallIcon(R.drawable.ic_music_note)
+                setSmallIcon(R.drawable.ic_music_head)
                 setContentTitle(mediaSession.player.currentMediaItem?.mediaMetadata?.title)
                 setContentText(mediaSession.player.currentMediaItem?.mediaMetadata?.artist)
                 setOngoing(true)

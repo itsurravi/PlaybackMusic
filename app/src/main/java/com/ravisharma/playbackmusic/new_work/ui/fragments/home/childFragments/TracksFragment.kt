@@ -109,7 +109,7 @@ class TracksFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             Log.i("TracksFragment", "initObserver")
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.allSongs.collectLatest { list ->
+                mainViewModel.allSongs.collect { list ->
                     Log.i("TracksFragment", "Collected list")
                     list?.let {
                         setupData(it)

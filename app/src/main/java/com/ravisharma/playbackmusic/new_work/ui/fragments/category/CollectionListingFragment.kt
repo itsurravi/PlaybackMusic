@@ -3,6 +3,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.category
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -33,6 +34,7 @@ import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
 import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing) {
@@ -97,12 +99,54 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                 )
             }
 
+            cvPlay.setOnClickListener {
+                collectionViewModel.setQueue(getCurrentList(), 0)
+            }
             imageBack1.setOnClickListener {
                 findNavController().popBackStack()
             }
-            imageBack1.changeStatusBarMargin()
+            imgOptions.setOnClickListener {
+                showMoreOptionsMenu(it)
+            }
+            toolbar.changeStatusBarMargin()
             songList.changeNavigationBarPadding()
         }
+    }
+
+    private fun showMoreOptionsMenu(it: View) {
+        PopupMenu(requireContext(), it).apply {
+            menuInflater.inflate(R.menu.collection_menu, menu)
+
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.addToQueue -> {
+                        collectionViewModel.addToQueue(getCurrentList())
+                        true
+                    }
+
+                    R.id.addToPlaylist -> {
+                        val bundle = Bundle().apply {
+                            putStringArrayList(
+                                NavigationConstant.AddToPlaylistSongs,
+                                getCurrentList().map {
+                                    it.location
+                                } as ArrayList<String>
+                            )
+                        }
+                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }.also {
+            it.show()
+        }
+    }
+
+    private fun getCurrentList(): List<Song> {
+        return (binding.songList.adapter as TracksAdapter).getCurrentList()
     }
 
     private fun initObservers() {
@@ -182,87 +226,29 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
 
             if (data.songs.isEmpty()) {
                 noDataFound.noDataLayout.isVisible = true
+                cvPlay.isVisible = false
+                imgOptions.isVisible = false
             } else {
                 noDataFound.noDataLayout.isVisible = false
+                cvPlay.isVisible = true
+                imgOptions.isVisible = true
                 (songList.adapter as TracksAdapter).submitList(data.songs)
             }
         }
     }
 
     private fun songClicked(song: Song, position: Int) {
-        val currentList =
-            (binding.songList.adapter as TracksAdapter).getCurrentList()
-        collectionViewModel.setQueue(currentList, position)
+        collectionViewModel.setQueue(getCurrentList(), position)
     }
 
     private fun songLongClicked(song: Song, position: Int) {
         if (reorderListAllowed) {
             requireActivity().onPlaylistSongLongPress(song) { longItemClick ->
                 longClickItem(longItemClick, song, position)
-                /*when (longItemClick) {
-                    LongItemClick.Play -> {
-                        songClicked(song, position)
-                    }
-
-                    LongItemClick.SinglePlay -> {
-                        collectionViewModel.setQueue(listOf(song), 0)
-                    }
-
-                    LongItemClick.AddToQueue -> {
-                        collectionViewModel.addToQueue(song)
-                    }
-
-                    LongItemClick.RemoveFromList -> {
-                        collectionViewModel.removeFromPlaylist(song)
-                    }
-
-                    LongItemClick.Share -> {
-                        requireContext().shareSong(song.location)
-                    }
-
-                    LongItemClick.Details -> {
-                        requireContext().showSongInfo(song)
-                    }
-
-                    else -> Unit
-                }*/
             }
         } else {
             requireActivity().onSongLongPress(song) { longItemClick ->
                 longClickItem(longItemClick, song, position)
-                /*when (longItemClick) {
-                    LongItemClick.Play -> {
-                        songClicked(song, position)
-                    }
-
-                    LongItemClick.SinglePlay -> {
-                        collectionViewModel.setQueue(listOf(song), 0)
-                    }
-
-                    LongItemClick.AddToQueue -> {
-                        collectionViewModel.addToQueue(song)
-                    }
-
-                    LongItemClick.AddToPlaylist -> {
-                        val bundle = Bundle().apply {
-                            putStringArrayList(
-                                NavigationConstant.AddToPlaylistSongs,
-                                arrayListOf(song.location)
-                            )
-                        }
-                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
-                    }
-
-                    LongItemClick.Share -> {
-                        requireContext().shareSong(song.location)
-                    }
-
-                    LongItemClick.Details -> {
-                        requireContext().showSongInfo(song)
-                    }
-
-                    else -> Unit
-                }*/
             }
         }
     }
@@ -302,6 +288,8 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
                 }
                 findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
             }
+
+            else -> Unit
         }
     }
 }

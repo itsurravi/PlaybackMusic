@@ -4,6 +4,6 @@
     <solid android:color="@color/contentBGclr" />
     <stroke
         android:width="1dp"
-        android:color="@color/colorPrimary" />
+        android:color="@color/divider" />
 </shape>
 

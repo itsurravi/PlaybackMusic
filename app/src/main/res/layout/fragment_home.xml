@@ -22,16 +22,20 @@
             android:layout_height="?attr/actionBarSize"
             android:gravity="center_vertical">
 
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/logo" />
+
             <TextView
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
                 android:text="@string/app_name"
-                android:textSize="24sp">
-
-            </TextView>
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -42,9 +46,9 @@
                     android:id="@+id/iv_search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="12dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
+                    android:padding="4dp"
                     android:src="@drawable/ic_search" />
 
                 <ImageView
@@ -61,9 +65,9 @@
                     android:id="@+id/iv_more_options"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="12dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp"
+                    android:padding="4dp"
                     android:src="@drawable/ic_more_options" />
 
             </LinearLayout>
@@ -174,7 +178,7 @@
                 android:layout_marginVertical="10dp"
                 android:layout_marginEnd="10dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/uamp_ic_play_arrow_white_48dp"
+                android:src="@drawable/ic_baseline_play_24"
                 app:layout_constraintBottom_toTopOf="@id/progress_song"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1"

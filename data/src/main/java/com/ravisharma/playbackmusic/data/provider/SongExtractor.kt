@@ -137,7 +137,8 @@ class SongExtractor(
         val selection = StringBuilder()
         val selectionArgs = arrayListOf<String>()
         selection.append(MediaStore.Audio.Media.IS_MUSIC + " != 0 ").append("AND ")
-        selection.append(MediaStore.Audio.Media.DATA + " NOT LIKE '%Record%' ")
+        selection.append(MediaStore.Audio.Media.DATA + " NOT LIKE '%Record%' ").append("AND ")
+        selection.append(MediaStore.Audio.Media.DATA + " NOT LIKE '%Voice Not%' ")
 
         val query = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             MediaStore.Audio.Media.getContentUri(

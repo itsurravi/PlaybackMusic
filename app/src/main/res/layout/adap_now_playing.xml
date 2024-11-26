@@ -87,7 +87,7 @@
                     android:layout_gravity="center"
                     android:background="?android:selectableItemBackgroundBorderless"
                     android:padding="5dp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:src="@drawable/ic_close" />
 
             </LinearLayout>

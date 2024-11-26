@@ -87,7 +87,7 @@
                     android:gravity="center"
                     android:text="@string/favTracks"
                     app:drawableTint="@color/tabIndicatorColor"
-                    app:drawableTopCompat="@drawable/ic_favorite_not_24" />
+                    app:drawableTopCompat="@drawable/ic_baseline_favorite_border_24" />
 
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
@@ -123,7 +123,8 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/createNewPlaylist"
-            android:padding="12dp"
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/ic_playlist_add_24" />
 
     </LinearLayout>

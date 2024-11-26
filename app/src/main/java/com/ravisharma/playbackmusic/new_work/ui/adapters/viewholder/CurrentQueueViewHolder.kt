@@ -15,8 +15,7 @@ import com.ravisharma.playbackmusic.utils.StartDragListener
 class CurrentQueueViewHolder(
     private var dragListener: StartDragListener,
     val binding: AdapNowPlayingBinding
-) :
-    RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.ViewHolder(binding.root) {
 
     @SuppressLint("ClickableViewAccessibility")
     fun bind(

@@ -1,15 +1,7 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.home.childFragments
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,21 +11,19 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.VideoOptions
-import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.databinding.FragmentPlaylistBinding
 import com.ravisharma.playbackmusic.nativetemplates.NativeTemplateStyle
 import com.ravisharma.playbackmusic.new_work.ui.adapters.PlaylistsAdapter
+import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
+import com.ravisharma.playbackmusic.new_work.ui.extensions.onPlaylistLongPress
 import com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
@@ -69,8 +59,8 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
     }
 
     private fun setupAdLoader() {
-//        val builder = AdLoader.Builder(requireContext(), getString(R.string.nativeAdvanceId))
-        val builder = AdLoader.Builder(requireContext(), getString(R.string.testNativeAdvanceId))
+        val builder = AdLoader.Builder(requireContext(), getString(R.string.nativeAdvanceId))
+//        val builder = AdLoader.Builder(requireContext(), getString(R.string.testNativeAdvanceId))
         // TODO need to change when going to production
         builder.forNativeAd { nativeAd ->
             val styles = NativeTemplateStyle.Builder().build()
@@ -78,10 +68,10 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
             binding.myTemplate.setNativeAd(nativeAd)
             binding.myTemplate.visibility = View.VISIBLE
         }
-/*
-        val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
-        val adOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
-        builder.withNativeAdOptions(adOptions)*/
+        /*
+                val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
+                val adOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
+                builder.withNativeAdOptions(adOptions)*/
 
         val adLoader = builder.withAdListener(object : AdListener() {
             override fun onAdFailedToLoad(loadAdError: LoadAdError) {
@@ -120,7 +110,8 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 val bundle = Bundle().apply {
                     putParcelable(CollectionType.Category, collectionType)
                 }
-                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+                requireActivity().findNavController(R.id.nav_container)
+                    .navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
             }
             cardRecentAdded.setOnClickListener {
                 val collectionType =
@@ -128,7 +119,8 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 val bundle = Bundle().apply {
                     putParcelable(CollectionType.Category, collectionType)
                 }
-                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+                requireActivity().findNavController(R.id.nav_container)
+                    .navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
             }
             cardFavorites.setOnClickListener {
                 val collectionType =
@@ -136,15 +128,20 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 val bundle = Bundle().apply {
                     putParcelable(CollectionType.Category, collectionType)
                 }
-                requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+                requireActivity().findNavController(R.id.nav_container)
+                    .navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
             }
 
             playlistRecycler.apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
-                addItemDecoration(MaterialDividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                    dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
-                })
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
+                    ).apply {
+                        dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                    })
                 adapter = PlaylistsAdapter(
                     onClick = ::onPlaylistClick,
                     onLongClick = ::onPlaylistLongClick
@@ -173,11 +170,12 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
         val bundle = Bundle().apply {
             putParcelable(CollectionType.Category, collectionType)
         }
-        requireActivity().findNavController(R.id.nav_container).navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
+        requireActivity().findNavController(R.id.nav_container)
+            .navigate(R.id.action_homeFragment_to_categoryListingFragment, bundle)
     }
 
     private fun onPlaylistLongClick(playlistWithSongCount: PlaylistWithSongCount) {
-        val items = resources.getStringArray(R.array.longPressItemsPlaylist)
+        /*val items = resources.getStringArray(R.array.longPressItemsPlaylist)
         val ad = ArrayAdapter(requireContext(), R.layout.adapter_alert_list, items)
         val v = LayoutInflater.from(context).inflate(R.layout.alert_playlist, null)
         val lv = v.findViewById<ListView>(R.id.list)
@@ -199,7 +197,24 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
                 2 -> mainViewModel.deletePlaylist(playlistWithSongCount)
             }
             alertDialog.dismiss()
-        }
+        }*/
+        requireActivity().onPlaylistLongPress(
+            playlistWithSongCount = playlistWithSongCount,
+            itemClick = {
+                when(it) {
+                    LongItemClick.Play -> {
+                        playPlaylistSongs(playlistWithSongCount)
+                    }
+                    LongItemClick.Rename -> {
+                        updatePlaylistDialog(playlistWithSongCount)
+                    }
+                    LongItemClick.Delete -> {
+                        mainViewModel.deletePlaylist(playlistWithSongCount)
+                    }
+                    else -> Unit
+                }
+            }
+        )
     }
 
     private fun playPlaylistSongs(playlistWithSongCount: PlaylistWithSongCount) {
@@ -216,9 +231,11 @@ class PlaylistsFragment : Fragment(R.layout.fragment_playlist) {
 
     private fun updatePlaylistDialog(oldPlaylistName: PlaylistWithSongCount) {
         val listener = AlertClickListener { newPlaylistName ->
-            mainViewModel.updatePlaylistName(oldPlaylistName.copy(
-                playlistName = newPlaylistName
-            ))
+            mainViewModel.updatePlaylistName(
+                oldPlaylistName.copy(
+                    playlistName = newPlaylistName
+                )
+            )
         }
         val alert = PlaylistAlert(context, listener)
         alert.showUpdateListAlert(oldPlaylistName.playlistName)

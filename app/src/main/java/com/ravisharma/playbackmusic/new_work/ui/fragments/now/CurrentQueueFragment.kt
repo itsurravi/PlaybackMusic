@@ -85,9 +85,13 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                 adapter = currentQueueAdapter
                 layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
-                addItemDecoration(MaterialDividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                    dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
-                })
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
+                    ).apply {
+                        dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                    })
             }.also {
                 val shuffleIndex = mainViewModel.shuffledIndex
                 val list = if (shuffleIndex.isNotEmpty()) {

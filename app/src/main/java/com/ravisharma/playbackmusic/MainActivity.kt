@@ -503,19 +503,19 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
 
         if (lastShuffle) {
-            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
+            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
         } else {
-            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
+            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
         }
 
         if (lastRepeat) {
             if (lastRepeatOne) {
-                binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_one)
+                binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_once)
             } else {
-                binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_all)
+                binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat)
             }
         } else {
-            binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_off)
+            binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat)
         }
 
         viewModel.getPlaylistSong(getString(R.string.favTracks)).observe(this) { playlists ->
@@ -526,9 +526,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 }
             }
             if (check) {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_24)
             } else {
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_border_24)
             }
         }
 
@@ -619,7 +619,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         songPosn = position
         if (!nowPlaying) {
             normalList.clear()
-            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
+            binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
             musicSrv!!.shuffle = false
             setRepeatOff()
             manage.putBooleanPref(getString(R.string.Shuffle), false)
@@ -675,7 +675,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     normalList.addAll(songList)
                     songList.shuffle()
 
-                    binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
+                    binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
                     setRepeatOff()
 
                     Toast.makeText(this, getString(R.string.Shuffle_On), Toast.LENGTH_SHORT).show()
@@ -695,7 +695,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     normalList.clear()
 
                     Log.i("POSITION", songPosn.toString() + " " + musicSrv!!.songPosn)
-                    binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_off)
+                    binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
 
                     Toast.makeText(this, getString(R.string.Shuffle_Off), Toast.LENGTH_SHORT).show()
                     false
@@ -714,13 +714,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                     lastRepeat = true
 
                     Toast.makeText(this, getString(R.string.Repeat_One), Toast.LENGTH_SHORT).show()
-                    binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_one)
+                    binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_once)
                 } else if (musicSrv!!.repeat) {
                     lastRepeat = true
                     lastRepeatOne = false
 
                     Toast.makeText(this, getString(R.string.Repeat_On), Toast.LENGTH_SHORT).show()
-                    binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_all)
+                    binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat)
                 } else {
                     setRepeatOff()
                     Toast.makeText(this, getString(R.string.Repeat_Off), Toast.LENGTH_SHORT).show()
@@ -765,7 +765,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         lastRepeatOne = false
         lastRepeat = false
 
-        binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat_off)
+        binding.playingPanel.btnRepeat.setImageResource(R.drawable.ic_repeat)
 
         manage.putBooleanPref(getString(R.string.Repeat), lastRepeat)
         manage.putBooleanPref(getString(R.string.RepeatOne), lastRepeatOne)
@@ -778,7 +778,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
             if (exist > 0) {
                 musicSrv!!.updateFavNotification(false)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_border_24)
 
                 viewModel.removeSong(getString(R.string.favTracks), song.id)
             } else {
@@ -787,7 +787,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
                 musicSrv!!.updateFavNotification(true)
 
-                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
+                binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_24)
 
                 Toast.makeText(
                     this@MainActivity,
@@ -802,10 +802,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     private fun checkInFav(song: Song?) {
         val exist = viewModel.isSongExist(getString(R.string.favTracks), song!!.id)
         if (exist > 0) {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_24)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_24)
             musicSrv!!.updateFavNotification(true)
         } else {
-            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+            binding.playingPanel.imgFav.setImageResource(R.drawable.ic_baseline_favorite_border_24)
             musicSrv!!.updateFavNotification(false)
         }
     }
@@ -901,13 +901,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
     }
 
     fun setPlayIcons() {
-        binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
-        binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
+        binding.playingPanel.btnPlayPause.setImageResource(R.drawable.ic_baseline_play_24)
+        binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.ic_baseline_play_24)
     }
 
     fun setPauseIcons() {
-        binding.playingPanel.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
-        binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+        binding.playingPanel.btnPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
+        binding.playingPanel.btnPlayPauseSlide.setImageResource(R.drawable.ic_baseline_pause_24)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -1640,7 +1640,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
 
                 lastShuffle = true
 
-                binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle)
+                binding.playingPanel.btnShuffle.setImageResource(R.drawable.ic_shuffle_24)
 
                 normalList.clear()
                 songList.clear()

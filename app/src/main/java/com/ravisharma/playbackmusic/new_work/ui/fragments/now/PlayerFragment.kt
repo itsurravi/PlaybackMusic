@@ -6,7 +6,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import androidx.appcompat.widget.PopupMenu
@@ -152,14 +151,21 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private fun updateShuffleMode(isShuffled: Boolean) {
-        Log.i("updateShuffleMode", "$isShuffled")
+        /*binding.apply {
+            imgShuffle.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (isShuffled) R.color.fav_on else R.color.white
+                )
+            )
+        }*/
     }
 
     private fun togglePlaying(playing: Boolean?) {
         playing?.let {
             binding.apply {
                 btnPlayPause.setImageResource(
-                    if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
+                    if (it) R.drawable.ic_baseline_pause_24 else R.drawable.ic_baseline_play_24
                 )
             }
         }
@@ -182,7 +188,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 //                setDynamicBackground(it.artUri)
 
                 if (it.favourite) {
-                    imgFav.setImageResource(R.drawable.ic_favorite_24)
+                    imgFav.setImageResource(R.drawable.ic_baseline_favorite_24)
                     imgFav.imageTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(
                             requireContext(),
@@ -190,7 +196,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                         )
                     )
                 } else {
-                    imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+                    imgFav.setImageResource(R.drawable.ic_baseline_favorite_border_24)
                     imgFav.imageTintList = ColorStateList.valueOf(Color.WHITE)
                 }
 
@@ -302,8 +308,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             }
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
-//                mainViewModel.toggleShuffle()
             }
+//            imgShuffle.setOnClickListener {
+//                mainViewModel.toggleShuffle()
+//            }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)
             }
@@ -326,7 +334,10 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                                 arrayListOf(currentSong?.location)
                             )
                         }
-                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                        findNavController().navigate(
+                            R.id.action_to_addToPlaylistFragment,
+                            bundle
+                        )
                         true
                     }
 

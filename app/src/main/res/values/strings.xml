@@ -149,10 +149,11 @@
     </string-array>
 
     <string-array name="longPressItemsPlaylist">
-        <item>Play Playlist</item>
-        <item>Rename Playlist</item>
-        <item>Delete Playlist</item>
+        <item>Play</item>
+        <item>Rename</item>
+        <item>Delete</item>
     </string-array>
+
     <string-array name="timer">
         <item>15 Minutes</item>
         <item>30 Minutes</item>

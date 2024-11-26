@@ -285,7 +285,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 txtSongName.isSelected = it
                 txtSongArtist.isSelected = it
                 btnPlayPauseSlide.setImageResource(
-                    if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
+                    if (it) R.drawable.ic_baseline_pause_24 else R.drawable.ic_baseline_play_24
                 )
             }
         }
