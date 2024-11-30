@@ -26,13 +26,13 @@ class MainActivityViewModel @Inject constructor(
 
     private var pSong: MutableLiveData<Song> = MutableLiveData()
     private var sPosition: MutableLiveData<Int> = MutableLiveData()
-    private var currentPlayingList = MutableLiveData<ArrayList<Song>>()
+    private var currentPlayingList = MutableLiveData<ArrayList<Song>?>()
 
     init {
         currentPlayingList = getPlayingListData()
     }
 
-    fun getPlayingList(): LiveData<ArrayList<Song>> {
+    fun getPlayingList(): LiveData<ArrayList<Song>?> {
         return currentPlayingList
     }
 

@@ -1,3 +1,4 @@
+/*
 package com.ravisharma.playbackmusic.fragments.viewmodels
 
 import android.content.ContentResolver
@@ -61,7 +62,9 @@ class CategorySongViewModel @Inject constructor(
             musicCursor = contentResolver.query(
                 musicUri,
                 null,
-                MediaStore.Audio.Media.ALBUM_ID + "=" + id/* + " AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%")*/,
+                MediaStore.Audio.Media.ALBUM_ID + "=" + id*/
+/* + " AND " + MediaStore.Audio.Media.DATA + " NOT LIKE ? ", arrayOf("%Record%")*//*
+,
                 null,
                 MediaStore.Audio.Media.TITLE + " ASC"
             )
@@ -146,4 +149,4 @@ class CategorySongViewModel @Inject constructor(
     fun removeSong(playlistName: String?, songId: Long) {
         playlistRepository.removeSong(playlistName, songId)
     }
-}
+}*/

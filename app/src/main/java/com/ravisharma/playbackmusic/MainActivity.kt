@@ -392,7 +392,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         })
 
         viewModel.getPlayingList().observe(this) { songs ->
-            songList = songs
+            if (songs != null) {
+                songList = songs
+            }
             if (songList.size > 0) {
                 Log.d("Playing", "List Changed " + songList.size)
                 musicSrv!!.setList(songList)

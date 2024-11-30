@@ -1,8 +1,8 @@
 [versions]
 compileSdk = "35"
 minSdk = "21"
-versionCode = "67"
-versionName = "2.9.1"
+versionCode = "69"
+versionName = "2.9.2"
 jvm = "17"
 
 appUpdate = "2.1.0"
