@@ -61,6 +61,18 @@ fun View.changeStatusBarMargin() {
     }
 }
 
+fun View.changeNavigationBarMargin() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val bars = insets.getInsets(
+            WindowInsetsCompat.Type.navigationBars()
+        )
+        v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            bottomMargin = bars.bottom
+        }
+        WindowInsetsCompat.CONSUMED
+    }
+}
+
 fun View.linearGradientBackground(dominantColor: Int) {
     val newBackground = GradientDrawable().apply {
         colors = intArrayOf(

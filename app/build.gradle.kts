@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Locale
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,6 +13,8 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.protoPlugin)
 }
+val keystorePropertiesFile = rootProject.file("local.properties")
+
 android {
     namespace = "com.ravisharma.playbackmusic"
 
@@ -28,18 +31,41 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                val keystoreProperties = Properties().apply {
+                    load(keystorePropertiesFile.inputStream())
+                }
+
+                storeFile = file(keystoreProperties["KEYSTORE_FILE"] as String)
+                storePassword = keystoreProperties["KEYSTORE_PASSWORD"] as String
+                keyPassword = keystoreProperties["KEY_PASSWORD"] as String
+                keyAlias = keystoreProperties["KEY_ALIAS"] as String
+            } else {
+                // Fetch values from environment variables
+                storeFile = file(System.getenv("KEYSTORE_FILE"))
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyPassword = System.getenv("KEY_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+            }
+            enableV1Signing = false
+            enableV2Signing = true
+        }
+    }
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            firebaseCrashlytics {
-                mappingFileUploadEnabled = true
-            }
+//            firebaseCrashlytics {
+//                mappingFileUploadEnabled = true
+//            }
+            signingConfig = signingConfigs.getByName("release")
         }
-        getByName("debug") {
+        debug {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-d"
             isMinifyEnabled = false

@@ -31,3 +31,13 @@
 -keep class com.ravisharma.playbackmusic.new_work.ui.fragments.category.CollectionType
 
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+
+-keep class * extends androidx.room.RoomDatabase
+-keep class androidx.room.** { *; }
+-keep class com.google.dagger.hilt.** { *; }
+-keep class dagger.hilt.** { *; }
+
+-keep class * extends dagger.Module
+-keep class * extends dagger.Provides
+-keep class **$$Factory
+-keep class **$$ModuleAdapter

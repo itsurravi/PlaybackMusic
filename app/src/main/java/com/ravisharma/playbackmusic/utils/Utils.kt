@@ -22,13 +22,13 @@ fun setSongPosition(i: Int) {
 }
 
 //current playing list
-private var curPlayingList: MutableLiveData<ArrayList<Song>> = MutableLiveData()
+private var curPlayingList: MutableLiveData<ArrayList<Song>?> = MutableLiveData()
 
 fun setPlayingList(songList: ArrayList<Song>) {
     curPlayingList.value = songList.clone() as ArrayList<Song>
 }
 
-fun getPlayingListData(): MutableLiveData<ArrayList<Song>> {
+fun getPlayingListData(): MutableLiveData<ArrayList<Song>?> {
     return curPlayingList
 }
 

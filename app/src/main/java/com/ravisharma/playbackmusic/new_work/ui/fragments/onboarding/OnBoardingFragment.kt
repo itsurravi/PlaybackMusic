@@ -22,6 +22,7 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.ScanStatus
 import com.ravisharma.playbackmusic.databinding.FragmentOnboardingBinding
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarMargin
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +71,8 @@ class OnBoardingFragment : Fragment(R.layout.fragment_onboarding) {
     private fun setupFragment() {
         initObservers()
         binding.apply {
+            btnGrant.changeNavigationBarMargin()
+            btnScan.changeNavigationBarMargin()
             btnGrant.setOnClickListener {
                 checkForMultiplePermissions(getPermissionList())
             }
