@@ -24,7 +24,8 @@
                 android:layout_height="wrap_content"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:contentDescription="@string/back"
-                android:padding="15dp"
+                android:layout_margin="12dp"
+                android:padding="4dp"
                 android:src="@drawable/ic_back_28"
                 tools:ignore="RtlSymmetry" />
 
@@ -46,7 +47,8 @@
                 android:layout_gravity="center"
                 android:background="?android:selectableItemBackground"
                 android:contentDescription="@string/save_as_playlist"
-                android:padding="15dp"
+                android:layout_margin="12dp"
+                android:padding="4dp"
                 android:src="@drawable/ic_save_24" />
 
 
@@ -107,7 +109,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/ic_artist" />
+                        android:src="@drawable/ic_artist_filled_24" />
 
                     <TextView
                         android:id="@+id/songArtist"

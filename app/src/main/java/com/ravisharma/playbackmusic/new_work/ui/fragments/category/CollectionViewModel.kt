@@ -1,18 +1,13 @@
 package com.ravisharma.playbackmusic.new_work.ui.fragments.category
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ravisharma.playbackmusic.data.db.model.tables.PlaylistSongCrossRef
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.data.provider.DataProvider
 import com.ravisharma.playbackmusic.data.utils.Constants
-import com.ravisharma.playbackmusic.new_work.services.DataManager
 import com.ravisharma.playbackmusic.new_work.services.data.PlayerService
 import com.ravisharma.playbackmusic.new_work.services.data.PlaylistService
 import com.ravisharma.playbackmusic.new_work.services.data.QueueService
 import com.ravisharma.playbackmusic.new_work.services.data.SongService
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -66,6 +61,7 @@ class CollectionViewModel @Inject constructor(
                         }
                     }
                 }
+
                 CollectionType.RecentAddedType -> {
                     songService.getRecentAddedSongs().map {
                         CollectionUi(
@@ -75,6 +71,7 @@ class CollectionViewModel @Inject constructor(
                         )
                     }
                 }
+
                 CollectionType.AlbumType -> {
                     songService.getAlbumWithSongsByName(type.id).map {
                         if (it == null) CollectionUi()
@@ -87,6 +84,7 @@ class CollectionViewModel @Inject constructor(
                         }
                     }
                 }
+
                 CollectionType.ArtistType -> {
                     songService.getArtistWithSongsByName(type.id).map {
                         if (it == null) CollectionUi()
@@ -99,6 +97,7 @@ class CollectionViewModel @Inject constructor(
                         }
                     }
                 }
+
                 CollectionType.PlaylistType -> {
                     playlistService.getPlaylistWithSongsById(type.id.toLong()).map {
                         if (it == null) CollectionUi()
@@ -106,12 +105,13 @@ class CollectionViewModel @Inject constructor(
                             CollectionUi(
                                 songs = it.songs,
                                 topBarTitle = it.playlist.playlistName,
-                                topBarBackgroundImageUri = it.playlist.artUri ?:
-                                it.songs.randomOrNull()?.artUri ?: ""
+                                topBarBackgroundImageUri = it.playlist.artUri
+                                    ?: it.songs.randomOrNull()?.artUri ?: ""
                             )
                         }
                     }
                 }
+
                 CollectionType.FavouritesType -> {
                     songService.getFavouriteSongs().map {
                         CollectionUi(
@@ -121,6 +121,7 @@ class CollectionViewModel @Inject constructor(
                         )
                     }
                 }
+
                 else -> flow { }
             }
         }.catch { exception ->
@@ -178,19 +179,20 @@ class CollectionViewModel @Inject constructor(
         }
     }
 
-    fun removeFromPlaylist(song: Song){
+    fun removeFromPlaylist(song: Song) {
         viewModelScope.launch {
             try {
-                val playlistId = _collectionType.value?.id?.toLong() ?: throw IllegalArgumentException()
+                val playlistId =
+                    _collectionType.value?.id?.toLong() ?: throw IllegalArgumentException()
                 playlistService.removeSongsFromPlaylist(listOf(song.location), playlistId)
                 showMessage("Removed")
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 showMessage("Some error occurred")
             }
         }
     }
 
-    private fun showMessage(message: String){
+    private fun showMessage(message: String) {
         viewModelScope.launch {
             _message.update { message }
             delay(Constants.MESSAGE_DURATION)

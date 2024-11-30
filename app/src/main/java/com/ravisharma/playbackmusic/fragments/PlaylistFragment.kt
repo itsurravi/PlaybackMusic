@@ -72,7 +72,7 @@ class PlaylistFragment : Fragment(), OnPlaylistClicked, OnPlaylistLongClicked,
     private fun loadBanner2() {
         adView = AdView(requireContext())
         adView!!.adUnitId = getString(R.string.playlistFragId)
-        binding.bannerContainerPlaylist.addView(adView)
+//        binding.bannerContainerPlaylist.addView(adView)
 
         val adRequest = AdRequest.Builder().build()
         val adSize = AdSize.BANNER

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/contentBGclr"
@@ -12,14 +13,14 @@
         android:background="?android:selectableItemBackground"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="16dp">
 
         <ImageView
             android:id="@+id/playlistIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/ic_created_playlist" />
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_music_head" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -33,17 +34,19 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/textPrimary" />
+                android:textColor="@color/textPrimary"
+                tools:text="My Playlist" />
 
             <TextView
                 android:id="@+id/playlistSongCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
                 android:ellipsize="end"
                 android:maxLines="1"
+                android:textColor="@color/textSecondary"
                 android:textSize="12sp"
-                android:textColor="@color/textSecondary" />
+                tools:text="20 Song" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

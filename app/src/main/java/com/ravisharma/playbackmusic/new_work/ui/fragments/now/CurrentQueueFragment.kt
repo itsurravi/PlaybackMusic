@@ -3,13 +3,13 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.now
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -17,19 +17,21 @@ import coil.transform.RoundedCornersTransformation
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCurrentQueueBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.CurrentQueueAdapter
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.StartDragListener
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections
 
 @AndroidEntryPoint
 class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDragListener {
@@ -84,17 +86,30 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                 layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
                 addItemDecoration(
-                    DividerItemDecoration(
+                    MaterialDividerItemDecoration(
                         requireContext(),
                         DividerItemDecoration.VERTICAL
-                    )
-                )
+                    ).apply {
+                        dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                    })
             }.also {
-                currentQueueAdapter.submitList(mainViewModel.queue) {
-                    it.scrollToPosition(mainViewModel.queue.indexOf(mainViewModel.currentSong.value))
+                val shuffleIndex = mainViewModel.shuffledIndex
+                val list = if (shuffleIndex.isNotEmpty()) {
+                    shuffleIndex.map {
+                        mainViewModel.queue[it]
+                    }
+                } else {
+                    mainViewModel.queue
+                }
+
+                currentQueueAdapter.submitList(list) {
+                    it.scrollToPosition(list.indexOf(mainViewModel.currentSong.value))
                 }
             }
-            itemTouchHelper.attachToRecyclerView(rvSongList)
+//            itemTouchHelper.attachToRecyclerView(rvSongList)
+
+            currentPlayingPanel.changeStatusBarPadding()
+            rvSongList.changeNavigationBarPadding()
         }
         initClickListeners()
     }
@@ -103,7 +118,7 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
         viewLifecycleOwner.lifecycleScope.launch {
             val adapter = (binding.rvSongList.adapter as CurrentQueueAdapter)
             val adapterList = adapter.getCurrentList()
-            if(adapterList.size == 1) {
+            if (adapterList.size == 1) {
                 requireContext().showToast("Last song left in queue")
                 return@launch
             }
@@ -168,14 +183,20 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
     }
 
     private fun songClicked(song: Song, position: Int) {
-        mainViewModel.playerHelper.seekTo(position, 0)
+        val list = mainViewModel.shuffledIndex
+        val index = if (list.isNotEmpty()) {
+            list[position]
+        } else {
+            position
+        }
+        mainViewModel.playerHelper.seekTo(index, 0)
     }
 
     override fun requestDrag(viewHolder: RecyclerView.ViewHolder) {
-        itemTouchHelper.startDrag(viewHolder)
+//        itemTouchHelper.startDrag(viewHolder)
     }
 
-    private val itemTouchHelper by lazy {
+    /*private val itemTouchHelper by lazy {
         val simpleCallback: ItemTouchHelper.SimpleCallback =
             object : ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP or
@@ -202,6 +223,6 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                 }
             }
         ItemTouchHelper(simpleCallback)
-    }
+    }*/
 
 }

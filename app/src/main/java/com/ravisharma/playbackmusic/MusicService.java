@@ -354,9 +354,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void updateFavNotification(boolean check) {
         if (player != null && notification) {
             if (check) {
-                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_favorite_24, "Favorite", retrievePlaybackIntent(1));
+                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_baseline_favorite_24, "Favorite", retrievePlaybackIntent(1));
             } else {
-                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_favorite_not_24, "Favorite", retrievePlaybackIntent(1));
+                playerNotification.actions[0] = new Notification.Action(R.drawable.ic_baseline_favorite_border_24, "Favorite", retrievePlaybackIntent(1));
             }
             notificationManagerCompat.notify(id, playerNotification);
         }
@@ -392,25 +392,25 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         long exist = repository.isSongExist(getString(R.string.favTracks), playingSong.getId());
         if (exist > 0) {
             favorite = new NotificationCompat.Action
-                    .Builder(R.drawable.ic_favorite_24, "Favorite", retrievePlaybackIntent(1))
+                    .Builder(R.drawable.ic_baseline_favorite_24, "Favorite", retrievePlaybackIntent(1))
                     .build();
         } else {
             favorite = new NotificationCompat.Action
-                    .Builder(R.drawable.ic_favorite_not_24, "Favorite", retrievePlaybackIntent(1))
+                    .Builder(R.drawable.ic_baseline_favorite_border_24, "Favorite", retrievePlaybackIntent(1))
                     .build();
         }
 
         NotificationCompat.Action previous = new NotificationCompat.Action
-                .Builder(R.drawable.ic_previous_24, "Previous", retrievePlaybackIntent(2))
+                .Builder(R.drawable.ic_baseline_skip_previous_40, "Previous", retrievePlaybackIntent(2))
                 .build();
         NotificationCompat.Action playPause = new NotificationCompat.Action
                 .Builder(R.drawable.ic_baseline_pause_24, "PlayPause", retrievePlaybackIntent(3))
                 .build();
         NotificationCompat.Action next = new NotificationCompat.Action
-                .Builder(R.drawable.ic_next_24, "Next", retrievePlaybackIntent(4))
+                .Builder(R.drawable.ic_baseline_skip_next_40, "Next", retrievePlaybackIntent(4))
                 .build();
         NotificationCompat.Action close = new NotificationCompat.Action
-                .Builder(R.drawable.ic_close_24, "Close", retrievePlaybackIntent(5))
+                .Builder(R.drawable.ic_baseline_close_40, "Close", retrievePlaybackIntent(5))
                 .build();
 
         Intent intent = new Intent(this, MainActivity.class);
@@ -420,7 +420,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         playerNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_music_note)
+                .setSmallIcon(R.drawable.ic_music_head)
                 .setContentTitle(songTitle)
                 .setContentText(artist)
                 .setLargeIcon(artWork)

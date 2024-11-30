@@ -12,134 +12,109 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
+        android:scrollbars="none">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_recentAdded"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="@dimen/cardCorner"
-            app:contentPadding="10dp"
-            app:strokeColor="@color/tabIndicatorColor"
-            app:strokeWidth="0dp">
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_recentAdded"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_recent_timer"
-                    app:tint="@color/tabIndicatorColor" />
+                android:layout_marginEnd="6dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="@dimen/cardCorner"
+                app:contentPadding="8dp"
+                app:strokeColor="@color/tabIndicatorColor"
+                app:strokeWidth="0dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:drawablePadding="4dp"
                     android:gravity="center"
-                    android:text="@string/recentAdded" />
+                    android:text="@string/recentAdded"
+                    app:drawableTint="@color/tabIndicatorColor"
+                    app:drawableTopCompat="@drawable/ic_recent_timer" />
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_mostPlayed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="1"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="@dimen/cardCorner"
-            app:contentPadding="10dp"
-            app:strokeColor="@color/tabIndicatorColor"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_mostPlayed"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_most_played_24"
-                    app:tint="@color/tabIndicatorColor" />
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="@dimen/cardCorner"
+                app:contentPadding="8dp"
+                app:strokeColor="@color/tabIndicatorColor"
+                app:strokeWidth="0dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:drawablePadding="4dp"
                     android:gravity="center"
-                    android:text="@string/mostPlayed" />
+                    android:text="@string/mostPlayed"
+                    app:drawableTint="@color/tabIndicatorColor"
+                    app:drawableTopCompat="@drawable/ic_most_played_24" />
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_favorites"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="@dimen/cardCorner"
-            app:contentPadding="10dp"
-            app:strokeColor="@color/tabIndicatorColor"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_favorites"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_favorite_not_24"
-                    app:tint="@color/tabIndicatorColor" />
+                android:layout_marginStart="6dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="@dimen/cardCorner"
+                app:contentPadding="8dp"
+                app:strokeColor="@color/tabIndicatorColor"
+                app:strokeWidth="0dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:drawablePadding="4dp"
                     android:gravity="center"
-                    android:text="@string/favTracks" />
+                    android:text="@string/favTracks"
+                    app:drawableTint="@color/tabIndicatorColor"
+                    app:drawableTopCompat="@drawable/ic_baseline_favorite_border_24" />
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </HorizontalScrollView>
 
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
+    <com.ravisharma.playbackmusic.nativetemplates.TemplateView
+        android:id="@+id/my_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:gnt_template_type="@layout/gnt_small_template_view" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginVertical="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="My Playlists"
+            android:gravity="center_vertical"
+            android:text="@string/my_playlists"
             android:textSize="18sp" />
 
         <ImageView
@@ -148,21 +123,19 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/createNewPlaylist"
-            android:padding="12dp"
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
             android:src="@drawable/ic_playlist_add_24" />
 
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/banner_container_playlist"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/playlistRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        tools:listitem="@layout/adapter_playlist"
+        tools:itemCount="6"
         android:clipToPadding="false"
         android:paddingBottom="90dp" />
 

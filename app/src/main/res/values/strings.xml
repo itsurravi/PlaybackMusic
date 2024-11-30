@@ -18,6 +18,11 @@
     <string name="recentSongsActId">ca-app-pub-8188016146639430/3140098926</string>
     <string name="nowPlayingActId">ca-app-pub-8188016146639430/1243729172</string>
     <string name="tracksFragId">ca-app-pub-8188016146639430/7494562314</string>
+    
+    <string name="nativeAdvanceId">ca-app-pub-8188016146639430/1615506674</string>
+    <string name="testNativeAdvanceId">ca-app-pub-3940256099942544/2247696110</string>
+
+    <string name="ad_attribution">Ad</string>
 
     <string name="doit">do</string>
     <string name="prev">prev</string>
@@ -66,9 +71,9 @@
     <string name="mins90">Timer Set To 90 Mins</string>
     <string name="mins120">Timer Set To 120 Mins</string>
     <string name="playlist">Playlist</string>
-    <string name="Tracks">Tracks</string>
-    <string name="Albums">Albums</string>
-    <string name="Artists">Artists</string>
+    <string name="tracks">Tracks</string>
+    <string name="albums">Albums</string>
+    <string name="artists">Artists</string>
     <string name="music_Service">Music Service</string>
     <string name="PlaybackMusicService">PlaybackMusicService</string>
     <string name="Grant">Grant</string>
@@ -106,7 +111,6 @@
     <string name="noSong">No Song for This Category</string>
     <string name="save_as_playlist">Save as Playlist</string>
     <string name="timer">Timer</string>
-    <string name="tracks">Tracks</string>
     <string name="sleep_after">Sleep After:</string>
     <string name="sleep_timer_title">Sleep Timer</string>
     <string name="time_text_off">Off</string>
@@ -145,10 +149,11 @@
     </string-array>
 
     <string-array name="longPressItemsPlaylist">
-        <item>Play Playlist</item>
-        <item>Rename Playlist</item>
-        <item>Delete Playlist</item>
+        <item>Play</item>
+        <item>Rename</item>
+        <item>Delete</item>
     </string-array>
+
     <string-array name="timer">
         <item>15 Minutes</item>
         <item>30 Minutes</item>
@@ -189,4 +194,5 @@
 
     <string name="noSongDialog">noSongDialog</string>
     <string name="noSongFoundToPlay">No Song Found to Play</string>
+    <string name="my_playlists">My Playlists</string>
 </resources>

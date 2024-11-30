@@ -1,8 +1,12 @@
 package com.ravisharma.playbackmusic.new_work.ui.activity
 
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.fragment.NavHostFragment
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.ActivityNewPlayerBinding
@@ -24,6 +28,16 @@ class NewPlayerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
+
+        enableEdgeToEdge(
+            navigationBarStyle = SystemBarStyle.dark(
+                ContextCompat.getColor(this, R.color.colorPrimary)
+            ),
+            statusBarStyle = SystemBarStyle.dark(
+                ContextCompat.getColor(this, R.color.statusBarColor)
+            )
+        )
         setContentView(binding.root)
 
         val navController =

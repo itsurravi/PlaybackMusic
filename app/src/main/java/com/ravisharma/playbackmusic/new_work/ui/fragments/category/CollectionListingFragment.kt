@@ -3,6 +3,8 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.category
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -16,18 +18,23 @@ import coil.load
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.databinding.FragmentCollectionListingBinding
 import com.ravisharma.playbackmusic.new_work.ui.adapters.TracksAdapter
 import com.ravisharma.playbackmusic.new_work.ui.extensions.LongItemClick
+import com.ravisharma.playbackmusic.new_work.ui.extensions.onPlaylistSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.onSongLongPress
 import com.ravisharma.playbackmusic.new_work.ui.extensions.shareSong
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.ArrayList
 
 @AndroidEntryPoint
 class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing) {
@@ -74,29 +81,72 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
 
     private fun initViews() {
         binding.apply {
-            binding.apply {
-                firstLayout.isVisible = true
+            firstLayout.isVisible = true
 
-                songList.apply {
-                    layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                    itemAnimator = DefaultItemAnimator()
-                    addItemDecoration(
-                        DividerItemDecoration(
-                            this.context,
-                            DividerItemDecoration.VERTICAL
-                        )
-                    )
-                    adapter = TracksAdapter(
-                        onItemClick = ::songClicked,
-                        onItemLongClick = ::songLongClicked
-                    )
-                }
+            songList.apply {
+                layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                itemAnimator = DefaultItemAnimator()
+                addItemDecoration(
+                    MaterialDividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
+                    ).apply {
+                        dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                    })
+                adapter = TracksAdapter(
+                    onItemClick = ::songClicked,
+                    onItemLongClick = ::songLongClicked
+                )
+            }
 
-                imageBack1.setOnClickListener {
-                    findNavController().popBackStack()
+            cvPlay.setOnClickListener {
+                collectionViewModel.setQueue(getCurrentList(), 0)
+            }
+            imageBack1.setOnClickListener {
+                findNavController().popBackStack()
+            }
+            imgOptions.setOnClickListener {
+                showMoreOptionsMenu(it)
+            }
+            toolbar.changeStatusBarMargin()
+            songList.changeNavigationBarPadding()
+        }
+    }
+
+    private fun showMoreOptionsMenu(it: View) {
+        PopupMenu(requireContext(), it).apply {
+            menuInflater.inflate(R.menu.collection_menu, menu)
+
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.addToQueue -> {
+                        collectionViewModel.addToQueue(getCurrentList())
+                        true
+                    }
+
+                    R.id.addToPlaylist -> {
+                        val bundle = Bundle().apply {
+                            putStringArrayList(
+                                NavigationConstant.AddToPlaylistSongs,
+                                getCurrentList().map {
+                                    it.location
+                                } as ArrayList<String>
+                            )
+                        }
+                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                        true
+                    }
+
+                    else -> false
                 }
             }
+        }.also {
+            it.show()
         }
+    }
+
+    private fun getCurrentList(): List<Song> {
+        return (binding.songList.adapter as TracksAdapter).getCurrentList()
     }
 
     private fun initObservers() {
@@ -176,53 +226,70 @@ class CollectionListingFragment : Fragment(R.layout.fragment_collection_listing)
 
             if (data.songs.isEmpty()) {
                 noDataFound.noDataLayout.isVisible = true
+                cvPlay.isVisible = false
+                imgOptions.isVisible = false
             } else {
                 noDataFound.noDataLayout.isVisible = false
+                cvPlay.isVisible = true
+                imgOptions.isVisible = true
                 (songList.adapter as TracksAdapter).submitList(data.songs)
             }
         }
     }
 
     private fun songClicked(song: Song, position: Int) {
-        val currentList =
-            (binding.songList.adapter as TracksAdapter).getCurrentList()
-        collectionViewModel.setQueue(currentList, position)
+        collectionViewModel.setQueue(getCurrentList(), position)
     }
 
     private fun songLongClicked(song: Song, position: Int) {
-        requireContext().onSongLongPress(song) { longItemClick ->
-            when (longItemClick) {
-                LongItemClick.Play -> {
-                    songClicked(song, position)
-                }
-
-                LongItemClick.SinglePlay -> {
-                    collectionViewModel.setQueue(listOf(song), 0)
-                }
-
-                LongItemClick.AddToQueue -> {
-                    collectionViewModel.addToQueue(song)
-                }
-
-                LongItemClick.AddToPlaylist -> {
-                    val bundle = Bundle().apply {
-                        putStringArrayList(
-                            NavigationConstant.AddToPlaylistSongs,
-                            arrayListOf(song.location)
-                        )
-                    }
-                    findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
-                }
-
-                LongItemClick.Share -> {
-                    requireContext().shareSong(song.location)
-                }
-
-                LongItemClick.Details -> {
-                    requireContext().showSongInfo(song)
-                }
+        if (reorderListAllowed) {
+            requireActivity().onPlaylistSongLongPress(song) { longItemClick ->
+                longClickItem(longItemClick, song, position)
+            }
+        } else {
+            requireActivity().onSongLongPress(song) { longItemClick ->
+                longClickItem(longItemClick, song, position)
             }
         }
-        requireContext().showToast("song long click")
+    }
+
+    private fun longClickItem(longItemClick: LongItemClick, song: Song, position: Int) {
+        when (longItemClick) {
+            LongItemClick.Play -> {
+                songClicked(song, position)
+            }
+
+            LongItemClick.SinglePlay -> {
+                collectionViewModel.setQueue(listOf(song), 0)
+            }
+
+            LongItemClick.AddToQueue -> {
+                collectionViewModel.addToQueue(song)
+            }
+
+            LongItemClick.RemoveFromList -> {
+                collectionViewModel.removeFromPlaylist(song)
+            }
+
+            LongItemClick.Share -> {
+                requireContext().shareSong(song.location)
+            }
+
+            LongItemClick.Details -> {
+                requireActivity().showSongInfo(song)
+            }
+
+            LongItemClick.AddToPlaylist -> {
+                val bundle = Bundle().apply {
+                    putStringArrayList(
+                        NavigationConstant.AddToPlaylistSongs,
+                        arrayListOf(song.location)
+                    )
+                }
+                findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+            }
+
+            else -> Unit
+        }
     }
 }

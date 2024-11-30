@@ -137,6 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:checked="false"
+            app:thumbTint="@drawable/custom_thumb_drawable"
             app:trackDecorationTint="@color/scrollThumb" />
     </LinearLayout>
 

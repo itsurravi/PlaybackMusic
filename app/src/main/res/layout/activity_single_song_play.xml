@@ -121,8 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/uamp_ic_pause_white_48dp"
-                tools:targetApi="lollipop" />
+                android:src="@drawable/ic_baseline_pause_24" />
 
         </LinearLayout>
 

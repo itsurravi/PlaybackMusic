@@ -2,6 +2,7 @@ package com.ravisharma.playbackmusic.new_work.ui.fragments.home
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -13,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.data.db.model.PlaylistWithSongCount
 import com.ravisharma.playbackmusic.databinding.ActivityAddToPlaylistBinding
-import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
 import com.ravisharma.playbackmusic.new_work.ui.adapters.PlaylistsAdapter
+import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
@@ -85,11 +89,15 @@ class AddToPlaylistFragment : Fragment(R.layout.activity_add_to_playlist) {
             playlistRecycler.apply {
                 layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
                 itemAnimator = DefaultItemAnimator()
-                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+                addItemDecoration(MaterialDividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
+                    dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
+                })
                 adapter = PlaylistsAdapter(
                     onClick = ::onPlaylistClick,
                 )
             }
+            topBar.changeStatusBarPadding()
+            playlistRecycler.changeNavigationBarPadding()
         }
     }
 

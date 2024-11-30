@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -31,11 +32,15 @@ import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
 import com.ravisharma.playbackmusic.databinding.FragmentHomeBinding
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
+import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import com.ravisharma.playbackmusic.new_work.utils.Constants
-import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarColor
+import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarMargin
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.linearGradientBackground
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import com.ravisharma.playbackmusic.new_work.viewmodel.MusicScanViewModel
-import com.ravisharma.playbackmusic.new_work.ui.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,6 +53,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     @Inject
     lateinit var sleepTimerService: SleepTimerService
+
+    @Inject
+    lateinit var themeManager: DynamicThemeManager
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val musicViewModel: MusicScanViewModel by activityViewModels()
@@ -63,11 +71,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             ),
             PendingIntent.FLAG_IMMUTABLE
         )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireActivity().changeStatusBarColor(R.color.colorPrimaryDark)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,6 +101,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initToolbar()
         initClickListeners()
         setupBottomNavigation()
+        binding.appBar.changeStatusBarPadding()
+        binding.bottomNavigationView.changeNavigationBarPadding()
     }
 
     private fun setupBottomNavigation() {
@@ -172,10 +177,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                     R.id.rateUs -> {
                         try {
-                            startActivity(Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-                            ))
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+                                )
+                            )
                         } catch (e: ActivityNotFoundException) {
                             requireContext().showToast(getString(R.string.unableToFindMarketApp))
                         }
@@ -251,9 +258,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     transformations(RoundedCornersTransformation(10f))
                     crossfade(true)
                 }
+
+                setDynamicBackground(it.artUri)
+
                 txtSongName.text = it.title
                 txtSongArtist.text = it.artist
                 progressSong.max = it.durationMillis.toInt()
+            }
+        }
+    }
+
+    private fun setDynamicBackground(artUri: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            artUri?.let {
+                val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
+                color?.let { it1 ->
+                    binding.bottomPanel.linearGradientBackground(it1)
+                }
             }
         }
     }
@@ -264,7 +285,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 txtSongName.isSelected = it
                 txtSongArtist.isSelected = it
                 btnPlayPauseSlide.setImageResource(
-                    if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
+                    if (it) R.drawable.ic_baseline_pause_24 else R.drawable.ic_baseline_play_24
                 )
             }
         }

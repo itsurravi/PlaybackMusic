@@ -103,11 +103,11 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
                 setMediaPlayer(data.data)
             } else {
                 if (player!!.isPlaying) {
-                    binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
+                    binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_play_24)
                     player!!.pause()
                 } else {
                     requestAudioFocus()
-                    binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+                    binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
                     player!!.start()
                 }
             }
@@ -207,7 +207,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
         if (mp.currentPosition > 0) {
             mp.reset()
             binding.seekBar.progress = 0
-            binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
+            binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_play_24)
             player = null
         }
     }
@@ -216,7 +216,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
         played = true
         requestAudioFocus()
         mp.start()
-        binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+        binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
         binding.seekBar.max = mp.duration
         binding.seekBar.postDelayed(mProgressRunner, 100)
         binding.tvTotalDuration.text = String.format(
@@ -236,7 +236,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
             AudioManager.AUDIOFOCUS_GAIN -> {
                 if (!player!!.isPlaying) {
                     player!!.start()
-                    binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_pause_white_48dp)
+                    binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_pause_24)
                 }
                 player!!.setVolume(1.0f, 1.0f)
             }
@@ -244,7 +244,7 @@ class SingleSongPlayActivity : AppCompatActivity(), OnPreparedListener, OnComple
             AudioManager.AUDIOFOCUS_LOSS -> {
                 if (player!!.isPlaying) {
                     player!!.pause()
-                    binding.btnPlayPause.setImageResource(R.drawable.uamp_ic_play_arrow_white_48dp)
+                    binding.btnPlayPause.setImageResource(R.drawable.ic_baseline_play_24)
                 }
                 killApp()
             }

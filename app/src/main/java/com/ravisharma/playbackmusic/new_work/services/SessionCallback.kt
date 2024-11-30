@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@UnstableApi
 @ServiceScoped
 class SessionCallback @Inject constructor(
     @ApplicationContext context: Context,

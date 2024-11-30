@@ -15,8 +15,7 @@ import com.ravisharma.playbackmusic.utils.StartDragListener
 class CurrentQueueViewHolder(
     private var dragListener: StartDragListener,
     val binding: AdapNowPlayingBinding
-) :
-    RecyclerView.ViewHolder(binding.root) {
+) : RecyclerView.ViewHolder(binding.root) {
 
     @SuppressLint("ClickableViewAccessibility")
     fun bind(
@@ -53,12 +52,12 @@ class CurrentQueueViewHolder(
             imgRemove.setOnClickListener {
                 onItemRemoveClick?.let { it1 -> it1(song, bindingAdapterPosition) }
             }
-            ivOrder.setOnTouchListener { v, event ->
+            /*ivOrder.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
                     dragListener.requestDrag(this@CurrentQueueViewHolder)
                 }
                 true
-            }
+            }*/
         }
     }
 }

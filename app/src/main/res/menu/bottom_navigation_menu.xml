@@ -3,18 +3,18 @@
 
     <item
         android:id="@+id/playlistsFragment"
-        android:icon="@drawable/ic_library_music_24"
-        android:title="Playlist" />
+        android:icon="@drawable/bottom_nav_playlist_selector"
+        android:title="@string/playlist" />
     <item
         android:id="@+id/tracksFragment"
-        android:icon="@drawable/ic_title"
-        android:title="Songs" />
+        android:icon="@drawable/bottom_nav_tracks_selector"
+        android:title="@string/tracks" />
     <item
         android:id="@+id/albumsFragment"
-        android:icon="@drawable/ic_album_24"
-        android:title="Albums" />
+        android:icon="@drawable/bottom_nav_album_selector"
+        android:title="@string/albums" />
     <item
         android:id="@+id/artistsFragment"
-        android:icon="@drawable/ic_artist"
-        android:title="Artists" />
+        android:icon="@drawable/bottom_nav_artist_selector"
+        android:title="@string/artists" />
 </menu>

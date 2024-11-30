@@ -27,7 +27,10 @@ import com.ravisharma.playbackmusic.databinding.FragmentPlayerBinding
 import com.ravisharma.playbackmusic.new_work.services.PlaybackBroadcastReceiver
 import com.ravisharma.playbackmusic.new_work.ui.extensions.showSongInfo
 import com.ravisharma.playbackmusic.new_work.utils.Constants
+import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
 import com.ravisharma.playbackmusic.new_work.utils.NavigationConstant
+import com.ravisharma.playbackmusic.new_work.utils.changeNavigationBarPadding
+import com.ravisharma.playbackmusic.new_work.utils.changeStatusBarPadding
 import com.ravisharma.playbackmusic.new_work.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -48,6 +51,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
 
     @Inject
     lateinit var exoPlayer: ExoPlayer
+
+    @Inject
+    lateinit var themeManager: DynamicThemeManager
 
     private var adView: AdView? = null
     private var adUnitId: String? = null
@@ -137,18 +143,29 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                 }
             }
             launch {
-                /*mainViewModel.shuffleMode.collect {
+                mainViewModel.shuffle.collect {
                     updateShuffleMode(it)
-                }*/
+                }
             }
         }
+    }
+
+    private fun updateShuffleMode(isShuffled: Boolean) {
+        /*binding.apply {
+            imgShuffle.imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (isShuffled) R.color.fav_on else R.color.white
+                )
+            )
+        }*/
     }
 
     private fun togglePlaying(playing: Boolean?) {
         playing?.let {
             binding.apply {
                 btnPlayPause.setImageResource(
-                    if (it) R.drawable.uamp_ic_pause_white_48dp else R.drawable.uamp_ic_play_arrow_white_48dp
+                    if (it) R.drawable.ic_baseline_pause_24 else R.drawable.ic_baseline_play_24
                 )
             }
         }
@@ -167,8 +184,11 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                     transformations(RoundedCornersTransformation(20f))
                     crossfade(300)
                 }
+
+//                setDynamicBackground(it.artUri)
+
                 if (it.favourite) {
-                    imgFav.setImageResource(R.drawable.ic_favorite_24)
+                    imgFav.setImageResource(R.drawable.ic_baseline_favorite_24)
                     imgFav.imageTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(
                             requireContext(),
@@ -176,7 +196,7 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                         )
                     )
                 } else {
-                    imgFav.setImageResource(R.drawable.ic_favorite_not_24)
+                    imgFav.setImageResource(R.drawable.ic_baseline_favorite_border_24)
                     imgFav.imageTintList = ColorStateList.valueOf(Color.WHITE)
                 }
 
@@ -186,9 +206,27 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
         }
     }
 
+    /*private fun setDynamicBackground(artUri: String?) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            artUri?.let {
+                val color = themeManager.getBackgroundColorForImageFromUrl(it, requireContext())
+                color?.let { it1 ->
+                    val initialBg = binding.controlBack.background
+                    val newBackground = binding.controlBack.linearGradientBackground(it1)
+                    val transitionDrawable = TransitionDrawable(arrayOf(initialBg, newBackground))
+                    binding.controlBack.background = transitionDrawable
+                    transitionDrawable.startTransition(200)
+
+                }
+            }
+        }
+    }*/
+
     private fun initViews() {
         initSeekbarListener()
         initClickListeners()
+        binding.topBar.changeStatusBarPadding()
+        binding.controlPanel.changeNavigationBarPadding()
     }
 
     /*private fun currentAudioProgress(exoPlayer: ExoPlayer) = flow {
@@ -271,6 +309,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
+//            imgShuffle.setOnClickListener {
+//                mainViewModel.toggleShuffle()
+//            }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)
             }
@@ -293,12 +334,15 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
                                 arrayListOf(currentSong?.location)
                             )
                         }
-                        findNavController().navigate(R.id.action_to_addToPlaylistFragment, bundle)
+                        findNavController().navigate(
+                            R.id.action_to_addToPlaylistFragment,
+                            bundle
+                        )
                         true
                     }
 
                     R.id.info -> {
-                        currentSong?.let { requireContext().showSongInfo(it) }
+                        currentSong?.let { requireActivity().showSongInfo(it) }
                         true
                     }
 

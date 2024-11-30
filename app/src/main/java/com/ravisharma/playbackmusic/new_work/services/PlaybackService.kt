@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
@@ -14,16 +15,17 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.ravisharma.playbackmusic.data.db.model.tables.Song
+import com.ravisharma.playbackmusic.data.provider.SongExtractor
+import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateProvider
+import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationProvider
 import com.ravisharma.playbackmusic.new_work.services.data.QueueService
 import com.ravisharma.playbackmusic.new_work.services.data.SleepTimerService
 import com.ravisharma.playbackmusic.new_work.services.data.SongService
-import com.ravisharma.playbackmusic.data.db.model.tables.Song
-import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.new_work.utils.Constants
-import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateProvider
-import com.ravisharma.playbackmusic.new_work.notification.PlaybackNotificationProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,23 +37,40 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlin.system.exitProcess
 
 @UnstableApi
 @AndroidEntryPoint
-class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBroadcastReceiver.Callback {
+class PlaybackService : MediaSessionService(), QueueService.Listener,
+    PlaybackBroadcastReceiver.Callback {
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
         mediaSession
 
-    @Inject lateinit var songExtractor: SongExtractor
-    @Inject lateinit var queueService: QueueService
-    @Inject lateinit var songService: SongService
-    @Inject lateinit var sleepTimerService: SleepTimerService
-    @Inject lateinit var exoPlayer: ExoPlayer
-    @Inject lateinit var queueStateProvider: QueueStateProvider
-    @Inject lateinit var sessionCallback: SessionCallback
-    @Inject lateinit var notificationProvider: PlaybackNotificationProvider
+    @Inject
+    lateinit var songExtractor: SongExtractor
+
+    @Inject
+    lateinit var queueService: QueueService
+
+    @Inject
+    lateinit var songService: SongService
+
+    @Inject
+    lateinit var sleepTimerService: SleepTimerService
+
+    @Inject
+    lateinit var exoPlayer: ExoPlayer
+
+    @Inject
+    lateinit var queueStateProvider: QueueStateProvider
+
+    @Inject
+    lateinit var sessionCallback: SessionCallback
+
+    @Inject
+    lateinit var notificationProvider: PlaybackNotificationProvider
 
     private var broadcastReceiver: PlaybackBroadcastReceiver? = null
 
@@ -70,7 +89,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         super.onCreate()
         isRunning.set(true)
         broadcastReceiver = PlaybackBroadcastReceiver()
-        mediaSession = MediaSession.Builder(applicationContext, exoPlayer)
+        mediaSession = MediaSession.Builder(this, exoPlayer)
             .setCallback(sessionCallback)
             .setId(System.currentTimeMillis().toString())
             .build()
@@ -87,17 +106,35 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         broadcastReceiver?.startListening(this)
         exoPlayer.addListener(exoPlayerListener)
 
-        /*scope.launch {
-            preferencesProvider.playbackParams.collect {
-                val params = it.toCorrectedParams().toExoPlayerPlaybackParameters()
-                withContext(Dispatchers.Main) {
-                    exoPlayer.playbackParameters = params
+        scope.launch {
+            launch {
+                queueService.repeatMode.collect {
+                    withContext(Dispatchers.Main) {
+                        exoPlayer.repeatMode = it.toExoPlayerRepeatMode()
+                    }
                 }
             }
-        }*/
-        scope.launch {
-            queueService.repeatMode.collect {
-                withContext(Dispatchers.Main) { exoPlayer.repeatMode = it.toExoPlayerRepeatMode() }
+            launch {
+                queueService.shuffle.collect {
+                    withContext(Dispatchers.Main) {
+                        exoPlayer.shuffleModeEnabled = it
+                        try {
+                            val shuffleOrder = CustomShuffleOrder(
+                                exoPlayer.mediaItemCount,
+                                exoPlayer.currentMediaItemIndex,
+                                Random.nextLong(1, 100)
+                            )
+                            exoPlayer.setShuffleOrder(shuffleOrder)
+                            if (exoPlayer.shuffleModeEnabled) {
+                                checkShuffleData(shuffleOrder)
+                            } else {
+                                queueService.updateShuffleIndex(emptyList())
+                            }
+                        } catch (_: Exception) {
+
+                        }
+                    }
+                }
             }
         }
 
@@ -112,28 +149,11 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
                 queueService.setCurrentSong(exoPlayer.currentMediaItemIndex)
                 queueService.getSongAtIndex(exoPlayer.currentMediaItemIndex)?.let { song ->
                     updateNotification(song.favourite)
-                    /*val broadcast = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                        putExtra(WidgetBroadcast.WIDGET_BROADCAST, WidgetBroadcast.SONG_CHANGED)
-                        putExtra("imageUri", song.artUri)
-                        putExtra("title", song.title)
-                        putExtra("artist", song.artist)
-                        putExtra("album", song.album)
-                    }
-                    this@ZenPlayer.applicationContext.sendBroadcast(broadcast)*/
                 }
             } catch (_: Exception) {
 
             }
         }
-
-        /*override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            val broadcast = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                putExtra(WidgetBroadcast.WIDGET_BROADCAST, WidgetBroadcast.IS_PLAYING_CHANGED)
-                putExtra("isPlaying", isPlaying)
-            }
-            this@ZenPlayer.applicationContext.sendBroadcast(broadcast)
-        }*/
 
         override fun onPlayerError(error: PlaybackException) {
             super.onPlayerError(error)
@@ -155,7 +175,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
 
     private fun stopService() {
         isRunning.set(false)
-        if(queueService.queue.isNotEmpty()) {
+        if (queueService.queue.isNotEmpty()) {
             queueStateProvider.saveState(
                 queue = queueService.queue.map { it.location },
                 startIndex = exoPlayer.currentMediaItemIndex,
@@ -211,6 +231,23 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
         }
     }
 
+    private fun checkShuffleData(shuffleOrder: ShuffleOrder) {
+        val list = mutableListOf<Int>()
+        val length = shuffleOrder.length
+        val firstIndex = shuffleOrder.firstIndex
+        val lastIndex = shuffleOrder.lastIndex
+        Log.i("ShuffleOrder", "$length $firstIndex $lastIndex")
+        if (firstIndex > -1) {
+            var index = firstIndex
+            do {
+                list.add(index)
+                Log.i("ShuffleOrder", "Order Value: $index")
+                index = shuffleOrder.getNextIndex(index)
+            } while (index != -1)
+        }
+        queueService.updateShuffleIndex(list)
+    }
+
     override fun onAppend(song: Song) {
         exoPlayer.addMediaItem(song.toMediaItem())
     }
@@ -253,7 +290,14 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
      * Player.Listener onIsPlayingChanged gets called.
      */
     override fun onBroadcastPausePlay() {
-        if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
+        if (exoPlayer.isPlaying) {
+            exoPlayer.pause()
+        } else {
+            if (exoPlayer.playbackState == Player.STATE_ENDED) {
+                exoPlayer.seekTo(0, 0)
+            }
+            exoPlayer.play()
+        }
     }
 
     /**
@@ -305,9 +349,11 @@ class PlaybackService : MediaSessionService(), QueueService.Listener, PlaybackBr
          * To close the media session, first call mediaSession.release followed by stopSelf()
          * See issue: https://github.com/androidx/media/issues/389#issuecomment-1546611545
          */
-        mediaSession?.player?.release()
-        mediaSession?.release()
-        mediaSession = null
+        mediaSession?.run {
+            player.release()
+            release()
+            mediaSession = null
+        }
         stopService()
         stopSelf()
     }

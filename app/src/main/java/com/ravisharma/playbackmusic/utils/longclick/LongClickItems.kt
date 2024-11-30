@@ -161,19 +161,11 @@ class LongClickItems {
     }
 
     private fun itemClick(position: Int) {
-        when (context) {
-            is SearchActivity -> {
-                context.onItemClick(position)
-            }
-        }
+
     }
 
     private fun playSingleOnly(song: Song) {
         val list = arrayListOf(song)
-        when (context) {
-            is SearchActivity -> {
-                context.onItemClick(list)
-            }
-        }
+
     }
 }

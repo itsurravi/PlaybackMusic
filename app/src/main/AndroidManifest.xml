@@ -26,8 +26,11 @@
         android:resizeableActivity="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.App.Starting"
         tools:targetApi="q">
+        <property android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:replace="android:resource"/>
         <activity
             android:name=".activities.SingleSongPlayActivity"
             android:excludeFromRecents="true"
@@ -54,12 +57,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.AboutActivity"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.AddToPlaylistActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.SearchActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
@@ -88,8 +89,8 @@
 
         <service
             android:name=".new_work.services.PlaybackService"
-            android:exported="true"
             android:foregroundServiceType="mediaPlayback"
+            android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />

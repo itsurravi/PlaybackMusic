@@ -30,6 +30,14 @@ interface QueueService {
 
     fun updateRepeatMode(mode: RepeatMode)
 
+    val shuffle: StateFlow<Boolean>
+
+    fun toggleShuffle()
+
+    val shuffledIndex: ArrayList<Int>
+
+    fun updateShuffleIndex(list: List<Int>)
+
     interface Listener {
         fun onAppend(song: Song)
         fun onAppend(songs: List<Song>)
@@ -125,6 +133,7 @@ class QueueServiceImpl() : QueueService {
             clear()
             addAll(songs)
         }
+        _shuffle.update { false }
         val idx = if (startPlayingFromPosition >= songs.size || startPlayingFromPosition < 0) 0
         else startPlayingFromPosition
         _currentSong.update { mutableQueue[idx] }
@@ -149,6 +158,32 @@ class QueueServiceImpl() : QueueService {
     override fun updateRepeatMode(mode: RepeatMode) {
         _repeatMode.update { mode }
     }
+
+    private val _shuffle = MutableStateFlow(false)
+    override val shuffle: StateFlow<Boolean> = _shuffle.asStateFlow()
+
+    override fun toggleShuffle() {
+        _shuffle.update { !it }
+    }
+
+    override val shuffledIndex: ArrayList<Int> = ArrayList()
+
+    override fun updateShuffleIndex(list: List<Int>) {
+        shuffledIndex.clear()
+        if (list.isNotEmpty()) {
+            shuffledIndex.addAll(list)
+        }
+    }
+
+    /*fun shuffleQueue() {
+        val shuffle = true
+        if (!shuffle) {
+            val list = mutableQueue.filter { it.location != currentSong.value?.location }.shuffled()
+            mutableQueue.clear()
+            mutableQueue.add(currentSong.value!!)
+            mutableQueue.addAll(list)
+        }
+    }*/
 
     private val callbacks = ArrayList<QueueService.Listener>()
 

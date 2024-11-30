@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
     val message = _message.asStateFlow()
 
     val allSongs = songService.songs.map {
-        it.filter { song -> song.location.contains(".mp3") }
+        it.filterNot { song -> song.location.lowercase().contains("voice note") }
     }.catch { exception ->
         Log.e("allSongs", "$exception")
     }.stateIn(
@@ -103,8 +103,16 @@ class MainViewModel @Inject constructor(
 
     val repeatMode = queueService.repeatMode
 
+    val shuffle = queueService.shuffle
+
+    val shuffledIndex = queueService.shuffledIndex
+
     fun toggleRepeatMode() {
         queueService.updateRepeatMode(repeatMode.value.next())
+    }
+
+    fun toggleShuffle() {
+        queueService.toggleShuffle()
     }
 
     private val _currentSongPlaying = MutableStateFlow<Boolean?>(null)
