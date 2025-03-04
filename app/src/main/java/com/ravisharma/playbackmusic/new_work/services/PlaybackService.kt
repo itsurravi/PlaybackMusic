@@ -118,7 +118,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener,
                 queueService.shuffle.collect {
                     withContext(Dispatchers.Main) {
                         exoPlayer.shuffleModeEnabled = it
-                        try {
+                        /*try {
                             val shuffleOrder = CustomShuffleOrder(
                                 exoPlayer.mediaItemCount,
                                 exoPlayer.currentMediaItemIndex,
@@ -132,7 +132,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener,
                             }
                         } catch (_: Exception) {
 
-                        }
+                        }*/
                     }
                 }
             }
@@ -231,7 +231,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener,
         }
     }
 
-    private fun checkShuffleData(shuffleOrder: ShuffleOrder) {
+    /*private fun checkShuffleData(shuffleOrder: ShuffleOrder) {
         val list = mutableListOf<Int>()
         val length = shuffleOrder.length
         val firstIndex = shuffleOrder.firstIndex
@@ -246,7 +246,7 @@ class PlaybackService : MediaSessionService(), QueueService.Listener,
             } while (index != -1)
         }
         queueService.updateShuffleIndex(list)
-    }
+    }*/
 
     override fun onAppend(song: Song) {
         exoPlayer.addMediaItem(song.toMediaItem())

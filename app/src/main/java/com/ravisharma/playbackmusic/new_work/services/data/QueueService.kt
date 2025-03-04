@@ -34,9 +34,11 @@ interface QueueService {
 
     fun toggleShuffle()
 
-    val shuffledIndex: ArrayList<Int>
+    fun enableShuffle()
 
-    fun updateShuffleIndex(list: List<Int>)
+//    val shuffledIndex: ArrayList<Int>
+
+//    fun updateShuffleIndex(list: List<Int>)
 
     interface Listener {
         fun onAppend(song: Song)
@@ -166,14 +168,18 @@ class QueueServiceImpl() : QueueService {
         _shuffle.update { !it }
     }
 
-    override val shuffledIndex: ArrayList<Int> = ArrayList()
+    override fun enableShuffle() {
+        _shuffle.update { true }
+    }
 
-    override fun updateShuffleIndex(list: List<Int>) {
+//    override val shuffledIndex: ArrayList<Int> = ArrayList()
+
+    /*override fun updateShuffleIndex(list: List<Int>) {
         shuffledIndex.clear()
         if (list.isNotEmpty()) {
             shuffledIndex.addAll(list)
         }
-    }
+    }*/
 
     /*fun shuffleQueue() {
         val shuffle = true

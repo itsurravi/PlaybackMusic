@@ -151,14 +151,14 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
     }
 
     private fun updateShuffleMode(isShuffled: Boolean) {
-        /*binding.apply {
+        binding.apply {
             imgShuffle.imageTintList = ColorStateList.valueOf(
                 ContextCompat.getColor(
                     requireContext(),
                     if (isShuffled) R.color.fav_on else R.color.white
                 )
             )
-        }*/
+        }
     }
 
     private fun togglePlaying(playing: Boolean?) {
@@ -309,9 +309,9 @@ class PlayerFragment : Fragment(R.layout.fragment_player) {
             imgFav.setOnClickListener {
                 mainViewModel.changeFavouriteValue()
             }
-//            imgShuffle.setOnClickListener {
-//                mainViewModel.toggleShuffle()
-//            }
+            imgShuffle.setOnClickListener {
+                mainViewModel.toggleShuffle()
+            }
             ivMoreOptions.setOnClickListener {
                 showMoreOptionsPopup(it)
             }
