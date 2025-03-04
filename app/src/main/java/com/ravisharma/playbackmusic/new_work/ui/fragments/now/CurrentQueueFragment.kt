@@ -93,14 +93,16 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
                         dividerColor = ContextCompat.getColor(requireContext(), R.color.divider)
                     })
             }.also {
-                val shuffleIndex = mainViewModel.shuffledIndex
+                /*val shuffleIndex = mainViewModel.shuffledIndex
                 val list = if (shuffleIndex.isNotEmpty()) {
                     shuffleIndex.map {
                         mainViewModel.queue[it]
                     }
                 } else {
                     mainViewModel.queue
-                }
+                }*/
+
+                val list = mainViewModel.queue
 
                 currentQueueAdapter.submitList(list) {
                     it.scrollToPosition(list.indexOf(mainViewModel.currentSong.value))
@@ -183,12 +185,14 @@ class CurrentQueueFragment : Fragment(R.layout.fragment_current_queue), StartDra
     }
 
     private fun songClicked(song: Song, position: Int) {
-        val list = mainViewModel.shuffledIndex
+        /*val list = mainViewModel.shuffledIndex
         val index = if (list.isNotEmpty()) {
             list[position]
         } else {
             position
-        }
+        }*/
+        val index = position
+
         mainViewModel.playerHelper.seekTo(index, 0)
     }
 

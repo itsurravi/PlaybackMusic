@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -105,7 +106,7 @@ class MainViewModel @Inject constructor(
 
     val shuffle = queueService.shuffle
 
-    val shuffledIndex = queueService.shuffledIndex
+//    val shuffledIndex = queueService.shuffledIndex
 
     fun toggleRepeatMode() {
         queueService.updateRepeatMode(repeatMode.value.next())
@@ -113,6 +114,10 @@ class MainViewModel @Inject constructor(
 
     fun toggleShuffle() {
         queueService.toggleShuffle()
+    }
+
+    fun enableShuffle() {
+        queueService.enableShuffle()
     }
 
     private val _currentSongPlaying = MutableStateFlow<Boolean?>(null)
@@ -203,7 +208,11 @@ class MainViewModel @Inject constructor(
     /**
      * Shuffle the queue and start playing from first song
      */
-    fun shufflePlay(songs: List<Song>?) = setQueue(songs?.shuffled(), 0)
+    fun shufflePlay(songs: List<Song>?) {
+        val random = Random.nextInt(0, songs?.size ?: 0)
+        setQueue(songs, random)
+        enableShuffle()
+    }
 
     fun onPlaylistCreate(playlistName: String) {
         viewModelScope.launch {
