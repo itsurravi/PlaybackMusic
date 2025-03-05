@@ -13,7 +13,7 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'music2.jks'
-          fileDir: './'
+#          fileDir: './'
           encodedString: ${{ secrets.KEYSTORE_FILE }}
 
       - name: Set Keystore File Path
