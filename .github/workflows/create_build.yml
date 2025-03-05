@@ -11,13 +11,14 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'music2.jks'
-          fileDir: './'
+          fileDir: '${pwd}'
           encodedString: ${{ secrets.KEYSTORE_FILE }}
 
       - name: Set Keystore File Path
-        run: echo "KEYSTORE_FILE=./music2.jks" >> $GITHUB_ENV
+        run: echo "KEYSTORE_FILE=${pwd}/music2.jks" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: set up JDK 17 #17
         uses: actions/setup-java@v4
