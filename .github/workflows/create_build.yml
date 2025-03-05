@@ -13,17 +13,10 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'music2.jks'
-          #          fileDir: './'
           encodedString: ${{ secrets.KEYSTORE_FILE }}
 
       - name: Set Keystore File Path
         run: echo "KEYSTORE_FILE=${{ steps.decode_keystore.outputs.filePath }}" >> $GITHUB_ENV
-
-      - name: Decode Path
-        run: echo "${{ steps.decode_keystore.outputs.filePath }}"
-
-      - name: Debug Environment Variables
-        run: echo "KEYSTORE_FILE=$KEYSTORE_FILE"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +34,7 @@ jobs:
       - name: build prod
         run: ./gradlew app:bundleRelease
         env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+          KEYSTORE_FILE: ${{ steps.decode_keystore.outputs.filePath }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
