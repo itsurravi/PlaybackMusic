@@ -13,6 +13,9 @@ jobs:
           fileName: 'music2.jks'
           encodedString: ${{ secrets.KEYSTORE_FILE }}
 
+      - name: Set Keystore File Path
+        run: echo "KEYSTORE_FILE=$(pwd)/music2.jks" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
 
       - name: set up JDK 17 #17
