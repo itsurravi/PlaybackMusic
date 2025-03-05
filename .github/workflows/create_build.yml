@@ -18,7 +18,9 @@ jobs:
       - name: set up JDK 17 #17
         uses: actions/setup-java@v4
         with:
+          distribution: 'zulu'
           java-version: 17 #17
+          cache: 'gradle'
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
