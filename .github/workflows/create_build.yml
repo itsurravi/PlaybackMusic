@@ -45,11 +45,6 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICE_JSON }}
         run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/google-services.json
 
-      - name: Verify google-services.json
-        run: |
-          ls -la $GITHUB_WORKSPACE/app/
-          cat $GITHUB_WORKSPACE/app/google-services.json
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
