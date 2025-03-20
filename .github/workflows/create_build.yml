@@ -43,7 +43,7 @@ jobs:
       - name: Load Google Service file
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $DATA | base64 -di > $GITHUB_WORKSPACE/app/google-services.json
+        run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/google-services.json
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
