@@ -50,11 +50,6 @@ jobs:
 
       - name: Generate Release Bundle
         run: ./gradlew app:bundleRelease --scan
-        env:
-          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
-          KEY_ALIAS: ${{ env.KEY_ALIAS }}
-          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
