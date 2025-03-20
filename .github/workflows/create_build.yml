@@ -13,6 +13,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      JAVA_VERSION: 17
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
     steps:
       - name: Keystore Check
         id: decode_keystore
@@ -22,43 +28,67 @@ jobs:
           fileName: ${{ secrets.KEYSTORE_FILE_NAME }}
           encodedString: ${{ secrets.KEYSTORE_FILE }}
 
-#      - name: Set Keystore Path
-#        run: echo "KEYSTORE_FILE=${{ steps.decode_keystore.outputs.filePath }}" >> $GITHUB_ENV
+      - name: Set Keystore Path
+        run: echo "KEYSTORE_FILE=${{ steps.decode_keystore.outputs.filePath }}" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setting up JDK #17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: 17 #17
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Generate Release Bundle
-        run: ./gradlew app:bundleRelease
+        run: ./gradlew app:bundleRelease --scan
         env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE_NAME }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_FILE: ${{ env.KEYSTORE_FILE }}
+          KEY_ALIAS: ${{ env.KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
 
-      - name: Upload
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Build Artifacts
+          name: App-Bundle
           path: app/build/outputs
 
-      - name: Deploy Bundle to Google Play
-        if: startsWith(github.ref, 'refs/tags/v')
+#      - name: Deploy Bundle to Google Play
+#        if: startsWith(github.ref, 'refs/tags/v')
+#        uses: r0adkll/upload-google-play@v1.1.3
+#        with:
+#          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+#          serviceAccountJsonPlainText: ${{ secrets.PLAY_AUTH_JSON }}
+#          packageName: com.ravisharma.playbackmusic
+#          track: internal
+#          status: 'completed'
+
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') # Only run for tagged releases
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: App-Bundle
+          path: app/build/outputs/bundle/release/
+
+      - name: Upload to Google Play
         uses: r0adkll/upload-google-play@v1.1.3
         with:
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: app/build/outputs/bundle/release/*.aab
           serviceAccountJsonPlainText: ${{ secrets.PLAY_AUTH_JSON }}
           packageName: com.ravisharma.playbackmusic
           track: internal
-          status: 'completed'
-
+          status: completed
