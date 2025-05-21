@@ -6,11 +6,13 @@ import android.content.Context
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.google.common.util.concurrent.MoreExecutors
+import androidx.work.await
 import com.ravisharma.playbackmusic.data.db.model.tables.Song
 import com.ravisharma.playbackmusic.new_work.services.PlaybackService
 import com.ravisharma.playbackmusic.new_work.services.toMediaItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicLong
 
 interface PlayerService {
@@ -44,33 +46,49 @@ class PlayerServiceImpl(
         queueService.setQueue(songs, startPlayingFromPosition)
         if (isServiceRunning()) return
 
-        val factory = MediaController.Builder(
+        MediaController.Builder(
             context,
             SessionToken(context, ComponentName(context, PlaybackService::class.java))
-        ).buildAsync()
-
-        val repeatMode = queueService.repeatMode.first().toExoPlayerRepeatMode()
-
-        factory.addListener({
-            val mediaController = factory.let {
-                if (it.isDone)
-                    it.get()
-                else
-                    null
-            }
-
-            mediaController?.let {
-                it.stop()
-                it.clearMediaItems()
-                it.addMediaItems(songs.map(Song::toMediaItem))
-                it.prepare()
-                it.seekTo(startPlayingFromPosition, 0)
-                it.repeatMode = repeatMode
+        ).buildAsync().await().apply {
+            withContext(Dispatchers.Main) {
+                stop()
+                clearMediaItems()
+                addMediaItems(songs.map(Song::toMediaItem))
+                prepare()
+                seekTo(startPlayingFromPosition, 0)
+                repeatMode = queueService.repeatMode.first().toExoPlayerRepeatMode()
                 /*playbackParameters = preferenceProvider.playbackParams.value
-                .toCorrectedParams()
-                .toExoPlayerPlaybackParameters()*/
-                it.play()
+                    .toCorrectedParams()
+                    .toExoPlayerPlaybackParameters()*/
+                play()
             }
-        }, MoreExecutors.directExecutor())
+        }
+
+//        val factory = MediaController.Builder(
+//            context,
+//            SessionToken(context, ComponentName(context, PlaybackService::class.java))
+//        ).buildAsync()
+//
+//        factory.addListener({
+//            val mediaController = factory.let {
+//                if (it.isDone)
+//                    it.get()
+//                else
+//                    null
+//            }
+//
+//            mediaController?.let {
+//                it.stop()
+//                it.clearMediaItems()
+//                it.addMediaItems(songs.map(Song::toMediaItem))
+//                it.prepare()
+//                it.seekTo(startPlayingFromPosition, 0)
+//                it.repeatMode = repeatMode
+//                /*playbackParameters = preferenceProvider.playbackParams.value
+//                .toCorrectedParams()
+//                .toExoPlayerPlaybackParameters()*/
+//                it.play()
+//            }
+//        }, MoreExecutors.directExecutor())
     }
 }

@@ -2,7 +2,6 @@ package com.ravisharma.playbackmusic.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.ravisharma.playbackmusic.data.components.DaoCollection
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
 import com.ravisharma.playbackmusic.data.provider.SongExtractor
 import com.ravisharma.playbackmusic.data.utils.Constants
@@ -44,10 +43,10 @@ object DataModule {
     fun providesSongExtractor(
         @ApplicationContext context: Context,
         db: MusicDatabase,
+        applicationScope: CoroutineScope
     ): SongExtractor {
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
         return SongExtractor(
-            scope = scope,
+            scope = applicationScope,
             context = context,
             songDao = db.songDao(),
             albumDao = db.albumDao(),
