@@ -3,10 +3,10 @@ package com.ravisharma.playbackmusic.activities.viewmodel
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.*
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
-import com.ravisharma.playbackmusic.model.Playlist
-import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.model.Song
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.LinkedHashSet
@@ -19,7 +19,7 @@ class AddToPlaylistViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun getAllPlaylists(): MutableLiveData<ArrayList<String>> {
-        return pref.fetchAllPlayList().map {
+        return pref.fetchAllPlayList().asLiveData().map {
             ArrayList(LinkedHashSet(it))
         } as MutableLiveData<ArrayList<String>>
     }

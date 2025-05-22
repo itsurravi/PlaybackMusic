@@ -6,9 +6,9 @@ import android.content.ContentUris
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.MutableLiveData
-import com.ravisharma.playbackmusic.model.Album
-import com.ravisharma.playbackmusic.model.Artist
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Album
+import com.ravisharma.playbackmusic.data.olddb.model.Artist
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import kotlinx.coroutines.*
 
 class SongsProvider {

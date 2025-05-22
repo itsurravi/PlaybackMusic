@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.roomPlugin)
 }
 
 android {
@@ -14,22 +15,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    "room.schemaLocation" to "${projectDir}/schemas",
-                    "room.incremental" to "true"
-                )
-            }
-        }
-    }
-    sourceSets {
-        getByName("androidTest") {
-            assets {
-                srcDirs(files("${projectDir}/schemas"))
-            }
-        }
     }
 
     compileOptions {
@@ -41,10 +26,19 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+ksp {
+    arg("room.generateKotlin", "true")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
+
+    implementation(libs.androidx.datastore)
 
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)

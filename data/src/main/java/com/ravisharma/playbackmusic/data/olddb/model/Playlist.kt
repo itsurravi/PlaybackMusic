@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.model
+package com.ravisharma.playbackmusic.data.olddb.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Embedded

@@ -17,7 +17,7 @@ import com.ravisharma.playbackmusic.adapters.PlaylistAdapter
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.OnPlaylistClicked
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.OnPlaylistLongClicked
 import com.ravisharma.playbackmusic.databinding.ActivityAddToPlaylistBinding
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
 import dagger.hilt.android.AndroidEntryPoint

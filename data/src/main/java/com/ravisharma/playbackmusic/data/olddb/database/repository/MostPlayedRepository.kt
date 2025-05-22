@@ -1,12 +1,9 @@
-package com.ravisharma.playbackmusic.database.repository
+package com.ravisharma.playbackmusic.data.olddb.database.repository
 
-import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.ravisharma.playbackmusic.database.PlaylistDatabase
-import com.ravisharma.playbackmusic.database.dao.MostPlayedDao
-import com.ravisharma.playbackmusic.database.model.MostPlayed
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.database.dao.MostPlayedDao
+import com.ravisharma.playbackmusic.data.olddb.database.model.MostPlayed
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

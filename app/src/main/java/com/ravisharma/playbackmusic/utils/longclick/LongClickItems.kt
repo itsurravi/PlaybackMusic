@@ -18,7 +18,7 @@ import coil.load
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.*
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
 import java.io.File

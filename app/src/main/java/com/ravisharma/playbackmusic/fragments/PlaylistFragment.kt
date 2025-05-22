@@ -25,10 +25,9 @@ import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.OnPlaylistClicked
 import com.ravisharma.playbackmusic.adapters.PlaylistAdapter.OnPlaylistLongClicked
 import com.ravisharma.playbackmusic.databinding.FragmentPlaylistBinding
 import com.ravisharma.playbackmusic.fragments.viewmodels.PlaylistFragmentViewModel
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener
 import com.ravisharma.playbackmusic.utils.alert.PlaylistAlert
-import com.ravisharma.playbackmusic.utils.openFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 

@@ -9,7 +9,7 @@ import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.ravisharma.playbackmusic.R
-import com.ravisharma.playbackmusic.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
 import java.lang.Thread.UncaughtExceptionHandler
 
 class AppRate(private val hostActivity: Activity) {

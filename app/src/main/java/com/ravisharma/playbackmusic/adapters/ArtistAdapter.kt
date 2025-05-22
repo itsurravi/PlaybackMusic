@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ravisharma.playbackmusic.adapters.ArtistAdapter.ArtistViewHolder
 import com.ravisharma.playbackmusic.databinding.AdapterArtistBinding
-import com.ravisharma.playbackmusic.model.Artist
+import com.ravisharma.playbackmusic.data.olddb.model.Artist
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
 class ArtistAdapter(private var artistList: ArrayList<Artist>) :

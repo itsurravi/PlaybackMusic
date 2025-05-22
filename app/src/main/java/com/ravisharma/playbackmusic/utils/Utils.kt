@@ -2,7 +2,7 @@ package com.ravisharma.playbackmusic.utils
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 
 //current playing song
 var curPlayingSong: MutableLiveData<Song> = MutableLiveData()

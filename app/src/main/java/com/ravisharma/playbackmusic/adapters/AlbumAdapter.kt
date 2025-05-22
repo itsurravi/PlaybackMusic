@@ -10,7 +10,7 @@ import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.AlbumViewHolder
 import com.ravisharma.playbackmusic.databinding.AdapterAlbumsBinding
-import com.ravisharma.playbackmusic.model.Album
+import com.ravisharma.playbackmusic.data.olddb.model.Album
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
 class AlbumAdapter : RecyclerView.Adapter<AlbumViewHolder>(),

@@ -9,7 +9,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.AdapSongBinding
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.util.concurrent.TimeUnit
 

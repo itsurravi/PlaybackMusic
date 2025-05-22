@@ -1,4 +1,4 @@
-package com.ravisharma.playbackmusic.prefrences
+package com.ravisharma.playbackmusic.data.olddb.prefrences
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -12,8 +12,6 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.asLiveData
-import com.ravisharma.playbackmusic.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -30,11 +28,11 @@ private val Context.dataStore by preferencesDataStore(
 )
 
 private fun sharedPreferencesMigration(context: Context) =
-    listOf(SharedPreferencesMigration(context, context.getString(R.string.playback_info)))
+    listOf(SharedPreferencesMigration(context, "playback_info"))
 
 class PrefManager @Inject constructor(c: Context) {
 
-    private val Playlist: String = c.getString(R.string.playLists)
+    private val Playlist: String = "PlayLists"
 
     private val dataStore = c.dataStore
 
@@ -121,11 +119,7 @@ class PrefManager @Inject constructor(c: Context) {
         val list =
             dataStore.getValueFlow(stringSetPreferencesKey(Playlist), LinkedHashSet())
                 .first()
-        val l: MutableList<String> = if (list == null) {
-            ArrayList()
-        } else {
-            ArrayList(list)
-        }
+        val l: MutableList<String> = ArrayList(list)
         l.add(playlistName)
         val list2: Set<String> = LinkedHashSet(l)
 
@@ -138,16 +132,12 @@ class PrefManager @Inject constructor(c: Context) {
         val list =
             dataStore.getValueFlow(stringSetPreferencesKey(Playlist), LinkedHashSet())
                 .first()
-        val l: MutableList<String>
-        if (list != null) {
+        val l: MutableList<String> = ArrayList(list)
+        l[l.indexOf(oldName)] = newName
+        val list2: Set<String> = LinkedHashSet(l)
 
-            l = ArrayList(list)
-            l[l.indexOf(oldName)] = newName
-            val list2: Set<String> = LinkedHashSet(l)
-
-            dataStore.edit {
-                it[stringSetPreferencesKey(Playlist)] = list2
-            }
+        dataStore.edit {
+            it[stringSetPreferencesKey(Playlist)] = list2
         }
     }
 
@@ -157,7 +147,7 @@ class PrefManager @Inject constructor(c: Context) {
             LinkedHashSet()
         ).map {
             ArrayList(LinkedHashSet(it))
-        }.asLiveData()
+        }
 
     suspend fun deletePlaylist(playlistName: String) {
         val list = dataStore.getValueFlow(

@@ -9,13 +9,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter
 import com.ravisharma.playbackmusic.adapters.AlbumAdapter.OnAlbumClicked
 import com.ravisharma.playbackmusic.databinding.FragmentAlbumsBinding
-import com.ravisharma.playbackmusic.model.Album
+import com.ravisharma.playbackmusic.data.olddb.model.Album
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.albumList
-import com.ravisharma.playbackmusic.utils.openFragment
 import java.util.*
 
 class AlbumsFragment : Fragment(), OnAlbumClicked {

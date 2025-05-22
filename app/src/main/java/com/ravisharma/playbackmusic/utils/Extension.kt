@@ -7,12 +7,11 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.ravisharma.playbackmusic.MainActivity
 import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.databinding.InfoBinding
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import java.util.concurrent.TimeUnit
 
 fun Context.showSongInfo(song: Song) {

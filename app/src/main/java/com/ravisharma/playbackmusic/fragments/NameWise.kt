@@ -26,10 +26,9 @@ import com.ravisharma.playbackmusic.R
 import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity
 import com.ravisharma.playbackmusic.adapters.SongAdapter
 import com.ravisharma.playbackmusic.databinding.FragmentNameWiseBinding
-import com.ravisharma.playbackmusic.model.Song
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 import java.io.File
 import java.util.*
 

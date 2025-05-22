@@ -1,0 +1,546 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "31ffd443823d0ccb13d2e14b4bdf34f2",
+    "entities": [
+      {
+        "tableName": "new_song_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`location` TEXT NOT NULL, `title` TEXT NOT NULL, `album` TEXT NOT NULL DEFAULT 'Unknown', `size` TEXT NOT NULL, `addedDate` TEXT NOT NULL, `modifiedDate` TEXT NOT NULL, `artist` TEXT NOT NULL DEFAULT 'Unknown', `albumArtist` TEXT NOT NULL DEFAULT 'Unknown', `composer` TEXT NOT NULL DEFAULT 'Unknown', `genre` TEXT NOT NULL DEFAULT 'Unknown', `lyricist` TEXT NOT NULL DEFAULT 'Unknown', `year` INTEGER NOT NULL, `comment` TEXT, `durationMillis` INTEGER NOT NULL, `durationFormatted` TEXT NOT NULL, `bitrate` REAL NOT NULL, `sampleRate` REAL NOT NULL, `bitsPerSample` INTEGER NOT NULL, `mimeType` TEXT, `favourite` INTEGER NOT NULL, `artUri` TEXT, `playCount` INTEGER NOT NULL DEFAULT 0, `lastPlayed` INTEGER, PRIMARY KEY(`location`), FOREIGN KEY(`album`) REFERENCES `new_album_table`(`name`) ON UPDATE NO ACTION ON DELETE SET DEFAULT , FOREIGN KEY(`artist`) REFERENCES `new_artist_table`(`name`) ON UPDATE NO ACTION ON DELETE SET DEFAULT , FOREIGN KEY(`genre`) REFERENCES `new_genre_table`(`genre`) ON UPDATE NO ACTION ON DELETE SET DEFAULT , FOREIGN KEY(`albumArtist`) REFERENCES `new_album_artist_table`(`name`) ON UPDATE NO ACTION ON DELETE SET DEFAULT , FOREIGN KEY(`lyricist`) REFERENCES `new_lyricist_table`(`name`) ON UPDATE NO ACTION ON DELETE SET DEFAULT , FOREIGN KEY(`composer`) REFERENCES `new_composer_table`(`name`) ON UPDATE NO ACTION ON DELETE SET DEFAULT )",
+        "fields": [
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "album",
+            "columnName": "album",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedDate",
+            "columnName": "addedDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "modifiedDate",
+            "columnName": "modifiedDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artist",
+            "columnName": "artist",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "albumArtist",
+            "columnName": "albumArtist",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "composer",
+            "columnName": "composer",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "genre",
+            "columnName": "genre",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "lyricist",
+            "columnName": "lyricist",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'Unknown'"
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "durationMillis",
+            "columnName": "durationMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "durationFormatted",
+            "columnName": "durationFormatted",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bitrate",
+            "columnName": "bitrate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sampleRate",
+            "columnName": "sampleRate",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bitsPerSample",
+            "columnName": "bitsPerSample",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mimeType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "favourite",
+            "columnName": "favourite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artUri",
+            "columnName": "artUri",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "playCount",
+            "columnName": "playCount",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "lastPlayed",
+            "columnName": "lastPlayed",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "location"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_new_song_table_album",
+            "unique": false,
+            "columnNames": [
+              "album"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_album` ON `${TABLE_NAME}` (`album`)"
+          },
+          {
+            "name": "index_new_song_table_artist",
+            "unique": false,
+            "columnNames": [
+              "artist"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_artist` ON `${TABLE_NAME}` (`artist`)"
+          },
+          {
+            "name": "index_new_song_table_albumArtist",
+            "unique": false,
+            "columnNames": [
+              "albumArtist"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_albumArtist` ON `${TABLE_NAME}` (`albumArtist`)"
+          },
+          {
+            "name": "index_new_song_table_composer",
+            "unique": false,
+            "columnNames": [
+              "composer"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_composer` ON `${TABLE_NAME}` (`composer`)"
+          },
+          {
+            "name": "index_new_song_table_genre",
+            "unique": false,
+            "columnNames": [
+              "genre"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_genre` ON `${TABLE_NAME}` (`genre`)"
+          },
+          {
+            "name": "index_new_song_table_lyricist",
+            "unique": false,
+            "columnNames": [
+              "lyricist"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_song_table_lyricist` ON `${TABLE_NAME}` (`lyricist`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "new_album_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "album"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          },
+          {
+            "table": "new_artist_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "artist"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          },
+          {
+            "table": "new_genre_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "genre"
+            ],
+            "referencedColumns": [
+              "genre"
+            ]
+          },
+          {
+            "table": "new_album_artist_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "albumArtist"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          },
+          {
+            "table": "new_lyricist_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "lyricist"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          },
+          {
+            "table": "new_composer_table",
+            "onDelete": "SET DEFAULT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "composer"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "new_album_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `albumArtUri` TEXT, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "albumArtUri",
+            "columnName": "albumArtUri",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_artist_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_playlist_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playlistId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `playlistName` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `artUri` TEXT DEFAULT NULL)",
+        "fields": [
+          {
+            "fieldPath": "playlistId",
+            "columnName": "playlistId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "playlistName",
+            "columnName": "playlistName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artUri",
+            "columnName": "artUri",
+            "affinity": "TEXT",
+            "defaultValue": "NULL"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "playlistId"
+          ]
+        }
+      },
+      {
+        "tableName": "new_playlist_song_cross_ref_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playlistId` INTEGER NOT NULL, `location` TEXT NOT NULL, PRIMARY KEY(`playlistId`, `location`), FOREIGN KEY(`playlistId`) REFERENCES `new_playlist_table`(`playlistId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`location`) REFERENCES `new_song_table`(`location`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "playlistId",
+            "columnName": "playlistId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "playlistId",
+            "location"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_new_playlist_song_cross_ref_table_location",
+            "unique": false,
+            "columnNames": [
+              "location"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_new_playlist_song_cross_ref_table_location` ON `${TABLE_NAME}` (`location`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "new_playlist_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "playlistId"
+            ],
+            "referencedColumns": [
+              "playlistId"
+            ]
+          },
+          {
+            "table": "new_song_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "location"
+            ],
+            "referencedColumns": [
+              "location"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "new_genre_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`genre` TEXT NOT NULL, PRIMARY KEY(`genre`))",
+        "fields": [
+          {
+            "fieldPath": "genre",
+            "columnName": "genre",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "genre"
+          ]
+        }
+      },
+      {
+        "tableName": "new_album_artist_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_composer_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "new_lyricist_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "thumbnail_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`location` TEXT NOT NULL, `addedOn` INTEGER NOT NULL, `artCount` INTEGER NOT NULL, `deleteThis` INTEGER NOT NULL, PRIMARY KEY(`location`))",
+        "fields": [
+          {
+            "fieldPath": "location",
+            "columnName": "location",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedOn",
+            "columnName": "addedOn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artCount",
+            "columnName": "artCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleteThis",
+            "columnName": "deleteThis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "location"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_thumbnail_table_location",
+            "unique": true,
+            "columnNames": [
+              "location"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_thumbnail_table_location` ON `${TABLE_NAME}` (`location`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '31ffd443823d0ccb13d2e14b4bdf34f2')"
+    ]
+  }
+}

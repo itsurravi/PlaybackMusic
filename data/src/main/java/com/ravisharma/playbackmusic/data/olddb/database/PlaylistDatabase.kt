@@ -1,29 +1,26 @@
-package com.ravisharma.playbackmusic.database
+package com.ravisharma.playbackmusic.data.olddb.database
 
 import android.content.Context
-import androidx.lifecycle.map
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ravisharma.playbackmusic.R
-import com.ravisharma.playbackmusic.database.dao.LastPlayedDao
-import com.ravisharma.playbackmusic.database.dao.MostPlayedDao
-import com.ravisharma.playbackmusic.database.dao.PlaylistDao
-import com.ravisharma.playbackmusic.database.model.LastPlayed
-import com.ravisharma.playbackmusic.database.model.MostPlayed
-import com.ravisharma.playbackmusic.model.Playlist
-import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.prefrences.PrefManager
-import com.ravisharma.playbackmusic.prefrences.TinyDB
+import com.ravisharma.playbackmusic.data.olddb.database.dao.LastPlayedDao
+import com.ravisharma.playbackmusic.data.olddb.database.dao.MostPlayedDao
+import com.ravisharma.playbackmusic.data.olddb.database.dao.PlaylistDao
+import com.ravisharma.playbackmusic.data.olddb.database.model.LastPlayed
+import com.ravisharma.playbackmusic.data.olddb.database.model.MostPlayed
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.model.Song
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.prefrences.TinyDB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Database(entities = [Playlist::class, MostPlayed::class, LastPlayed::class], version = 3)
 abstract class PlaylistDatabase : RoomDatabase() {
@@ -88,7 +85,7 @@ abstract class PlaylistDatabase : RoomDatabase() {
         private fun transferSongsInDB() {
             val tinydb = TinyDB(context)
             val p = PrefManager(context!!)
-            val fav = context!!.getString(R.string.favTracks)
+            val fav = "My Favorites"
 
             val list = ArrayList<String>()
 
@@ -96,9 +93,8 @@ abstract class PlaylistDatabase : RoomDatabase() {
                 list.add(fav)
                 val differ = async {
                     try {
-                        p.fetchAllPlayList().value!!
-                    }
-                    catch (e: Exception){
+                        p.fetchAllPlayList().first()
+                    } catch (e: Exception) {
                         ArrayList<String>()
                     }
                 }

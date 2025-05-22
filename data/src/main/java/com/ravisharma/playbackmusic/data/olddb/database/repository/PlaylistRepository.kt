@@ -1,12 +1,9 @@
-package com.ravisharma.playbackmusic.database.repository
+package com.ravisharma.playbackmusic.data.olddb.database.repository
 
-import android.content.Context
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.ravisharma.playbackmusic.database.PlaylistDatabase
-import com.ravisharma.playbackmusic.database.dao.PlaylistDao
-import com.ravisharma.playbackmusic.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.database.dao.PlaylistDao
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
 import javax.inject.Inject
 import javax.inject.Singleton
 
