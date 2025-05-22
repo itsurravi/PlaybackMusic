@@ -7,7 +7,6 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.sevices)
     alias(libs.plugins.firebase.crashlytics)
@@ -35,6 +34,10 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    sourceSets["main"].java.srcDirs(
+        "build/generated/source/proto/main/java",
+        "build/generated/source/proto/main/kotlin"
+    )
     signingConfigs {
         create("release") {
             if (keystorePropertiesFile.exists()) {
@@ -94,14 +97,8 @@ androidComponents {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
 
-            val kspTaskName = "ksp${capName}Kotlin"
-            val protoTaskName = "generate${capName}Proto"
-
-            val kspTask = tasks.named(kspTaskName)
-            val protoTask = tasks.named(protoTaskName)
-
-            kspTask.configure {
-                dependsOn(protoTask)
+            tasks.getByName<KotlinJvmCompile>("ksp${capName}Kotlin") {
+                setSource(tasks.getByName("generate${capName}Proto").outputs)
             }
         }
     }
@@ -166,6 +163,7 @@ dependencies {
     implementation(libs.androidx.core.splash)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.glide)
+    ksp(libs.glideKsp)
 }
 allprojects {
     tasks.withType<KotlinJvmCompile>().configureEach {

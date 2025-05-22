@@ -1,7 +1,7 @@
 package com.ravisharma.playbackmusic.new_work.data_migrate_old_to_new
 
 import androidx.annotation.WorkerThread
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.data.olddb.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.new_work.services.data.PlaylistService
 import javax.inject.Inject
 import javax.inject.Singleton

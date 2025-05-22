@@ -1,13 +1,12 @@
-package com.ravisharma.playbackmusic.prefrences;
+package com.ravisharma.playbackmusic.data.olddb.prefrences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.text.TextUtils;
 
-import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.data.olddb.model.Song;
 import com.google.gson.Gson;
-import com.ravisharma.playbackmusic.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,7 +17,7 @@ public class TinyDB {
     private final SharedPreferences preferences;
 
     public TinyDB(Context appContext) {
-        preferences = appContext.getSharedPreferences(appContext.getString(R.string.DB), Context.MODE_PRIVATE);
+        preferences = appContext.getSharedPreferences("DB", Context.MODE_PRIVATE);
     }
 
     public void putListString(String key, ArrayList<String> stringList) {

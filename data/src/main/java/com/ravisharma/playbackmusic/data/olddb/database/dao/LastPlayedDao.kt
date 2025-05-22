@@ -1,10 +1,10 @@
-package com.ravisharma.playbackmusic.database.dao
+package com.ravisharma.playbackmusic.data.olddb.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.ravisharma.playbackmusic.database.model.LastPlayed
+import com.ravisharma.playbackmusic.data.olddb.database.model.LastPlayed
 
 @Dao
 interface LastPlayedDao {

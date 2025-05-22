@@ -3,12 +3,15 @@ package com.ravisharma.playbackmusic;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import android.Manifest;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -18,6 +21,8 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
@@ -29,10 +34,10 @@ import android.app.PendingIntent;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import com.ravisharma.playbackmusic.broadcast.NotificationHandler;
-import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository;
-import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository;
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository;
-import com.ravisharma.playbackmusic.model.Song;
+import com.ravisharma.playbackmusic.data.olddb.database.repository.LastPlayedRepository;
+import com.ravisharma.playbackmusic.data.olddb.database.repository.MostPlayedRepository;
+import com.ravisharma.playbackmusic.data.olddb.database.repository.PlaylistRepository;
+import com.ravisharma.playbackmusic.data.olddb.model.Song;
 import com.ravisharma.playbackmusic.utils.UtilsKt;
 
 import javax.inject.Inject;
@@ -358,6 +363,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } else {
                 playerNotification.actions[0] = new Notification.Action(R.drawable.ic_baseline_favorite_border_24, "Favorite", retrievePlaybackIntent(1));
             }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             notificationManagerCompat.notify(id, playerNotification);
         }
     }
@@ -444,6 +459,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             playerNotification.actions[2] = new Notification.Action(R.drawable.ic_baseline_pause_24, "PlayPause", retrievePlaybackIntent(3));
         } else {
             playerNotification.actions[2] = new Notification.Action(R.drawable.ic_baseline_play_24, "PlayPause", retrievePlaybackIntent(3));
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
         notificationManagerCompat.notify(id, playerNotification);
     }

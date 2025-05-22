@@ -1,10 +1,10 @@
-package com.ravisharma.playbackmusic.database.dao
+package com.ravisharma.playbackmusic.data.olddb.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.ravisharma.playbackmusic.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
 
 @Dao
 interface PlaylistDao {

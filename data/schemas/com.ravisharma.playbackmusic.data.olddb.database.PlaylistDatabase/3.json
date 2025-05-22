@@ -1,0 +1,218 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "698d408d47d69e4ca866f34cc56fcacf",
+    "entities": [
+      {
+        "tableName": "playlistTable",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playlistId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `playlistName` TEXT NOT NULL, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "playlistId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "playlistName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.artist",
+            "columnName": "artist",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.art",
+            "columnName": "art",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.data",
+            "columnName": "data",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.dateModified",
+            "columnName": "dateModified",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.album",
+            "columnName": "album",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.composer",
+            "columnName": "composer",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "playlistId"
+          ]
+        }
+      },
+      {
+        "tableName": "mostPlayed",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playedCount` INTEGER NOT NULL, `playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "playCount",
+            "columnName": "playedCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "playedId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "song.id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.artist",
+            "columnName": "artist",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.art",
+            "columnName": "art",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.data",
+            "columnName": "data",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.dateModified",
+            "columnName": "dateModified",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.album",
+            "columnName": "album",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.composer",
+            "columnName": "composer",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "playedId"
+          ]
+        }
+      },
+      {
+        "tableName": "lastPlayed",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playedId` INTEGER PRIMARY KEY AUTOINCREMENT, `id` INTEGER NOT NULL, `title` TEXT, `artist` TEXT, `art` TEXT, `duration` INTEGER NOT NULL, `data` TEXT, `dateModified` TEXT, `album` TEXT, `composer` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "playedId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "song.id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.artist",
+            "columnName": "artist",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.art",
+            "columnName": "art",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.duration",
+            "columnName": "duration",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "song.data",
+            "columnName": "data",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.dateModified",
+            "columnName": "dateModified",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.album",
+            "columnName": "album",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "song.composer",
+            "columnName": "composer",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "playedId"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '698d408d47d69e4ca866f34cc56fcacf')"
+    ]
+  }
+}

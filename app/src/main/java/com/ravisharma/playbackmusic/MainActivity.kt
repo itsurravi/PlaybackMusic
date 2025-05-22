@@ -59,10 +59,10 @@ import com.ravisharma.playbackmusic.MusicService.MusicBinder
 import com.ravisharma.playbackmusic.activities.AboutActivity
 import com.ravisharma.playbackmusic.activities.EqualizerActivity
 import com.ravisharma.playbackmusic.broadcast.Timer
-import com.ravisharma.playbackmusic.database.model.LastPlayed
-import com.ravisharma.playbackmusic.database.model.MostPlayed
-import com.ravisharma.playbackmusic.database.repository.LastPlayedRepository
-import com.ravisharma.playbackmusic.database.repository.MostPlayedRepository
+import com.ravisharma.playbackmusic.data.olddb.database.model.LastPlayed
+import com.ravisharma.playbackmusic.data.olddb.database.model.MostPlayed
+import com.ravisharma.playbackmusic.data.olddb.database.repository.LastPlayedRepository
+import com.ravisharma.playbackmusic.data.olddb.database.repository.MostPlayedRepository
 import com.ravisharma.playbackmusic.databinding.ActivityMainBinding
 import com.ravisharma.playbackmusic.databinding.AlertPopupMessageBinding
 import com.ravisharma.playbackmusic.databinding.AlertTimerBinding
@@ -70,10 +70,10 @@ import com.ravisharma.playbackmusic.equalizer.model.EqualizerModel
 import com.ravisharma.playbackmusic.equalizer.model.EqualizerSettings
 import com.ravisharma.playbackmusic.equalizer.model.Settings
 import com.ravisharma.playbackmusic.fragments.*
-import com.ravisharma.playbackmusic.model.Playlist
-import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.prefrences.PrefManager
-import com.ravisharma.playbackmusic.prefrences.TinyDB
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.model.Song
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.prefrences.TinyDB
 import com.ravisharma.playbackmusic.provider.SongsProvider
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
@@ -1148,7 +1148,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
         }
     }
 
-    override fun onBackPressed() {
+    /*override fun onBackPressed() {
         if (binding.slidingLayout.panelState == PanelState.EXPANDED ||
             binding.slidingLayout.panelState == PanelState.ANCHORED
         ) {
@@ -1176,7 +1176,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, NameWise.OnFragm
                 )
             }
         }
-    }
+    }*/
 
     private fun killApp() {
         if (musicSrv != null) {

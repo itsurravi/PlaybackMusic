@@ -1,9 +1,9 @@
 package com.ravisharma.playbackmusic.fragments.viewmodels
 
 import androidx.lifecycle.*
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
-import com.ravisharma.playbackmusic.model.Playlist
-import com.ravisharma.playbackmusic.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ class PlaylistFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun getAllPlaylists(): MutableLiveData<ArrayList<String>> {
-        return prefManager.fetchAllPlayList().map {
+        return prefManager.fetchAllPlayList().asLiveData().map {
             ArrayList(LinkedHashSet(it))
         } as MutableLiveData<ArrayList<String>>
     }

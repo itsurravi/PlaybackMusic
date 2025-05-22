@@ -31,9 +31,9 @@ import com.ravisharma.playbackmusic.activities.AddToPlaylistActivity
 import com.ravisharma.playbackmusic.adapters.NowPlayingAdapter
 import com.ravisharma.playbackmusic.databinding.AlertListBinding
 import com.ravisharma.playbackmusic.databinding.FragmentNowPlayingBinding
-import com.ravisharma.playbackmusic.model.Playlist
-import com.ravisharma.playbackmusic.model.Song
-import com.ravisharma.playbackmusic.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.model.Playlist
+import com.ravisharma.playbackmusic.data.olddb.model.Song
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
 import com.ravisharma.playbackmusic.provider.SongsProvider.Companion.songListByName
 import com.ravisharma.playbackmusic.utils.*
 import com.ravisharma.playbackmusic.utils.alert.AlertClickListener

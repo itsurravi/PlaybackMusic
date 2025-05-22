@@ -16,9 +16,9 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
 import com.ravisharma.playbackmusic.data.db.MusicDatabase
-import com.ravisharma.playbackmusic.database.PlaylistDatabase
-import com.ravisharma.playbackmusic.database.dao.PlaylistDao
-import com.ravisharma.playbackmusic.database.repository.PlaylistRepository
+import com.ravisharma.playbackmusic.data.olddb.database.PlaylistDatabase
+import com.ravisharma.playbackmusic.data.olddb.database.dao.PlaylistDao
+import com.ravisharma.playbackmusic.data.olddb.database.repository.PlaylistRepository
 import com.ravisharma.playbackmusic.new_work.utils.Constants
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueState
 import com.ravisharma.playbackmusic.new_work.data_proto.QueueStateSerializer
@@ -37,8 +37,8 @@ import com.ravisharma.playbackmusic.new_work.services.data.SongService
 import com.ravisharma.playbackmusic.new_work.services.data.SongServiceImpl
 import com.ravisharma.playbackmusic.new_work.utils.DrawableFromUrlUseCase
 import com.ravisharma.playbackmusic.new_work.utils.DynamicThemeManager
-import com.ravisharma.playbackmusic.prefrences.PrefManager
-import com.ravisharma.playbackmusic.prefrences.TinyDB
+import com.ravisharma.playbackmusic.data.olddb.prefrences.PrefManager
+import com.ravisharma.playbackmusic.data.olddb.prefrences.TinyDB
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
