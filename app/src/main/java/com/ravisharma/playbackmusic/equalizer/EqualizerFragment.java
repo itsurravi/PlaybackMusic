@@ -1,3 +1,4 @@
+/*
 package com.ravisharma.playbackmusic.equalizer;
 
 import android.annotation.SuppressLint;
@@ -17,7 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
-import com.ravisharma.playbackmusic.MainActivity;
+//import com.ravisharma.playbackmusic.MainActivity;
 import com.ravisharma.playbackmusic.R;
 import com.ravisharma.playbackmusic.equalizer.model.Settings;
 
@@ -111,10 +112,10 @@ public class EqualizerFragment extends Fragment {
                 Settings.equalizerModel.setEqualizerEnabled(isChecked);
                 Settings.equalizerModel.setEqualizerReloaded(isChecked);
 
-                MainActivity.Companion.getInstance().mEqualizer.setEnabled(isChecked);
-                MainActivity.Companion.getInstance().bassBoost.setEnabled(isChecked);
-                MainActivity.Companion.getInstance().virtualizer.setEnabled(isChecked);
-                MainActivity.Companion.getInstance().presetReverb.setEnabled(isChecked);
+//                MainActivity.Companion.getInstance().mEqualizer.setEnabled(isChecked);
+//                MainActivity.Companion.getInstance().bassBoost.setEnabled(isChecked);
+//                MainActivity.Companion.getInstance().virtualizer.setEnabled(isChecked);
+//                MainActivity.Companion.getInstance().presetReverb.setEnabled(isChecked);
 
                 if (isChecked) {
                     equalizerBlocker.setVisibility(View.INVISIBLE);
@@ -459,4 +460,4 @@ public class EqualizerFragment extends Fragment {
     }
 
 
-}
+}*/
