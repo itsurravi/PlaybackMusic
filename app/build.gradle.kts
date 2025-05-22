@@ -1,10 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import java.util.Locale
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.sevices)
     alias(libs.plugins.firebase.crashlytics)
@@ -30,6 +33,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     signingConfigs {
         create("release") {
@@ -89,8 +93,15 @@ androidComponents {
             val capName = variant.name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
-            tasks.getByName<KotlinCompile>("ksp${capName}Kotlin") {
-                setSource(tasks.getByName("generate${capName}Proto").outputs)
+
+            val kspTaskName = "ksp${capName}Kotlin"
+            val protoTaskName = "generate${capName}Proto"
+
+            val kspTask = tasks.named(kspTaskName)
+            val protoTask = tasks.named(protoTaskName)
+
+            kspTask.configure {
+                dependsOn(protoTask)
             }
         }
     }
@@ -157,9 +168,9 @@ dependencies {
     implementation(libs.glide)
 }
 allprojects {
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = libs.versions.jvm.get()
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvm.get()))
         }
     }
 }
