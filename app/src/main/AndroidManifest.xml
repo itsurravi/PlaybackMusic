@@ -13,7 +13,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:name=".PlaybackApp"
@@ -60,12 +59,6 @@
             android:theme="@style/AppTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.AddToPlaylistActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
             android:name=".new_work.ui.activity.NewPlayerActivity"
             android:exported="true"
             android:launchMode="singleTask"
@@ -80,12 +73,6 @@
                 <category android:name="android.intent.category.APP_MUSIC" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".MusicService"
-            android:exported="true"
-            android:foregroundServiceType="mediaPlayback"
-            tools:ignore="ExportedService" />
 
         <service
             android:name=".new_work.services.PlaybackService"
@@ -107,18 +94,6 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".broadcast.NotificationHandler"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="prev" />
-                <action android:name="playPause" />
-                <action android:name="next" />
-                <action android:name="close" />
-                <action android:name="favorite" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".broadcast.Timer" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
