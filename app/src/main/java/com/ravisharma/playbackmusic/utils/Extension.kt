@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.ravisharma.playbackmusic.R
+import com.ravisharma.playbackmusic.data.olddb.model.Song
 import com.ravisharma.playbackmusic.databinding.InfoBinding
-import com.ravisharma.playbackmusic.model.Song
 import java.util.concurrent.TimeUnit
 
 fun Context.showSongInfo(song: Song) {

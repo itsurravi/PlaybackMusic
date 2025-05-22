@@ -43,7 +43,7 @@ room = "2.7.1"
 slidinguppanel = "3.4.0"
 splashVersion = "1.0.1"
 verticalseekbar = "1.0.0"
-workRuntimeKtx = "2.10.1"
+workRuntimeKtx = "2.8.1"
 junit = "4.13.2"
 media3 = "1.5.0"
 
