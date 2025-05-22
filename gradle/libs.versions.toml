@@ -2,7 +2,7 @@
 compileSdk = "35"
 minSdk = "21"
 versionCode = "72"
-versionName = "2.9.5"
+versionName = "2.9.6"
 jvm = "17"
 
 appUpdate = "2.1.0"
