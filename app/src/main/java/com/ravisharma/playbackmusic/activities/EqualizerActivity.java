@@ -1,3 +1,4 @@
+/*
 package com.ravisharma.playbackmusic.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,4 +25,4 @@ public class EqualizerActivity extends AppCompatActivity {
                 .replace(R.id.eqFrame, equalizerFragment)
                 .commit();
     }
-}
+}*/

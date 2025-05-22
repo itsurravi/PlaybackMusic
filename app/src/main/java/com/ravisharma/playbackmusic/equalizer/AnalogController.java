@@ -9,7 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.ravisharma.playbackmusic.R;
-import com.ravisharma.playbackmusic.equalizer.EqualizerFragment;
+//import com.ravisharma.playbackmusic.equalizer.EqualizerFragment;
 
 public class AnalogController extends View {
 
@@ -60,11 +60,11 @@ public class AnalogController extends View {
         circlePaint.setStyle(Paint.Style.FILL);
 
         circlePaint2 = new Paint();
-        circlePaint2.setColor(EqualizerFragment.themeColor);
+//        circlePaint2.setColor(EqualizerFragment.themeColor);
         circlePaint2.setStyle(Paint.Style.FILL);
 
         linePaint = new Paint();
-        linePaint.setColor(EqualizerFragment.themeColor);
+//        linePaint.setColor(EqualizerFragment.themeColor);
         linePaint.setStrokeWidth(7);
 
         angle = "0.0";
@@ -101,7 +101,7 @@ public class AnalogController extends View {
         float x2 = midx + (float) (radius * ((float) 3 / 5) * Math.sin(2 * Math.PI * (1.0 - tmp2)));
         float y2 = midy + (float) (radius * ((float) 3 / 5) * Math.cos(2 * Math.PI * (1.0 - tmp2)));
 
-        circlePaint.setColor(EqualizerFragment.themeColor);
+//        circlePaint.setColor(EqualizerFragment.themeColor);
 
         canvas.drawCircle(midx, midy, radius * ((float) 11.5 / 15), circlePaint);
 
