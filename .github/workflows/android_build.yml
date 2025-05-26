@@ -45,13 +45,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Load Google Service file
+      - name: Load Google Service file for Debug
         env:
           DATA: ${{ secrets.GOOGLE_SERVICE_JSON_DEBUG }}
-        run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/google-services.json
+        run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/src/debug/google-services.json
+
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICE_JSON }}
+        run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/src/release/google-services.json
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew buildDebug
+        run: ./gradlew build
