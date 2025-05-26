@@ -11,8 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JAVA_VERSION: 17
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
     steps:
+      - name: Keystore Check
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: ${{ secrets.KEYSTORE_FILE_NAME }}
+          encodedString: ${{ secrets.KEYSTORE_FILE }}
+
+      - name: Set Keystore Path
+        run: echo "KEYSTORE_FILE=${{ steps.decode_keystore.outputs.filePath }}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
 
