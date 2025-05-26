@@ -25,3 +25,6 @@ A simple Android application that plays locally stored audio files, allowing pla
 
 - [Android Developers](https://developer.android.com/)
 - [Material Design](https://material.io/design)
+
+
+https://PlayBadges.pavi2410.me/badge/full?id=com.ravisharma.playbackmusic
