@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  debug-build:
     runs-on: ubuntu-latest
     env:
       JAVA_VERSION: 17
@@ -55,3 +55,52 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew buildDebug
+
+  release-build:
+    runs-on: ubuntu-latest
+    env:
+      JAVA_VERSION: 17
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    steps:
+      - name: Keystore Check
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: ${{ secrets.KEYSTORE_FILE_NAME }}
+          encodedString: ${{ secrets.KEYSTORE_FILE }}
+
+      - name: Set Keystore Path
+        run: echo "KEYSTORE_FILE=${{ steps.decode_keystore.outputs.filePath }}" >> $GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Cache Gradle and wrapper
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICE_JSON }}
+        run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/google-services.json
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew buildRelease
