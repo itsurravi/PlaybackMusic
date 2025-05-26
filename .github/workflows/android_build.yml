@@ -47,7 +47,7 @@ jobs:
 
       - name: Load Google Service file
         env:
-          DATA: ${{ secrets.GOOGLE_SERVICE_JSON }}
+          DATA: ${{ secrets.GOOGLE_SERVICE_JSON_DEBUG }}
         run: echo $DATA | base64 --decode > $GITHUB_WORKSPACE/app/google-services.json
 
       - name: Make Gradle executable
