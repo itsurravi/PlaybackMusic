@@ -1,4 +1,4 @@
-# <a href="Playback Music Logo"><img src="/logo.png" align="left" height="60px" width="60px" ></a> <h1>Playback Music Player</h1>
+# <p align="center"><a href="Playback Music Logo"><img src="/logo.png" align="left" height="60px" width="60px" ></a> <h1>Playback Music Player</h1></p>
 
 A simple Android application that plays locally stored audio files, allowing playback in the background while using other apps. This project leverages modern Android libraries to provide a seamless user experience.
 
