@@ -12,7 +12,7 @@ firebasePerfPlugin = "1.4.2"
 googleServicesVersion = "4.4.2"
 hiltVersion = "2.56.2"
 kotlinVersion = "2.1.20"
-kspVersion = "2.1.20-1.0.32"
+kspVersion = "2.1.21-2.0.1"
 paletteKtx = "1.0.0"
 protoPlugin = "0.9.1"
 
