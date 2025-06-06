@@ -7,7 +7,7 @@ jvm = "17"
 
 appUpdate = "2.1.0"
 androidGradlePlugin = "8.10.0"
-firebaseCrashlyticsPlugin = "3.0.3"
+firebaseCrashlyticsPlugin = "3.0.4"
 firebasePerfPlugin = "1.4.2"
 googleServicesVersion = "4.4.2"
 hiltVersion = "2.56.2"
