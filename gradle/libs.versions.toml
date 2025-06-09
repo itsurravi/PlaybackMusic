@@ -17,7 +17,7 @@ paletteKtx = "1.0.0"
 protoPlugin = "0.9.1"
 
 activityKtx = "1.10.1"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 androidSpinkit = "1.4.0"
 coil = "2.7.0"
 constraintlayout = "2.2.1"
